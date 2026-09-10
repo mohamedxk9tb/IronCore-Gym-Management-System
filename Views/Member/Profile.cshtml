@@ -1,0 +1,12 @@
+@{
+    ViewData["Title"] = "Profile"; ViewData["Dashboard"] = true;
+}
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = "Your profile",
+    ["Description"] =
+"Profile structure reserved for the member experience.",
+    ["Eyebrow"] = "Member"
+})
+<div class="content-panel">    <p class="text-secondary">Profile fields and account settings will be added with the identity implementation.</p>
+</div>

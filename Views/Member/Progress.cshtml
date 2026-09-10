@@ -1,0 +1,11 @@
+@{
+    ViewData["Title"] = "My Progress";
+    ViewData["Dashboard"] = true;
+}
+<partial name="_PageHeader" model='new Dictionary<string, string> { ["Title"] = "My progress", ["Description"] = "Static demo measurements for your next coaching review.", ["Eyebrow"] = "Member area" }' />
+<div class="row g-3 mb-4"><div class="col-sm-6 col-xl-3"><article class="stat-card"><span>Current weight</span><strong>78.4</strong><p>kg today</p></article></div><div class="col-sm-6 col-xl-3"><article class="stat-card"><span>Starting weight</span><strong>82.0</strong><p>kg / 04 June</p></article></div><div class="col-sm-6 col-xl-3"><article class="stat-card"><span>Target weight</span><strong>76.0</strong><p>kg / current block</p></article></div><div class="col-sm-6 col-xl-3"><article class="stat-card"><span>Goal progress</span><strong>60%</strong><p>3.6 kg completed</p></article></div></div>
+<div class="row g-4"><div class="col-lg-8"><section class="content-panel h-100"><div class="d-flex justify-content-between align-items-start gap-3"><div><p class="section-kicker">Weight history</p><h2 class="panel-title">Measured progress</h2></div><span class="status-pill">-3.6 kg overall</span></div><div class="progress-chart"><canvas id="weightProgressChart" aria-label="Weight progress from 82 kilograms in June to 78.4 kilograms in October" role="img"></canvas></div></section></div><div class="col-lg-4"><section class="content-panel h-100"><p class="section-kicker">Current direction</p><h2 class="panel-title">On course.</h2><p class="text-secondary">Your current weekly average supports a sustainable cut while preserving strength.</p><div class="metric-list"><div><span>Waist</span><strong>84 cm</strong></div><div><span>Strength index</span><strong>+18%</strong></div><div><span>Next review</span><strong>04 Oct</strong></div></div></section></div></div>
+@section Scripts {
+    <script src="~/lib/chart.js/chart.umd.min.js"></script>
+    <script src="~/js/progress-chart.js" asp-append-version="true"></script>
+}

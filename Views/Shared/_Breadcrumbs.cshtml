@@ -1,0 +1,7 @@
+<nav class="breadcrumb-iron" aria-label="Breadcrumb">
+    <a asp-controller="Home" asp-action="Index">IRONCORE</a>
+    <span>/</span>
+    <span>@(ViewData["Section"] ?? ViewContext.RouteData.Values["controller"])</span>
+    <span>/</span>
+    <strong>@(ViewData["Title"] ?? ViewContext.RouteData.Values["action"])</strong>
+</nav>

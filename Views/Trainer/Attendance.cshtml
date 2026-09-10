@@ -1,0 +1,18 @@
+@{
+    ViewData["Title"] = "Attendance"; ViewData["Dashboard"] = true;
+}
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = "Attendance",
+    ["Description"] =
+"Review attendance across your sessions.",
+    ["Eyebrow"] = "Trainer operations"
+})
+<div class="row g-4">    <div class="col-md-4">@await Html.PartialAsync("_StatCard", new Dictionary<string, string> { ["Title"] = "This week", ["Value"] = "91%", ["Icon"] = "01", ["Description"] = "Average attendance" })</div>
+    <div class="col-md-8">
+        <section class="content-panel">
+            <h2 class="panel-title">Attendance trend</h2>
+            <div class="chart-placeholder"></div>
+        </section>
+    </div>
+</div>

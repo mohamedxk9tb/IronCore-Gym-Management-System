@@ -1,0 +1,19 @@
+@{
+    ViewData["Title"] = "My Bookings"; ViewData["Dashboard"] = true;
+}
+<partial name="_PageHeader"
+         model='new Dictionary<string, string> { ["Title"] = "My bookings", ["Description"] = "Upcoming sessions and your training history.", ["Eyebrow"] = "Member area" }' />
+<div class="content-panel mb-4">
+    <h2 class="panel-title">Upcoming</h2>
+    <div class="booking-row">
+        <div>
+            <p class="section-kicker">Today - 18:00</p>
+            <h3>Engine Room</h3><span>Conditioning Floor - Sarah Nabil</span>
+        </div><span class="status-pill">Confirmed</span><button class="btn btn-iron-outline btn-sm">Cancel</button>
+    </div>
+</div>
+<div class="content-panel">
+    <h2 class="panel-title">Past sessions</h2>
+    <partial name="_EmptyState"
+             model='new Dictionary<string, string> { ["Title"] = "No history yet", ["Description"] = "Completed sessions will appear here after your first visit." }' />
+</div>

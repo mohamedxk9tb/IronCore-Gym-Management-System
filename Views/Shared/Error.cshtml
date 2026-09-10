@@ -1,0 +1,19 @@
+@model ErrorViewModel
+@{
+    ViewData["Title"] = "System Error";
+}
+<section class="error-surface container-xxl">
+    <div class="error-copy">
+        <p class="section-kicker">500 / Internal server error</p>
+        <h1>The server missed a rep.</h1>
+        <p>Our systems could not complete that request. Return to the floor and try again.</p>
+        <div class="error-actions">
+            <a class="btn btn-iron" asp-controller="Home" asp-action="Index">Back to IRONCORE</a>
+            <a class="btn btn-iron-outline" href="">Try again</a>
+        </div>
+    </div>
+    <div class="error-image-panel">
+        <img class="error-illustration" src="~/images/svg404-500/500.png" alt="IRONCORE server repair illustration"
+             onerror="this.hidden=true" />
+    </div>
+</section>

@@ -1,0 +1,42 @@
+@{
+    ViewData["Title"] = "Class Schedule";
+}
+<section class="page-surface container-xxl">
+    <header class="public-page-header">
+        <p class="section-kicker">This week</p>
+        <h1>Class schedule.</h1>
+        <p>Book the work that moves you forward. Capacity is shown live for every session.</p>
+    </header>
+    <div class="schedule-toolbar"><strong>Monday 14 October</strong><span>Week 42 / 2026</span></div>
+    <div class="row g-4">
+        <div class="col-md-6 col-xl-4">
+            <article class="class-card"><img src="~/images/classes/class-strength.png" alt="Strength class" />
+                <div>
+                    <p class="section-kicker">06:30 · Studio Alpha</p>
+                    <h2>Strength Foundations</h2>
+                    <p>Coach Omar Hassan · 8 seats remaining</p><a class="btn btn-iron" asp-controller="Account"
+                                                                  asp-action="Login">Book class</a>
+                </div>
+            </article>
+        </div>
+        <div class="col-md-6 col-xl-4">
+            <article class="class-card"><img src="~/images/classes/class-conditioning.png" alt="Conditioning class" />
+                <div>
+                    <p class="section-kicker">18:00 · Conditioning Floor</p>
+                    <h2>Engine Room</h2>
+                    <p>Coach Sarah Nabil · 4 seats remaining</p><a class="btn btn-iron" asp-controller="Account"
+                                                                  asp-action="Login">Book class</a>
+                </div>
+            </article>
+        </div>
+        <div class="col-md-6 col-xl-4">
+            <article class="class-card class-card-full"><img src="~/images/classes/class-yoga.png"
+                                                                 alt="Mobility class" />
+                <div>
+                    <p class="section-kicker">19:30 · Recovery Studio</p>
+                    <h2>Mobility Reset</h2>
+                    <p>Coach Adam Kareem · Full</p><button class="btn btn-secondary" disabled>Class full</button>
+                </div>
+            </article>
+        </div>
+    </div></section>

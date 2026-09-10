@@ -1,0 +1,43 @@
+@{
+    ViewData["Title"] = "Payments"; ViewData["Dashboard"] = true;
+}
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = "Payments",
+    ["Description"] =
+"Collected revenue and receipt records.",
+    ["Eyebrow"] = "Operations"
+})<section class="content-panel">
+<div class="table-responsive">
+    <table class="table table-iron">
+        <thead>
+            <tr>
+                <th>Member</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Method</th>
+                <th>Status</th>
+                <th>Receipt</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Alex Morgan</td>
+                <td>$79.00</td>
+                <td>04 Oct 2026</td>
+                <td>Card ---- 4488</td>
+                <td><span class="status-pill">Paid</span></td>
+                <td><a class="text-link" asp-controller="Admin" asp-action="Payments">View receipt</a></td>
+            </tr>
+            <tr>
+                <td>Samira Khan</td>
+                <td>$1,299.00</td>
+                <td>22 Sep 2026</td>
+                <td>Transfer</td>
+                <td><span class="status-pill">Paid</span></td>
+                <td><a class="text-link" asp-controller="Admin" asp-action="Payments">View receipt</a></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</section>

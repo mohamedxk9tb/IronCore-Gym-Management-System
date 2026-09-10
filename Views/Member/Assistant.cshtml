@@ -1,0 +1,112 @@
+@{
+    ViewData["Title"] = "AI Coach";
+    ViewData["Section"] = "Member";
+    ViewData["Dashboard"] = true;
+}
+
+<header class="page-header assistant-page-header">
+    <div>
+        <p class="section-kicker">IRONCORE / AI COACH</p>
+        <h1>Your personal<br />training assistant</h1>
+        <p>Get quick guidance about training, nutrition, recovery, and your current fitness routine.</p>
+    </div>
+</header>
+
+<div class="assistant-workspace">
+    <section class="ai-chat-panel" aria-labelledby="aiCoachTitle">
+        <header class="ai-chat-header">
+            <div>
+                <div class="ai-coach-title"><span class="ai-coach-mark">IC</span><h2 id="aiCoachTitle">IRONCORE AI COACH</h2></div>
+                <p><span class="status-dot"></span> Online <span class="ai-header-separator">/</span> Your training companion</p>
+            </div>
+            <button class="btn ai-clear-button" type="button" data-ai-clear>Clear chat</button>
+        </header>
+
+        <div class="ai-message-log" data-ai-log aria-live="polite">
+            <article class="ai-message ai-message-coach">
+                <span class="ai-message-label">IRONCORE COACH</span>
+                <p>Hey Mohamed. What do you want to work on today?</p>
+            </article>
+            <article class="ai-message ai-message-member">
+                <span class="ai-message-label">YOU</span>
+                <p>I want to improve my strength but I only have three training days this week.</p>
+            </article>
+            <article class="ai-message ai-message-coach">
+                <span class="ai-message-label">IRONCORE COACH</span>
+                <p>That’s enough to build a focused plan. I’d prioritize full-body strength sessions with progressive overload and enough recovery between sessions.</p>
+            </article>
+        </div>
+
+        <p class="ai-empty-state" data-ai-empty hidden>Start a conversation with your IRONCORE coach.</p>
+        <p class="ai-error-state" data-ai-error hidden>Something went wrong. Try again.</p>
+
+        <div class="ai-composer-area">
+            <div class="ai-prompt-row" aria-label="Quick prompts">
+                <button type="button" class="ai-prompt-chip" data-ai-prompt="Build a workout">Build a workout</button>
+                <button type="button" class="ai-prompt-chip" data-ai-prompt="Improve my diet">Improve my diet</button>
+                <button type="button" class="ai-prompt-chip" data-ai-prompt="Check my progress">Check my progress</button>
+                <button type="button" class="ai-prompt-chip" data-ai-prompt="Recovery advice">Recovery advice</button>
+                <button type="button" class="ai-prompt-chip" data-ai-prompt="What should I train today?">What should I train today?</button>
+            </div>
+            <form class="ai-composer" data-ai-form>
+                <label class="visually-hidden" for="aiCoachInput">Ask your AI fitness coach</label>
+                <input id="aiCoachInput" class="form-control" data-ai-input autocomplete="off" maxlength="280" placeholder="Ask your AI fitness coach..." />
+                <button class="btn btn-iron" type="submit">Send <span aria-hidden="true">↗</span></button>
+            </form>
+        </div>
+    </section>
+
+    <aside class="ai-side-rail" aria-label="Training snapshot and coaching topics">
+        <section class="ai-info-panel">
+            <p class="section-kicker">Member 04 / Live snapshot</p>
+            <h2>Your training snapshot</h2>
+            <dl class="ai-snapshot-list">
+                <div><dt>Current plan</dt><dd>Elite Performance</dd></div>
+                <div><dt>Current weight</dt><dd>82.4 <small>kg</small></dd></div>
+                <div><dt>Goal</dt><dd>Build Muscle</dd></div>
+                <div><dt>Fitness level</dt><dd>Intermediate</dd></div>
+            </dl>
+            <div class="ai-next-class"><span>Next class</span><strong>Strength Fundamentals</strong><small>Today · 6:00 PM</small></div>
+        </section>
+        <section class="ai-info-panel ai-help-panel">
+            <p class="section-kicker">What I can help with</p>
+            <ul>
+                <li>Training</li><li>Nutrition</li><li>Recovery</li><li>Progress</li><li>Class recommendations</li>
+            </ul>
+        </section>
+    </aside>
+</div>
+
+@section Scripts {
+<script>
+(() => {
+    const panel = document.querySelector('.ai-chat-panel');
+    if (!panel) return;
+    const log = panel.querySelector('[data-ai-log]');
+    const input = panel.querySelector('[data-ai-input]');
+    const empty = panel.querySelector('[data-ai-empty]');
+    const form = panel.querySelector('[data-ai-form]');
+    const welcome = log.innerHTML;
+    const escapeHtml = value => { const node = document.createElement('div'); node.textContent = value; return node.innerHTML; };
+    const message = (role, label, text) => `<article class="ai-message ai-message-${role}"><span class="ai-message-label">${label}</span><p>${escapeHtml(text)}</p></article>`;
+    const scroll = () => { log.scrollTop = log.scrollHeight; };
+    const send = text => {
+        const cleanText = text.trim();
+        if (!cleanText) return;
+        empty.hidden = true;
+        log.insertAdjacentHTML('beforeend', message('member', 'YOU', cleanText));
+        log.insertAdjacentHTML('beforeend', '<article class="ai-thinking" data-ai-thinking><span></span><span></span><span></span> Thinking...</article>');
+        input.value = '';
+        scroll();
+        window.setTimeout(() => {
+            panel.querySelector('[data-ai-thinking]')?.remove();
+            log.insertAdjacentHTML('beforeend', message('coach', 'IRONCORE COACH', 'For this week, keep the priority simple: choose three compound lifts, track one small progression in each session, and leave a rest day between your hardest workouts.'));
+            scroll();
+        }, 700);
+    };
+    panel.querySelectorAll('[data-ai-prompt]').forEach(button => button.addEventListener('click', () => { input.value = button.dataset.aiPrompt; input.focus(); }));
+    form.addEventListener('submit', event => { event.preventDefault(); send(input.value); });
+    panel.querySelector('[data-ai-clear]').addEventListener('click', () => { log.innerHTML = ''; empty.hidden = false; input.value = ''; input.focus(); });
+})();
+</script>
+}

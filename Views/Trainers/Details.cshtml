@@ -1,0 +1,21 @@
+@model TrainerProfile
+@{
+    ViewData["Title"] = $"{Model.Name} | Trainer Profile";
+}
+<section class="page-surface container-xxl">
+    <a class="back-link" asp-controller="Trainers" asp-action="Index">&larr; Back to trainers</a>
+    <div class="trainer-profile">
+        <img src="~/images/trainers/@Model.ImageFile" alt="@Model.Name, IRONCORE coach" />
+        <div>
+            <p class="section-kicker">@Model.Specialty</p>
+            <h1>@Model.Name.</h1>
+            <p class="profile-rating">&#9733; @Model.Rating / 5 &middot; @Model.Experience</p>
+            <p class="profile-copy">@Model.Biography</p>
+            <div class="profile-facts">
+                <div><span>Specialty</span><strong>@Model.Specialty</strong></div>
+                <div><span>Certificates</span><strong>@string.Join(" · ", Model.Certifications)</strong></div>
+                <div><span>Classes</span>@foreach (var trainingClass in Model.Classes) { <strong>@trainingClass</strong> }</div>
+            </div>
+        </div>
+    </div>
+</section>

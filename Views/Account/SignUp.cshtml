@@ -1,0 +1,25 @@
+@{
+    ViewData["Title"] = "Sign Up";
+    ViewData["AuthPage"] = true;
+}
+<main class="auth-stage" aria-labelledby="signup-title">
+    <header class="auth-stage-header">
+        <a class="auth-back-link" asp-controller="Home" asp-action="Index">&larr; Back to Home</a>
+        <a class="auth-logo" asp-controller="Home" asp-action="Index" aria-label="IRONCORE home"><img src="~/images/brand/ironcore-logo.svg" alt="IRONCORE Gym and Fitness" /></a>
+    </header>
+    <section class="auth-editorial" aria-label="IRONCORE training message"><h1>Forge your<br />strongest<br /><span>self.</span></h1><p>Train harder. Move better. Become stronger.</p></section>
+    <section class="auth-card auth-card--signup" data-auth-card>
+        @await Html.PartialAsync("_AuthPandaPanel", new Dictionary<string, string> { ["Image"] = Url.Content("~/images/auth/panda-signup.png"), ["Alt"] = "IRONCORE panda mascot for sign up" })
+        <section class="auth-form-panel" aria-labelledby="signup-title">
+            <div class="auth-form-content">
+            <p class="auth-kicker">IRONCORE / New member</p><h2 id="signup-title">Create account</h2><p class="auth-form-intro">Three details. A better training rhythm.</p>
+            <form class="auth-form" data-auth-form data-auth-mode="signup" novalidate>
+                <div class="auth-field"><label for="Email">Email</label><input class="auth-input" id="Email" name="Email" type="email" autocomplete="email" placeholder="you@example.com" required aria-describedby="EmailError" /><span class="auth-error" id="EmailError" data-error-for="Email" aria-live="polite"></span></div>
+                <div class="auth-field"><label for="Password">Password</label><div class="auth-input-wrap"><input class="auth-input auth-password-input" id="Password" name="Password" type="password" autocomplete="new-password" placeholder="Create a password" required aria-describedby="PasswordHint PasswordError" /><button class="auth-visibility" type="button" data-password-toggle="Password" aria-label="Show password">Show</button></div><div class="auth-strength" data-password-strength><div class="auth-strength-track" aria-hidden="true"><span></span><span></span><span></span></div><span class="auth-strength-label">Use 8+ characters with a mix of letters and numbers</span></div><span class="auth-error" id="PasswordError" data-error-for="Password" aria-live="polite"></span></div>
+                <div class="auth-field"><label for="ConfirmPassword">Confirm Password</label><div class="auth-input-wrap"><input class="auth-input auth-password-input" id="ConfirmPassword" name="ConfirmPassword" type="password" autocomplete="new-password" placeholder="Re-enter your password" required aria-describedby="ConfirmPasswordError" /><button class="auth-visibility" type="button" data-password-toggle="ConfirmPassword" aria-label="Show confirm password">Show</button></div><span class="auth-error" id="ConfirmPasswordError" data-error-for="ConfirmPassword" aria-live="polite"></span></div>
+                <button class="btn btn-iron auth-submit" type="submit" data-auth-submit>Create account</button><p class="auth-status" data-auth-status aria-live="polite"></p>
+            </form><p class="auth-switch">Already have an account? <a asp-controller="Account" asp-action="Login" data-auth-switch>Login</a></p>
+            </div>
+        </section>
+    </section>
+</main>

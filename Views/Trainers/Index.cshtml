@@ -1,0 +1,13 @@
+@model IReadOnlyList<TrainerProfile>
+@{
+    ViewData["Title"] = "Coaches";
+}
+<section class="page-surface container-xxl">
+    <header class="public-page-header"><p class="section-kicker">The coach team</p><h1>People who know the work.</h1><p>Specialists in strength, conditioning, mobility, and the discipline between sessions.</p></header>
+    <div class="row g-4 trainer-grid">
+        @foreach (var trainer in Model)
+        {
+            <div class="col-sm-6 col-lg-3"><article class="trainer-card"><img src="~/images/trainers/@trainer.ImageFile" alt="@trainer.Name, IRONCORE coach" onerror="this.hidden=true" /><div><p class="section-kicker">@trainer.Specialty</p><h2>@trainer.Name</h2><p class="trainer-rating">Rating @trainer.Rating / 5</p><a class="text-link" asp-controller="Trainers" asp-action="Details" asp-route-id="@trainer.Id">View profile</a></div></article></div>
+        }
+    </div>
+</section>

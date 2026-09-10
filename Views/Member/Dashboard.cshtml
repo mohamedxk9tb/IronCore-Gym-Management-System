@@ -1,0 +1,21 @@
+@{
+    ViewData["Title"] = "Member dashboard";
+    ViewData["Section"] = "Member";
+    ViewData["Dashboard"] = true;
+}
+<header class="page-header">
+    <div><p class="section-kicker">Member area / Performance plan</p><h1>Good morning, Marcus.</h1><p>Your current training week is on track. Membership active through 26 September.</p></div>
+    <a class="btn btn-iron" asp-controller="Member" asp-action="CheckIn">Check in</a>
+</header>
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3"><article class="stat-card"><span>Days remaining</span><strong>18</strong><p>Renews 26 September</p></article></div>
+    <div class="col-sm-6 col-xl-3"><article class="stat-card"><span>Membership</span><strong>Active</strong><p>Performance plan</p></article></div>
+    <div class="col-sm-6 col-xl-3"><article class="stat-card"><span>Monthly attendance</span><strong>12</strong><p>86% of your goal</p></article></div>
+    <div class="col-sm-6 col-xl-3"><article class="stat-card"><span>Next class</span><strong>18:00</strong><p>Engine Room / Today</p></article></div>
+</div>
+<div class="row g-4">
+    <div class="col-lg-7"><section class="content-panel h-100"><p class="section-kicker">Up next / Today</p><h2 class="panel-title">Engine Room</h2><p class="text-secondary">18:00–19:00 · Conditioning Floor · Coach Sarah Nabil</p><div class="d-flex flex-wrap gap-2 mt-4"><a class="btn btn-iron" asp-controller="Member" asp-action="Bookings">View booking</a><a class="btn btn-iron-outline" asp-controller="Member" asp-action="Classes">Browse schedule</a></div></section></div>
+    <div class="col-lg-5"><section class="content-panel h-100"><h2 class="panel-title">Quick actions</h2><div class="quick-actions"><a asp-controller="Member" asp-action="FitnessPlan">Review fitness plan</a><a asp-controller="Member" asp-action="Progress">Log progress snapshot</a><a asp-controller="Member" asp-action="Profile">Update profile</a></div></section></div>
+    <div class="col-lg-7"><section class="content-panel h-100"><h2 class="panel-title">Recent activity</h2><div class="timeline"><p><strong>Yesterday</strong> — Checked in for Olympic Barbell.</p><p><strong>12 Sep</strong> — Completed your weekly mobility target.</p><p><strong>10 Sep</strong> — Weight check recorded: 78.4 kg.</p></div></section></div>
+    <div class="col-lg-5"><section class="content-panel h-100"><p class="section-kicker">Progress snapshot</p><h2 class="panel-title">78.4 kg</h2><p class="text-secondary">1.2 kg closer to your 76 kg target this month.</p><div class="progress progress-iron" role="progressbar" aria-label="Weight goal progress" aria-valuenow="68" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width:68%"></div></div></section></div>
+</div>

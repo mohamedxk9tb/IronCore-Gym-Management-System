@@ -1,0 +1,41 @@
+@{
+    ViewData["Title"] = "Classes"; ViewData["Dashboard"] = true;
+}
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = "Classes",
+    ["Description"] =
+"Schedules, capacity, and coaches.",
+    ["Eyebrow"] = "Manage classes"
+})
+<section class="content-panel">
+    <div class="admin-toolbar"><input class="form-control" placeholder="Search classes"
+                                          aria-label="Search classes" /><select class="form-select">
+        <option>All days</option>
+        <option>Monday</option>
+        <option>Tuesday</option>
+    </select></div>
+    <div class="table-responsive">
+        <table class="table table-iron">
+            <thead>
+                <tr>
+                    <th>Class</th>
+                    <th>Coach</th>
+                    <th>Schedule</th>
+                    <th>Capacity</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Engine Room</td>
+                    <td>Sarah Nabil</td>
+                    <td>Mon / Wed - 18:00</td>
+                    <td>16</td>
+                    <td><a asp-action="ClassesEdit" asp-route-id="1">Edit</a> - <a asp-action="ClassesDetails"
+                                                                                       asp-route-id="1">View</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>

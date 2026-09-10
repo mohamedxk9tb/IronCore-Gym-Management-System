@@ -1,0 +1,8 @@
+@if (TempData["Success"] is string success)
+{
+    <div class="toast-container position-fixed top-0 end-0 p-3">    <div class="toast toast-iron show">
+        <div class="toast-body"><strong>Updated</strong> @success <button type="button"
+                                                                              class="btn-close btn-close-white float-end" data-bs-dismiss="toast"></button></div>
+        </div>
+    </div>
+}

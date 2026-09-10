@@ -1,0 +1,50 @@
+@{
+    ViewData["Title"] = "Membership Plans";
+}
+<section class="page-surface container-xxl">
+    <header class="public-page-header">
+        <p class="section-kicker">Membership</p>
+        <h1>Choose your training base.</h1>
+        <p>Simple plans for consistent work, considered coaching, and measurable progress.</p>
+    </header>
+    <div class="row g-4 plan-cards">
+        <div class="col-lg-4">
+            <article class="plan-card">
+                <p class="section-kicker">Monthly</p>
+                <h2>Foundation</h2><strong>$49 <small>/ month</small></strong>
+                <p>Full training floor access and a coached induction.</p>
+                <ul>
+                    <li>Open gym access</li>
+                    <li>Progress check-ins</li>
+                    <li>Locker facilities</li>
+                </ul><a class="btn btn-iron-outline w-100" asp-controller="Account" asp-action="SignUp">Choose
+                foundation</a>
+            </article>
+        </div>
+        <div class="col-lg-4">
+            <article class="plan-card plan-featured"><span class="plan-label">Most selected</span>
+                <p class="section-kicker">Quarterly</p>
+                <h2>Performance</h2><strong>$219 <small>/ quarter</small></strong>
+                <p>Unlimited coached sessions for athletes who want structure.</p>
+                <ul>
+                    <li>Everything in Foundation</li>
+                    <li>Unlimited group classes</li>
+                    <li>Monthly goal review</li>
+                </ul><a class="btn btn-iron w-100" asp-controller="Account" asp-action="SignUp">Choose performance</a>
+            </article>
+        </div>
+        <div class="col-lg-4">
+            <article class="plan-card">
+                <p class="section-kicker">Yearly</p>
+                <h2>Coached</h2><strong>$1,299 <small>/ year</small></strong>
+                <p>Personal programming, coaching, and recovery support.</p>
+                <ul>
+                    <li>Everything in Performance</li>
+                    <li>Personal programming</li>
+                    <li>Recovery consultations</li>
+                </ul><a class="btn btn-iron-outline w-100" asp-controller="Account" asp-action="SignUp">Choose
+                coached</a>
+            </article>
+        </div>
+    </div>
+</section>

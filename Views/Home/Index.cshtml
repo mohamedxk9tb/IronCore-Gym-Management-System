@@ -1,0 +1,175 @@
+@{
+    ViewData["Title"] = "Train Hard. Live Stronger.";
+}
+<section class="hero-section">
+    <div class="container-xxl hero-grid">
+        <div class="hero-copy">
+            <div class="live-label"><span class="status-dot"></span>High intensity performance facility</div>
+            <h1>Train hard.<br /><span>Live stronger.</span></h1>
+            <p class="hero-lead">IRONCORE is a dedicated strength facility for people who want more from every session:
+                better coaching, better equipment, and better recovery.</p>
+                <div class="d-flex flex-wrap gap-3"><a class="btn btn-iron btn-lg" href="#plans">Join now - 14 day
+                    pass</a><a class="btn btn-iron-outline btn-lg" href="#classes">View membership plans</a></div>
+                    <div class="hero-telemetry"><span>Live floor occupancy</span><strong>41% optimal capacity</strong><small>74
+                        athletes currently training</small></div>
+                    </div>
+                    <div class="hero-visual" role="img" aria-label="IRONCORE Olympic lifting platform"><img
+                        src="~/images/hero/hero-main.png" alt="IRONCORE training mascot in the gym" />
+                        <div class="hero-visual-copy"><span>Main platform active</span><strong>Zone 01: Olympic
+                            Rig</strong><small><i class="status-dot"></i>Clear and sanitized</small></div>
+                        </div>
+                    </div>
+                </section>
+                <section class="metric-strip">
+                    <div class="container-xxl">
+                        <div class="row g-0">
+                            <div class="col-6 col-lg-3 metric-item"><strong>18,000</strong><span>sq ft of purpose-built training</span>
+                            </div>
+                            <div class="col-6 col-lg-3 metric-item"><strong>42+</strong><span>coached sessions weekly</span></div>
+                            <div class="col-6 col-lg-3 metric-item"><strong>14</strong><span>master trainers on staff</span></div>
+                            <div class="col-6 col-lg-3 metric-item"><strong>99.4%</strong><span>member goal completion</span></div>
+                        </div>
+                    </div>
+                </section>
+                <section class="section-space facility-section">
+                    <div class="container-xxl">
+                        <div class="section-heading">
+                            <div>
+                                <p class="section-kicker">Built for longevity and power</p>
+                                <h2>Facility pillars</h2>
+                            </div>
+                            <p>Every square foot is planned around work that compounds: strength, conditioning, mobility, and recovery.
+                            </p>
+                        </div>
+                        <div class="row g-0 facility-grid">
+                            <article class="col-md-6 col-xl-3 feature-panel"><b>01</b>
+                                <h3>Heavy iron</h3>
+                                <p>Competition bars, calibrated plates, squat cages, and oak deadlift platforms.</p><a
+                                href="#classes">Explore platforms</a>
+                            </article>
+                            <article class="col-md-6 col-xl-3 feature-panel"><b>02</b>
+                                <h3>Functional arena</h3>
+                                <p>Sprint turf, sleds, rowers, assault bikes, and ballistic throw walls.</p><a href="#classes">View
+                                arena</a>
+                            </article>
+                            <article class="col-md-6 col-xl-3 feature-panel"><b>03</b>
+                                <h3>Recovery suite</h3>
+                                <p>Mobility tools, cold immersion, and considered recovery protocols.</p><a href="#plans">Recovery
+                                protocols</a>
+                            </article>
+                            <article class="col-md-6 col-xl-3 feature-panel"><b>04</b>
+                                <h3>Precision coaching</h3>
+                                <p>Coaches turn clear assessment data into sessions with intent.</p><a href="#trainers">Meet the
+                                coaches</a>
+                            </article>
+                        </div>
+                    </div>
+                </section>
+                <section id="classes" class="section-space section-surface">
+                    <div class="container-xxl">
+                        <div class="section-heading">
+                            <div>
+                                <p class="section-kicker">On the floor this week</p>
+                                <h2>Train with a purpose.</h2>
+                            </div><a class="text-link" asp-controller="Classes" asp-action="Index">Full class schedule</a>
+                        </div>
+                        <div class="row g-4">
+                            <div class="col-lg-7">
+                                <article class="featured-class">
+                                    <div class="featured-class-body">
+                                        <p class="section-kicker">Monday / Wednesday / Friday</p>
+                                        <h3>HYROX Performance Circuit</h3>
+                                        <p>A high-density circuit of sled pushes, row intervals, loaded carries, and sandbag work.</p>
+                                        <div class="class-meta"><span>18:00</span><span>Studio Alpha</span><span>16 places</span></div>
+                                        <div class="class-block-number">01</div>
+                                    </div>
+                                    <div class="featured-class-art">
+                                        <img src="~/images/classes/class-hyrox.png" alt="HYROX Performance Circuit class"
+                                             onerror="this.hidden=true; this.nextElementSibling.hidden=false" />
+                                        <div class="class-image-fallback" hidden>
+                                            <span class="section-kicker">Class image</span>
+                                            <strong>Coming soon</strong>
+                                            <small>HYROX Performance Circuit</small>
+                                        </div>
+                                    </div>
+                                </article>
+                            </div>
+                            <div class="col-lg-5">
+                                <article class="program-card">
+                                    <div class="program-art art-barbell"><img src="~/images/classes/class-strength.png"
+                                                                                  alt="Strength training class" /></div>
+                                        <p>Tuesday / Thursday</p>
+                                        <h3>Olympic Barbell</h3><span>19:00 - Platform Deck - Coach Omar Hassan</span>
+                                    </article>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section id="trainers" class="section-space">
+                        <div class="container-xxl coach-layout">
+                            <div class="coach-slab"><img src="~/images/trainers/trainer-01.png"
+                                                             alt="IRONCORE coach leading a training session" onerror="this.hidden=true" /><span>Coach
+                                team</span><strong>14</strong><small>specialists across strength,
+                                conditioning, and recovery</small></div>
+                                <div class="coach-copy">
+                                    <p class="section-kicker">People who know the work</p>
+                                    <h2>Coaching without noise.</h2>
+                                    <p>Every coach at IRONCORE works from the same simple standard: meet you where you are, then give you the
+                                        work that earns the next level.</p><a class="btn btn-iron-outline" asp-controller="Trainers"
+                                                                              asp-action="Index">Meet the coach team</a>
+                                    </div>
+                                </div>
+                            </section>
+                            <section id="plans" class="section-space plan-section">
+                                <div class="container-xxl">
+                                    <div class="section-heading">
+                                        <div>
+                                            <p class="section-kicker">Membership</p>
+                                            <h2>Choose your training base.</h2>
+                                        </div>
+                                        <p>All plans include a coached induction and full access to the member progress area.</p>
+                                    </div>
+                                    <div class="row g-0 plan-grid">
+                                        <div class="col-lg-4">
+                                            <article class="plan-card">
+                                                <h3>Foundation</h3><strong>$49 <small>/ month</small></strong>
+                                                <p>Training floor access for a consistent personal program.</p><a class="btn btn-iron-outline w-100"
+                                                                                                                  asp-controller="Plans" asp-action="Index">View plan</a>
+                                            </article>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <article class="plan-card plan-featured"><span class="plan-label">Most selected</span>
+                                                <h3>Performance</h3><strong>$79 <small>/ month</small></strong>
+                                                <p>Floor access plus unlimited coached group sessions.</p><a class="btn btn-iron w-100"
+                                                                                                             asp-controller="Plans" asp-action="Index">Choose performance</a>
+                                            </article>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <article class="plan-card">
+                                                <h3>Coached</h3><strong>$129 <small>/ month</small></strong>
+                                                <p>Personal coaching, programming, and recovery check-ins.</p><a class="btn btn-iron-outline w-100"
+                                                                                                                 asp-controller="Plans" asp-action="Index">Talk to a coach</a>
+                                            </article>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            <section class="gallery-band">
+                                <div class="container-xxl">
+                                    <div class="gallery-grid">
+                                        <div class="gallery-cell gallery-wide"><img src="~/images/gallery/gallery-02.png"
+                                                                                        alt="IRONCORE training floor" onerror="this.hidden=true" /><span>TRAINING FLOOR</span></div>
+                                            <div class="gallery-cell gallery-tall"><img src="~/images/gallery/gallery-04.png"
+                                                                                            alt="IRONCORE recovery and locker area" onerror="this.hidden=true" /><span>LOCKER &amp;
+                                                SHOWERS</span></div>
+                                                <div class="gallery-cell"><img src="~/images/gym/gym-equipment.png"
+                                                                                   alt="IRONCORE gym equipment" /><span>STRENGTH AREA</span></div>
+                                                </div>
+                                            </div>
+                                        </section>
+                                        <section class="cta-band">
+                                            <div class="container-xxl">
+                                                <p class="section-kicker">Your first session starts here</p>
+                                                <h2>Ready to earn your next level?</h2><a class="btn btn-iron btn-lg" href="#plans">Claim a 14 day pass</a>
+                                            </div>
+                                        </section>

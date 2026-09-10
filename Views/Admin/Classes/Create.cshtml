@@ -1,0 +1,6 @@
+@{
+    ViewData["Title"] = "Create Class"; ViewData["Dashboard"] = true;
+}
+<partial name="_PageHeader"
+         model='new Dictionary<string, string> { ["Title"] = "Create class", ["Description"] = "Schedule a new session.", ["Eyebrow"] = "Classes" }' />
+@await Html.PartialAsync("_AdminForm", new[] { "Class name", "Coach", "Day and time", "Capacity" })

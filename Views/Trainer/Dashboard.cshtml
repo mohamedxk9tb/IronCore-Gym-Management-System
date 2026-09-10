@@ -1,0 +1,61 @@
+@{
+    ViewData["Title"] = "Trainer dashboard"; ViewData["Section"] = "Trainer"; ViewData["Dashboard"] = true;
+}
+<header class="page-header">
+    <div>
+        <p class="section-kicker">Coach workspace</p>
+        <h1>Today on the coaching floor.</h1>
+        <p>Keep sessions moving and members seen.</p>
+    </div><a class="btn btn-iron" asp-controller="Trainer" asp-action="ClassRoster">View class roster</a>
+</header>
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <article class="stat-card"><span>Today classes</span><strong>4</strong>
+            <p>First class at 07:00</p>
+        </article>
+    </div>
+    <div class="col-md-3">
+        <article class="stat-card"><span>Booked members</span><strong>58</strong>
+            <p>Across your sessions</p>
+        </article>
+    </div>
+    <div class="col-md-3">
+        <article class="stat-card"><span>Attendance</span><strong>91%</strong>
+            <p>This week</p>
+        </article>
+    </div>
+    <div class="col-md-3">
+        <article class="stat-card"><span>Plans due</span><strong>3</strong>
+            <p>Review this week</p>
+        </article>
+    </div>
+</div>
+<section class="content-panel">
+    <h2 class="panel-title">Class roster</h2>
+    <div class="table-responsive">
+        <table class="table table-iron">
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Class</th>
+                    <th>Booked</th>
+                    <th>Floor</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>17:00</td>
+                    <td>HYROX Performance Circuit</td>
+                    <td>24 / 24</td>
+                    <td>Studio Alpha</td>
+                </tr>
+                <tr>
+                    <td>18:30</td>
+                    <td>Olympic Barbell</td>
+                    <td>12 / 16</td>
+                    <td>Platform Deck</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>

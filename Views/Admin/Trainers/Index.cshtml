@@ -1,0 +1,37 @@
+@{
+    ViewData["Title"] = "Trainers"; ViewData["Dashboard"] = true;
+}
+@await Html.PartialAsync("_PageHeader", new Dictionary<string,string> { ["Title"] = "Trainers" ,
+         ["Description"] = "Coach profiles and specialties." , ["Eyebrow"] = "Manage trainers" })
+<section class="content-panel">
+    <div class="admin-toolbar"><input class="form-control" placeholder="Search trainers"
+                                          aria-label="Search trainers" /><button class="btn btn-iron">Create trainer</button></div>
+        <div class="table-responsive">
+            <table class="table table-iron">
+                <thead>
+                    <tr>
+                        <th>Trainer</th>
+                        <th>Specialty</th>
+                        <th>Rating</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Omar Hassan</td>
+                        <td>Strength</td>
+                        <td>4.9</td>
+                        <td><a asp-action="TrainersEdit" asp-route-id="1">Edit</a> - <a asp-action="TrainersDetails"
+                                                                                            asp-route-id="1">View</a></td>
+                        </tr>
+                        <tr>
+                            <td>Sarah Nabil</td>
+                            <td>Conditioning</td>
+                            <td>4.8</td>
+                            <td><a asp-action="TrainersEdit" asp-route-id="2">Edit</a> - <a asp-action="TrainersDetails"
+                                                                                                asp-route-id="2">View</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>

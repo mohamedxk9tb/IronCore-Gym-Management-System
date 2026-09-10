@@ -1,0 +1,20 @@
+@{
+    ViewData["Title"] = "Check In"; ViewData["Dashboard"] = true;
+}
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = "Check in",
+    ["Description"] =
+"Start your session with one clear signal.",
+    ["Eyebrow"] = "Member area"
+})
+<section class="checkin-state checkin-success"><span class="state-mark">OK</span>
+    <p class="section-kicker">Subscription active</p>
+    <h2>You are cleared to train.</h2>
+    <p>Performance membership - 26 days remaining</p><button class="btn btn-iron">Check in now</button>
+</section>
+<section class="checkin-state checkin-expired">    <p class="section-kicker">Example expired state</p>
+    <h2>Renewal required.</h2>
+    <p>An expired subscription cannot be checked in. Visit Plans to choose a new training base.</p><a
+    class="btn btn-iron-outline" asp-controller="Plans" asp-action="Index">View plans</a>
+</section>

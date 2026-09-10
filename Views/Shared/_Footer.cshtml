@@ -1,0 +1,28 @@
+<footer class="site-footer">
+    <div class="container-xxl">
+        <div class="row g-4 align-items-end">
+            <div class="col-lg-5">
+                <img class="footer-logo" src="~/images/brand/ironcore-logo.svg" alt="IRONCORE Gym and Fitness" />
+                <p>Strength, coaching, and a training floor built for progress.</p>
+            </div>
+            <div class="col-6 col-lg-3">
+                <p class="footer-heading">Explore</p>
+                <a asp-controller="Classes" asp-action="Index">Classes</a>
+                <a asp-controller="Trainers" asp-action="Index">Trainers</a>
+                <a asp-controller="Plans" asp-action="Index">Membership</a>
+            </div>
+            <div class="col-6 col-lg-4">
+                <p class="footer-heading">Visit IRONCORE</p>
+                <span>24 Foundry Lane, Cairo</span>
+                <span>+20 100 000 0000</span>
+                <span>hello@ironcore.example</span>
+            </div>
+        </div>
+        <div class="footer-meta">
+            <span>&copy; @DateTime.Now.Year IRONCORE Gym</span>
+            <a href="mailto:hello@ironcore.example">Member support</a>
+            <a asp-controller="Home" asp-action="Privacy">Facility rules</a>
+            <a href="https://instagram.com" rel="noreferrer">Instagram</a>
+        </div>
+    </div>
+</footer>

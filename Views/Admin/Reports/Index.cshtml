@@ -1,0 +1,17 @@
+@{
+    ViewData["Title"] = "Reports"; ViewData["Dashboard"] = true;
+}
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string> { ["Title"] = "Reports", ["Description"] = "A measured view of the business and the floor.", ["Eyebrow"] = "Operations" })<div class="row g-3 mb-4">    <div class="col-md-3">@await Html.PartialAsync("_StatCard", new Dictionary<string, string> { ["Title"] = "Active members", ["Value"] = "842", ["Icon"] = "01" })</div>
+<div class="col-md-3">@await Html.PartialAsync("_StatCard", new Dictionary<string, string> { ["Title"] = "Monthly income", ["Value"] = "$42.8k", ["Icon"] = "02" })</div>
+<div class="col-md-3">@await Html.PartialAsync("_StatCard", new Dictionary<string, string>
+    {
+        ["Title"] = "Expiring",
+        ["Value"] = "27",
+        ["Icon"] = "03"
+    })</div>
+    <div class="col-md-3">@await Html.PartialAsync("_StatCard", new Dictionary<string, string> { ["Title"] = "Popular class", ["Value"] = "HYROX", ["Icon"] = "04" })</div>
+</div>
+<section class="content-panel">
+    <h2 class="panel-title">Performance report</h2>
+    <div class="chart-placeholder"></div>
+</section>

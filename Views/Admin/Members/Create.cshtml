@@ -1,0 +1,5 @@
+@{
+    ViewData["Title"] = "Create Member"; ViewData["Dashboard"] = true;
+}
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string> { ["Title"] = "Create member", ["Description"] = "Prepare a member record for future identity integration.", ["Eyebrow"] = "Members" })@await Html.PartialAsync("_AdminForm", new[] { "Full name", "Email",
+"Membership plan", "Start date" })

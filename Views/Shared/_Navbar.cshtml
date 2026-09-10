@@ -1,0 +1,41 @@
+@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? "Home";
+    var action = ViewContext.RouteData.Values["action"]?.ToString() ?? "Index";
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
+    bool IsActive(string targetController, string targetAction = "") => controller == targetController && (string.IsNullOrEmpty(targetAction) || action == targetAction);
+}
+<header class="site-header">
+    <nav class="navbar navbar-expand-lg navbar-dark" aria-label="Primary navigation">
+        <div class="container-xxl">
+            <a class="brand brand-with-logo" asp-controller="Home" asp-action="Index" aria-label="IRONCORE home"><img src="~/images/brand/ironcore-logo.svg" alt="IRONCORE Gym and Fitness" /></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#primaryNav" aria-controls="primaryNav" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="primaryNav">
+                <ul class="navbar-nav mx-lg-auto">
+                    @if (!isAuthenticated)
+                    {
+                        <li class="nav-item"><a class="nav-link @(IsActive("Home") ? "active" : "")" asp-controller="Home" asp-action="Index">Home</a></li>
+                        <li class="nav-item"><a class="nav-link @(IsActive("Plans") ? "active" : "")" asp-controller="Plans" asp-action="Index">Plans</a></li>
+                        <li class="nav-item"><a class="nav-link @(IsActive("Classes") ? "active" : "")" asp-controller="Classes" asp-action="Index">Classes</a></li>
+                        <li class="nav-item"><a class="nav-link @(IsActive("Trainers") ? "active" : "")" asp-controller="Trainers" asp-action="Index">Trainers</a></li>
+                    }
+                    else if (User.IsInRole("Member"))
+                    {
+                        <li class="nav-item"><a class="nav-link @(IsActive("Member", "Dashboard") ? "active" : "")" asp-controller="Member" asp-action="Dashboard">Dashboard</a></li><li class="nav-item"><a class="nav-link @(IsActive("Member", "Profile") ? "active" : "")" asp-controller="Member" asp-action="Profile">Profile</a></li><li class="nav-item"><a class="nav-link @(IsActive("Member", "Classes") ? "active" : "")" asp-controller="Member" asp-action="Classes">Classes</a></li><li class="nav-item"><a class="nav-link @(IsActive("Member", "Bookings") ? "active" : "")" asp-controller="Member" asp-action="Bookings">My bookings</a></li><li class="nav-item"><a class="nav-link @(IsActive("Member", "FitnessPlan") ? "active" : "")" asp-controller="Member" asp-action="FitnessPlan">Fitness plan</a></li><li class="nav-item"><a class="nav-link @(IsActive("Member", "Progress") ? "active" : "")" asp-controller="Member" asp-action="Progress">Progress</a></li><li class="nav-item"><a class="nav-link @(IsActive("Member", "CheckIn") ? "active" : "")" asp-controller="Member" asp-action="CheckIn">Check-in</a></li>
+                    }
+                    else if (User.IsInRole("Trainer"))
+                    {
+                        <li class="nav-item"><a class="nav-link @(IsActive("Trainer", "Dashboard") ? "active" : "")" asp-controller="Trainer" asp-action="Dashboard">Dashboard</a></li><li class="nav-item"><a class="nav-link @(IsActive("Trainer", "ClassRoster") ? "active" : "")" asp-controller="Trainer" asp-action="ClassRoster">Classes / Roster</a></li><li class="nav-item"><a class="nav-link @(IsActive("Trainer", "Attendance") ? "active" : "")" asp-controller="Trainer" asp-action="Attendance">Attendance</a></li>
+                    }
+                    else if (User.IsInRole("Admin"))
+                    {
+                        <li class="nav-item"><a class="nav-link @(IsActive("Admin") ? "active" : "")" asp-controller="Admin" asp-action="Dashboard">Dashboard</a></li>
+                    }
+                </ul>
+                @if (!isAuthenticated)
+                {
+                    <div class="nav-actions"><a class="nav-link @(IsActive("Account", "Login") ? "active" : "")" asp-controller="Account" asp-action="Login">Log in</a><a class="nav-link @(IsActive("Account", "SignUp") ? "active" : "")" asp-controller="Account" asp-action="SignUp">Sign up</a><a class="btn btn-iron btn-sm" asp-controller="Plans" asp-action="Index">Join now</a></div>
+                }
+            </div>
+        </div>
+    </nav>
+</header>

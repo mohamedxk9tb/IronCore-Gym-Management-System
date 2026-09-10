@@ -1,0 +1,8 @@
+@model IDictionary<string, string>
+@{
+    var imagePath = Model["Image"];
+    var imageAlt = Model["Alt"];
+}
+<section class="auth-image-panel" aria-label="@imageAlt">
+    <img class="auth-panda" src="@imagePath" alt="@imageAlt" />
+</section>

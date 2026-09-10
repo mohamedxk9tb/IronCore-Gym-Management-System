@@ -1,0 +1,35 @@
+@{
+    ViewData["Title"] = "Workout & Diet Plan"; ViewData["Dashboard"] = true;
+}
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = "Workout & diet plan",
+    ["Description"] = "Your current block, from first warm-up to final meal.",
+    ["Eyebrow"] = "Member area"
+})
+<div class="row g-4">
+    <div class="col-lg-7">
+        <section class="content-panel">
+            <p class="section-kicker">Monday - Lower strength</p>
+            <h2 class="panel-title">Session A</h2>
+            <div class="plan-line"><strong>Back squat</strong><span>4 sets x 6 reps</span></div>
+            <div class="plan-line"><strong>Romanian deadlift</strong><span>3 sets x 8 reps</span></div>
+            <div class="plan-line"><strong>Walking lunge</strong><span>3 sets x 12 reps</span></div>
+            <div class="plan-line"><strong>Loaded carry</strong><span>4 x 40m</span></div>
+        </section>
+    </div>
+    <div class="col-lg-5">
+        <section class="content-panel">
+            <p class="section-kicker">Nutrition target</p>
+            <h2 class="panel-title">Fuel the work.</h2>
+            <div class="nutrition-stat"><strong>4</strong><span>meals per day</span></div>
+            <p class="text-secondary">Protein at every meal, two litres of water, and a recovery snack after training.
+            </p>
+            <ul class="clean-list">
+                <li>Breakfast - oats, berries, eggs</li>
+                <li>Lunch - chicken, rice, greens</li>
+                <li>Dinner - salmon, potatoes, salad</li>
+            </ul>
+        </section>
+    </div>
+</div>

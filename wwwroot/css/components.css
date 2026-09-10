@@ -1,0 +1,239 @@
+﻿.dashboard-shell {
+    display: flex;
+    min-height: calc(100vh - 73px)
+}
+
+.dashboard-sidebar {
+    width: 260px;
+    flex: 0 0 260px;
+    padding: 2rem 1rem;
+    background: #111;
+    border-right: 1px solid var(--color-border);
+    transition: transform .2s ease
+}
+
+.sidebar-label {
+    padding: 0 .85rem .8rem;
+    color: var(--color-muted);
+    font-size: .66rem;
+    font-weight: 700;
+    letter-spacing: .13em;
+    text-transform: uppercase
+}
+
+.sidebar-nav {
+    display: grid;
+    gap: .25rem
+}
+
+.sidebar-nav a {
+    padding: .65rem .85rem;
+    border-left: 2px solid transparent;
+    color: var(--color-muted);
+    font-size: .84rem
+}
+
+.sidebar-nav a:hover,
+.sidebar-nav a.active {
+    border-left-color: var(--color-primary);
+    background: #1d1d1d;
+    color: var(--color-text)
+}
+
+.sidebar-nav span {
+    color: var(--color-primary);
+    font-size: .55rem
+}
+
+.sidebar-bottom {
+    margin-top: 3rem;
+    padding: .9rem;
+    border-top: 1px solid var(--color-border);
+    color: var(--color-muted);
+    font-size: .7rem
+}
+
+.dashboard-main {
+    width: 100%;
+    min-width: 0
+}
+
+.dashboard-container {
+    max-width: 1500px;
+    padding: 1.5rem 2rem 3rem
+}
+
+.breadcrumb-iron {
+    display: flex;
+    gap: .55rem;
+    margin-bottom: 1.5rem;
+    color: var(--color-muted);
+    font-size: .68rem;
+    letter-spacing: .07em;
+    text-transform: uppercase
+}
+
+.breadcrumb-iron a {
+    color: var(--color-primary)
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 1rem;
+    margin-bottom: 2rem
+}
+
+.page-header h1 {
+    margin: 0;
+    font: 3.4rem/.9 var(--font-display);
+    letter-spacing: .04em;
+    text-transform: uppercase
+}
+
+.page-header p:not(.section-kicker) {
+    margin: .6rem 0 0;
+    color: var(--color-muted)
+}
+
+.stat-card,
+.content-panel {
+    border: 1px solid var(--color-border);
+    background: var(--color-surface)
+}
+
+.stat-card {
+    height: 100%;
+    padding: 1.25rem
+}
+
+.stat-card-top {
+    display: flex;
+    justify-content: space-between;
+    color: var(--color-muted);
+    font-size: .75rem
+}
+
+.stat-card-top b {
+    color: var(--color-primary)
+}
+
+.stat-card>strong {
+    display: block;
+    margin: .8rem 0 .35rem;
+    font: 3.1rem/.8 var(--font-display);
+    letter-spacing: .04em
+}
+
+.stat-card p {
+    margin: 0;
+    color: var(--color-muted);
+    font-size: .75rem
+}
+
+.content-panel {
+    padding: 1.4rem
+}
+
+.panel-title {
+    margin: 0 0 1rem;
+    font: 1.8rem var(--font-display);
+    letter-spacing: .04em;
+    text-transform: uppercase
+}
+
+.table-iron {
+    margin: 0;
+    color: var(--color-text)
+}
+
+.table-iron th {
+    color: var(--color-muted);
+    font-size: .68rem;
+    letter-spacing: .08em;
+    text-transform: uppercase
+}
+
+.table-iron td,
+.table-iron th {
+    padding: .8rem;
+    border-color: var(--color-border)
+}
+
+.progress-iron {
+    height: .5rem;
+    background: #303030;
+    border-radius: 0
+}
+
+.progress-iron .progress-bar {
+    background: var(--color-primary)
+}
+
+.chart-placeholder {
+    height: 230px;
+    background: linear-gradient(180deg, transparent 24%, #242424 25%, transparent 26%, transparent 49%, #242424 50%, transparent 51%, transparent 74%, #242424 75%, transparent 76%)
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    border: 1px dashed #444;
+    background: var(--color-surface)
+}
+
+.empty-state-mark {
+    color: var(--color-primary);
+    font: 4rem/.8 var(--font-display)
+}
+
+.empty-state h2 {
+    margin: 1rem 0 .5rem;
+    font: 2rem var(--font-display);
+    text-transform: uppercase
+}
+
+.empty-state p {
+    color: var(--color-muted)
+}
+
+.toast-iron {
+    background: #26211d;
+    color: var(--color-text);
+    border-left: 3px solid var(--color-primary)
+}
+
+.alert-iron-error {
+    background: #301b1b;
+    border-color: #693232;
+    color: #ffd3d3
+}
+
+.alert-iron-warning {
+    background: #302715;
+    border-color: #6c5720;
+    color: #ffe0a1
+}
+
+@media(max-width:991px) {
+    .dashboard-sidebar {
+        position: fixed;
+        z-index: 1040;
+        top: 73px;
+        bottom: 0;
+        box-shadow: 20px 0 40px #000
+    }
+
+    .dashboard-container {
+        padding: 1.25rem
+    }
+
+    .page-header {
+        display: block
+    }
+
+    .page-header .btn {
+        margin-top: 1rem
+    }
+}

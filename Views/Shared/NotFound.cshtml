@@ -1,0 +1,18 @@
+@{
+    ViewData["Title"] = "Page Not Found";
+}
+<section class="error-surface container-xxl">
+    <div class="error-copy">
+        <p class="section-kicker">404 · Off the floor</p>
+        <h1>That page is not in the programme.</h1>
+        <p>The address may have changed, or the session has already ended.</p>
+        <div class="error-actions">
+            <a class="btn btn-iron" asp-controller="Home" asp-action="Index">Return home</a>
+            <a class="btn btn-iron-outline" asp-controller="Classes" asp-action="Index">View classes</a>
+        </div>
+    </div>
+    <div class="error-image-panel">
+        <img class="error-illustration" src="~/images/svg404-500/404.png" alt="IRONCORE 404 illustration"
+             onerror="this.hidden=true" />
+    </div>
+</section>

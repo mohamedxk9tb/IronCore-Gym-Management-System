@@ -1,0 +1,15 @@
+@{
+    ViewData["Title"] = "Member Details"; ViewData["Dashboard"] = true;
+}
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = "Alex Morgan",
+    ["Description"] =
+"Performance member - active through 04 Nov 2026",
+    ["Eyebrow"] = "Member details"
+})<section
+class="content-panel detail-grid">
+<div><span>Attendance</span><strong>84% this month</strong></div>
+<div><span>Bookings</span><strong>18 total</strong></div>
+<div><span>Last check-in</span><strong>Today - 06:18</strong></div>
+</section>

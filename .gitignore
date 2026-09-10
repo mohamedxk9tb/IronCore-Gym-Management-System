@@ -1,0 +1,34 @@
+# Build
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.rsuser
+
+# Rider
+.idea/
+
+# Logs
+*.log
+
+# Test results
+TestResults/
+
+# Publish
+publish/
+
+# Node
+node_modules/
+
+# Environment / secrets
+.env
+.env.*
+appsettings.Development.json
+
+# OS
+.DS_Store
+Thumbs.db

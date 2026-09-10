@@ -1,0 +1,44 @@
+@{
+    ViewData["Title"] = "Plans"; ViewData["Dashboard"] = true;
+}
+@await Html.PartialAsync("_PageHeader", new Dictionary<string,string> { ["Title"] = "Plans" ,    ["Description"] = "Membership products and pricing." , ["Eyebrow"] = "Manage plans" , ["Action"] = "Create plan" })
+<section class="content-panel">
+    <div class="admin-toolbar"><input class="form-control" placeholder="Search plans"
+                                          aria-label="Search plans" /><select class="form-select" aria-label="Filter plans">
+        <option>All statuses</option>
+        <option>Active</option>
+        <option>Archived</option>
+    </select></div>
+    <div class="table-responsive">
+        <table class="table table-iron">
+            <thead>
+                <tr>
+                    <th>Plan</th>
+                    <th>Billing</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Performance</td>
+                    <td>Quarterly</td>
+                    <td>$219</td>
+                    <td>Active</td>
+                    <td><a asp-action="PlansEdit" asp-route-id="1">Edit</a> - <a asp-action="PlansDetails"
+                                                                                     asp-route-id="1">View</a></td>
+                    </tr>
+                    <tr>
+                        <td>Foundation</td>
+                        <td>Monthly</td>
+                        <td>$49</td>
+                        <td>Active</td>
+                        <td><a asp-action="PlansEdit" asp-route-id="2">Edit</a> - <a asp-action="PlansDetails"
+                                                                                         asp-route-id="2">View</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination-iron">1 - 2 - 3 - Next</div>
+        </section>

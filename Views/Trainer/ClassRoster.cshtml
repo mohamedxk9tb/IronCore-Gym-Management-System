@@ -1,0 +1,50 @@
+@{
+    ViewData["Title"] = "Class Roster"; ViewData["Dashboard"] = true;
+}
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = "Class roster",
+    ["Description"] = "Strength Foundations - Today at 06:30 - Studio Alpha",
+    ["Eyebrow"] = "Trainer operations"
+})
+<section class="content-panel">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="panel-title">12 booked members</h2><a class="btn btn-iron" asp-controller="Trainer"
+                                                         asp-action="Attendance">Save attendance</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-iron align-middle">
+            <thead>
+                <tr>
+                    <th>Member</th>
+                    <th>Membership</th>
+                    <th>Booking</th>
+                    <th>Attendance</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="member-avatar">AM</span> Alex Morgan</td>
+                    <td>Performance</td>
+                    <td>Confirmed</td>
+                    <td><button class="attendance-button present">Present</button><button
+                        class="attendance-button">Absent</button></td>
+                    </tr>
+                    <tr>
+                        <td><span class="member-avatar">SK</span> Samira Khan</td>
+                        <td>Coached</td>
+                        <td>Confirmed</td>
+                        <td><button class="attendance-button">Present</button><button
+                            class="attendance-button">Absent</button></td>
+                        </tr>
+                        <tr>
+                            <td><span class="member-avatar">JT</span> James Taylor</td>
+                            <td>Foundation</td>
+                            <td>Confirmed</td>
+                            <td><button class="attendance-button">Present</button><button
+                                class="attendance-button">Absent</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>

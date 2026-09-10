@@ -1,0 +1,6 @@
+@{
+    ViewData["Title"] = "Edit Trainer"; ViewData["Dashboard"] = true;
+}
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string> {
+["Title"] = "Edit trainer", ["Description"] = "Update Omar Hassan's profile.", ["Eyebrow"] =
+"Trainers" })@await Html.PartialAsync("_AdminForm", new[] { "Name", "Specialty", "Certificates", "Biography" })

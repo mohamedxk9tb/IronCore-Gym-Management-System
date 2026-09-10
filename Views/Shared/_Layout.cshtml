@@ -1,0 +1,65 @@
+@{
+    var isDashboard = ViewData["Dashboard"] as bool? == true;
+    var showDashboardSidebar = isDashboard && User.Identity?.IsAuthenticated == true;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0D0D0D" />
+    <title>@(ViewData["Title"] ?? "IRONCORE") | IRONCORE Gym</title>
+    <link rel="icon" href="~/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/components.css" asp-append-version="true" />
+    @if (ViewData["AuthPage"] as bool? == true)
+    {
+        <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+    }
+</head>
+<body class="@(isDashboard ? "dashboard-page" : ViewData["AuthPage"] as bool? == true ? "auth-page" : "public-page")">
+    <partial name="_Navbar" />
+
+    @if (isDashboard)
+    {
+        <div class="dashboard-shell">
+            @if (showDashboardSidebar)
+            {
+                <partial name="_Sidebar" />
+            }
+            <main id="main-content" class="dashboard-main">
+                <div class="container-fluid dashboard-container">
+                    <partial name="_Breadcrumbs" />
+                    <partial name="_Toast" />
+                    <partial name="_Alert" />
+                    @RenderBody()
+                </div>
+            </main>
+        </div>
+    }
+    else
+    {
+        <main id="main-content">
+            <partial name="_Toast" />
+            <partial name="_Alert" />
+            @RenderBody()
+        </main>
+    }
+
+    <partial name="_Footer" />
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @if (ViewData["AuthPage"] as bool? == true)
+    {
+        <script src="~/js/auth.js" asp-append-version="true"></script>
+    }
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
