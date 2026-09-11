@@ -1,15 +1,268 @@
+@model GymMvc.Models.Member
+
 @{
-    ViewData["Title"] = "Member Details"; ViewData["Dashboard"] = true;
+    ViewData["Title"] = "Member Details";
+    ViewData["Dashboard"] = true;
+
+    var latestWeight = Model.WeightLogs
+        .OrderByDescending(x => x.Date)
+        .FirstOrDefault();
+
+    var lastCheckIn = Model.CheckIns
+        .OrderByDescending(x => x.CheckInTime)
+        .FirstOrDefault();
 }
+
 @await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
 {
-    ["Title"] = "Alex Morgan",
-    ["Description"] =
-"Performance member - active through 04 Nov 2026",
-    ["Eyebrow"] = "Member details"
-})<section
-class="content-panel detail-grid">
-<div><span>Attendance</span><strong>84% this month</strong></div>
-<div><span>Bookings</span><strong>18 total</strong></div>
-<div><span>Last check-in</span><strong>Today - 06:18</strong></div>
+    ["Title"] = Model.FullName,
+    ["Description"] = "Member profile and recorded activity.",
+    ["Eyebrow"] = "Admin / Member details"
+})
+
+<div class="row g-4">
+
+    <div class="col-lg-8">
+
+        <section class="content-panel">
+
+            <div class="d-flex justify-content-between
+                        align-items-start flex-wrap gap-3 mb-4">
+
+                <div>
+                    <p class="auth-kicker mb-2">
+                        MEMBER #@Model.Id
+                    </p>
+
+                    <h2 class="mb-1">
+                        @Model.FullName
+                    </h2>
+
+                    <p class="text-secondary mb-0">
+                        @Model.Email
+                    </p>
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap">
+
+                    <a asp-controller="Admin"
+                       asp-action="MembersEdit"
+                       asp-route-id="@Model.Id"
+                       class="btn btn-iron">
+                        Edit
+                    </a>
+
+                    <a asp-controller="Admin"
+                       asp-action="MembersDelete"
+                       asp-route-id="@Model.Id"
+                       class="btn btn-iron-outline">
+                        Delete
+                    </a>
+
+                </div>
+
+            </div>
+
+            <div class="row g-3">
+
+                <div class="col-md-6">
+
+                    <div class="content-panel h-100">
+
+                        <span class="text-secondary small">
+                            Height
+                        </span>
+
+                        <h3 class="mt-2 mb-0">
+                            @Model.Height.ToString("0.0") cm
+                        </h3>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <div class="content-panel h-100">
+
+                        <span class="text-secondary small">
+                            Current weight
+                        </span>
+
+                        <h3 class="mt-2 mb-0">
+                            @Model.Weight.ToString("0.0") kg
+                        </h3>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <div class="content-panel h-100">
+
+                        <span class="text-secondary small">
+                            Weight records
+                        </span>
+
+                        <h3 class="mt-2 mb-0">
+                            @Model.WeightLogs.Count
+                        </h3>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <div class="content-panel h-100">
+
+                        <span class="text-secondary small">
+                            Check-ins
+                        </span>
+
+                        <h3 class="mt-2 mb-0">
+                            @Model.CheckIns.Count
+                        </h3>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+    <div class="col-lg-4">
+
+        <section class="content-panel h-100">
+
+            <p class="auth-kicker">
+                TRAINING GOAL
+            </p>
+
+            @if (string.IsNullOrWhiteSpace(Model.Goal))
+            {
+                <h3 class="mb-3">
+                    No goal recorded.
+                </h3>
+
+                <p class="text-secondary mb-0">
+                    The member has not specified a fitness
+                    goal yet.
+                </p>
+            }
+            else
+            {
+                <h3 class="mb-3">
+                    @Model.Goal
+                </h3>
+
+                <p class="text-secondary mb-0">
+                    This is the current goal saved on
+                    the member profile.
+                </p>
+            }
+
+        </section>
+
+    </div>
+
+</div>
+
+<section class="content-panel mt-4">
+
+    <div class="d-flex justify-content-between
+                align-items-center flex-wrap gap-2 mb-4">
+
+        <div>
+            <p class="auth-kicker mb-1">
+                ACTIVITY
+            </p>
+
+            <h3 class="mb-0">
+                Recent records
+            </h3>
+        </div>
+
+        <a asp-controller="Admin"
+           asp-action="Members"
+           class="btn btn-iron-outline btn-sm">
+            Back to members
+        </a>
+
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-md-6">
+
+            <div class="content-panel h-100">
+
+                <span class="text-secondary small">
+                    Latest weight record
+                </span>
+
+                @if (latestWeight is not null)
+                {
+                    <h4 class="mt-2 mb-1">
+                        @latestWeight.Weight.ToString("0.0") kg
+                    </h4>
+
+                    <p class="text-secondary mb-0">
+                        @latestWeight.Date.ToString("dd MMM yyyy")
+                    </p>
+                }
+                else
+                {
+                    <h4 class="mt-2 mb-1">
+                        No records
+                    </h4>
+
+                    <p class="text-secondary mb-0">
+                        No weight history has been recorded.
+                    </p>
+                }
+
+            </div>
+
+        </div>
+
+        <div class="col-md-6">
+
+            <div class="content-panel h-100">
+
+                <span class="text-secondary small">
+                    Last check-in
+                </span>
+
+                @if (lastCheckIn is not null)
+                {
+                    <h4 class="mt-2 mb-1">
+                        @lastCheckIn.CheckInTime.ToString("dd MMM yyyy")
+                    </h4>
+
+                    <p class="text-secondary mb-0">
+                        @lastCheckIn.CheckInTime.ToString("HH:mm")
+                    </p>
+                }
+                else
+                {
+                    <h4 class="mt-2 mb-1">
+                        No check-ins
+                    </h4>
+
+                    <p class="text-secondary mb-0">
+                        This member has no recorded check-ins.
+                    </p>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
 </section>

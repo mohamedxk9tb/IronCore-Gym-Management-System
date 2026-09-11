@@ -1,9 +1,116 @@
+@model GymMvc.Models.Member
+
 @{
-    ViewData["Title"] = "Delete Member"; ViewData["Dashboard"] = true;
+    ViewData["Title"] = "Delete Member";
+    ViewData["Dashboard"] = true;
 }
-<section class="confirm-panel">
-    <p class="section-kicker">Destructive action</p>
-    <h1>Delete Alex Morgan?</h1>
-    <p>This display-only confirmation is ready for the future persistence layer.</p><a class="btn btn-iron-outline"
-                                                                                       asp-action="Members">Cancel</a><button class="btn btn-danger">Confirm delete</button>
+
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = "Delete member",
+    ["Description"] = "Review this action before permanently removing the record.",
+    ["Eyebrow"] = "Admin / Members"
+})
+
+<section class="content-panel">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-7">
+
+            <div class="text-center">
+
+                <div class="state-mark mb-4">
+                    !
+                </div>
+
+                <p class="auth-kicker">
+                    Permanent action
+                </p>
+
+                <h2 class="mb-3">
+                    Delete @Model.FullName?
+                </h2>
+
+                <p class="text-secondary mb-4">
+                    This will permanently remove the member
+                    profile and its related weight logs and
+                    check-in records.
+                </p>
+
+            </div>
+
+            <div class="content-panel mb-4">
+
+                <div class="d-flex justify-content-between
+                            gap-3 py-2 border-bottom">
+
+                    <span class="text-secondary">
+                        Name
+                    </span>
+
+                    <strong>
+                        @Model.FullName
+                    </strong>
+
+                </div>
+
+                <div class="d-flex justify-content-between
+                            gap-3 py-2 border-bottom">
+
+                    <span class="text-secondary">
+                        Email
+                    </span>
+
+                    <strong>
+                        @Model.Email
+                    </strong>
+
+                </div>
+
+                <div class="d-flex justify-content-between
+                            gap-3 py-2">
+
+                    <span class="text-secondary">
+                        Member ID
+                    </span>
+
+                    <strong>
+                        #@Model.Id
+                    </strong>
+
+                </div>
+
+            </div>
+
+            <form asp-controller="Admin"
+                  asp-action="MembersDeleteConfirmed"
+                  asp-route-id="@Model.Id"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div class="d-flex justify-content-center
+                            flex-wrap gap-2">
+
+                    <a asp-controller="Admin"
+                       asp-action="MembersDetails"
+                       asp-route-id="@Model.Id"
+                       class="btn btn-iron-outline">
+                        Cancel
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-danger">
+                        Yes, delete member
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
 </section>

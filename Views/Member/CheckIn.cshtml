@@ -1,20 +1,82 @@
 @{
-    ViewData["Title"] = "Check In"; ViewData["Dashboard"] = true;
+    ViewData["Title"] = "Check In";
+    ViewData["Dashboard"] = true;
 }
+
 @await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
 {
     ["Title"] = "Check in",
-    ["Description"] =
-"Start your session with one clear signal.",
+    ["Description"] = "Start your session with one clear signal.",
     ["Eyebrow"] = "Member area"
 })
-<section class="checkin-state checkin-success"><span class="state-mark">OK</span>
-    <p class="section-kicker">Subscription active</p>
-    <h2>You are cleared to train.</h2>
-    <p>Performance membership - 26 days remaining</p><button class="btn btn-iron">Check in now</button>
+
+<section class="checkin-state checkin-success">
+
+    <span class="state-mark">
+        OK
+    </span>
+
+    <p class="section-kicker">
+        Check-in available
+    </p>
+
+    <h2>
+        You are ready to train.
+    </h2>
+
+    @if (ViewBag.LastCheckIn is DateTime lastCheckIn)
+    {
+        <p>
+            Last check-in:
+            @lastCheckIn.ToString("dd MMM yyyy, HH:mm")
+        </p>
+    }
+    else
+    {
+        <p>
+            This will be your first recorded check-in.
+        </p>
+    }
+
+    <form asp-controller="Member"
+          asp-action="CheckInNow"
+          method="post">
+
+        @Html.AntiForgeryToken()
+
+        <button type="submit"
+                class="btn btn-iron">
+
+            Check in now
+
+        </button>
+
+    </form>
+
 </section>
-<section class="checkin-state checkin-expired">    <p class="section-kicker">Example expired state</p>
-    <h2>Renewal required.</h2>
-    <p>An expired subscription cannot be checked in. Visit Plans to choose a new training base.</p><a
-    class="btn btn-iron-outline" asp-controller="Plans" asp-action="Index">View plans</a>
+
+<section class="checkin-state">
+
+    <p class="section-kicker">
+        Membership validation
+    </p>
+
+    <h2>
+        Subscription check coming next.
+    </h2>
+
+    <p>
+        Active subscription validation will be connected
+        after the Membership and Subscription models
+        are integrated.
+    </p>
+
+    <a class="btn btn-iron-outline"
+       asp-controller="Plans"
+       asp-action="Index">
+
+        View plans
+
+    </a>
+
 </section>
