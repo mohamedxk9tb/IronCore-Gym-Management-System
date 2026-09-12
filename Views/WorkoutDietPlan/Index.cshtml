@@ -1,0 +1,119 @@
+@model GymMvc.ViewModels.WorkoutDietPlanViewModel
+
+@{
+    ViewData["Title"] = "Workout & Diet Plan";
+}
+
+<div class="container py-4">
+
+    <h1>Workout & Diet Plan</h1>
+
+    <p>
+        Member:
+        <strong>@Model.MemberName</strong>
+    </p>
+
+    <hr />
+
+    <div class="row g-4">
+
+        <div class="col-md-6">
+
+            <div class="card">
+                <div class="card-body">
+
+                    <h3>Workout Plan</h3>
+
+                    <form asp-action="AddWorkoutPlan" method="post">
+
+                        <input type="hidden"
+                               name="memberId"
+                               value="@Model.MemberId" />
+
+                        <input type="hidden"
+                               name="memberName"
+                               value="@Model.MemberName" />
+
+                        <textarea name="planDetails"
+                                  class="form-control mb-3"
+                                  rows="6"
+                                  placeholder="Write workout plan..."
+                                  required></textarea>
+
+                        <button class="btn btn-primary">
+                            Save Workout Plan
+                        </button>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="col-md-6">
+
+            <div class="card">
+                <div class="card-body">
+
+                    <h3>Diet Plan</h3>
+
+                    <form asp-action="AddDietPlan" method="post">
+
+                        <input type="hidden"
+                               name="memberId"
+                               value="@Model.MemberId" />
+
+                        <input type="hidden"
+                               name="memberName"
+                               value="@Model.MemberName" />
+
+                        <textarea name="planDetails"
+                                  class="form-control mb-3"
+                                  rows="6"
+                                  placeholder="Write diet plan..."
+                                  required></textarea>
+
+                        <button class="btn btn-success">
+                            Save Diet Plan
+                        </button>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <hr class="my-4" />
+
+    <h3>Saved Workout Plans</h3>
+
+    @foreach (var plan in Model.WorkoutPlans)
+    {
+        <div class="card mb-2">
+            <div class="card-body">
+                <strong>@plan.MemberName</strong>
+                <p>@plan.PlanDetails</p>
+                <small>@plan.CreatedAt</small>
+            </div>
+        </div>
+    }
+
+    <h3 class="mt-4">Saved Diet Plans</h3>
+
+    @foreach (var plan in Model.DietPlans)
+    {
+        <div class="card mb-2">
+            <div class="card-body">
+                <strong>@plan.MemberName</strong>
+                <p>@plan.PlanDetails</p>
+                <small>@plan.CreatedAt</small>
+            </div>
+        </div>
+    }
+
+</div>

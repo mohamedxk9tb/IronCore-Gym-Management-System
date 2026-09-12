@@ -1,0 +1,82 @@
+@model GymMvc.ViewModels.ReportsViewModel
+
+@using System.Text.Json
+
+@{
+    ViewData["Title"] = "Reports";
+}
+
+<div class="container py-4">
+
+    <h1>Reports</h1>
+
+    <div class="row g-4 mt-2">
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Monthly Income</h5>
+                    <h2>@Model.MonthlyIncome.ToString("N0")</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Active Members</h5>
+                    <h2>@Model.ActiveMembers</h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-body">
+
+            <h3>Monthly Report</h3>
+
+            <canvas id="reportsChart"></canvas>
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        const months = @Html.Raw(JsonSerializer.Serialize(Model.Months));
+        const income = @Html.Raw(JsonSerializer.Serialize(Model.IncomeData));
+        const members = @Html.Raw(JsonSerializer.Serialize(Model.MembersData));
+
+        new Chart(
+            document.getElementById('reportsChart'),
+            {
+                data: {
+                    labels: months,
+
+                    datasets: [
+                        {
+                            type: 'bar',
+                            label: 'Income',
+                            data: income
+                        },
+                        {
+                            type: 'line',
+                            label: 'Active Members',
+                            data: members
+                        }
+                    ]
+                },
+
+                options: {
+                    responsive: true
+                }
+            }
+        );
+    </script>
+}

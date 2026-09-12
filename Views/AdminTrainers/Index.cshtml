@@ -1,0 +1,67 @@
+@model List<GymMvc.Models.Trainer>
+
+@{
+    ViewData["Title"] = "Admin - Trainers";
+}
+
+<div class="container mt-4">
+
+    <h1>Admin - Trainers</h1>
+
+    <a asp-controller="AdminTrainers"
+       asp-action="Create"
+       class="btn btn-primary mb-3">
+        Add Trainer
+    </a>
+
+    <table class="table table-bordered">
+
+        <thead>
+
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Specialty</th>
+                <th>Actions</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            @foreach (var trainer in Model)
+            {
+                <tr>
+
+                    <td>@trainer.Id</td>
+
+                    <td>@trainer.FullName</td>
+
+                    <td>@trainer.Specialty</td>
+
+                    <td>
+
+                        <a asp-controller="AdminTrainers"
+                           asp-action="Edit"
+                           asp-route-id="@trainer.Id"
+                           class="btn btn-warning btn-sm">
+                            Edit
+                        </a>
+
+                        <a asp-controller="AdminTrainers"
+                           asp-action="Delete"
+                           asp-route-id="@trainer.Id"
+                           class="btn btn-danger btn-sm">
+                            Delete
+                        </a>
+
+                    </td>
+
+                </tr>
+            }
+
+        </tbody>
+
+    </table>
+
+</div>
