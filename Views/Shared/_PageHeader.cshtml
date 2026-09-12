@@ -4,4 +4,12 @@
     var description = Model.TryGetValue("Description", out var descriptionValue) ? descriptionValue : null;
     var action = Model.TryGetValue("Action", out var actionValue) ? actionValue : null;
 }
-<header class="page-header"><div><p class="section-kicker">@eyebrow</p><h1>@Model["Title"]</h1>@if (!string.IsNullOrWhiteSpace(description)){<p>@description</p>}</div>@if (!string.IsNullOrWhiteSpace(action)){<button class="btn btn-iron" type="button">@action</button>}</header>
+<header class="page-header">    <div>
+    <p class="section-kicker">@eyebrow</p>
+    <h1>@Model["Title"]</h1>@if (!string.IsNullOrWhiteSpace(description)){
+    <p>@description</p>
+}
+</div>@if (!string.IsNullOrWhiteSpace(action)){
+<button class="btn btn-iron" type="button">@action</button>
+    }
+</header>
