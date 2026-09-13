@@ -14,12 +14,11 @@ namespace GymMvc.Models
         public Subscription Subscription { get; set; }
 
         [Required]
-        [Range(0, 100000)]
+        [Range(0.01, 100000)]
         public decimal Amount { get; set; }
 
         [Required]
         [DataType(DataType.Date)]
         public DateTime PaymentDate { get; set; }
-
     }
 }

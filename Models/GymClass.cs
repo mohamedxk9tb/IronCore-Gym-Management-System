@@ -22,6 +22,13 @@ namespace GymMvc.Models
         public string DayOfWeek { get; set; }
 
         [Required]
+        public TimeSpan StartTime { get; set; }
+
+        [Required]
+        [Range(1, 300)]
+        public int DurationMinutes { get; set; }
+
+        [Required]
         [Range(1, 100)]
         public int Capacity { get; set; }
 
