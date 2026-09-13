@@ -12,87 +12,59 @@ using GymMvc.ViewModels;
 
 namespace GymMvc.Services
 {
-    // الكلاس الوحيد في المشروع اللي بيكلم الـ AI API.
-    // ⚠️ ملحوظة مهمة: الكود ده مبني على شكل استجابة OpenAI "Chat Completions"
-    // (choices[0].message.content). لو المشروع فعلاً هيستخدم "Responses API"
-    // (endpoint: /v1/responses)، شكل الـ JSON بتاع الرد مختلف، ولازم تتأكد
-    // من الشكل الفعلي وتقولي عشان أظبط الـ parsing بالظبط - النقطة دي
-    // معلقة من الـ Audit ولسه محتاجة تأكيد منك.
+    // Talks to the OpenAI Chat Completions API. Register as a typed client:
+    // builder.Services.AddHttpClient<IAiChatService, AiChatService>();
     public class AiChatService : IAiChatService
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
         private readonly ILogger<AiChatService> _logger;
 
         private const string SystemPrompt =
-            "إنت مساعد لياقة بدنية عام جوه موقع جيم. قدّم معلومات عامة عن التمارين والتغذية بس. " +
-            "وضّح دايمًا إنك مش بديل عن استشارة طبية أو استشارة مدرب مختص. " +
-            "معندكش أي وصول لبيانات المشروع أو الداتابيز (لا أعضاء ولا اشتراكات ولا مدفوعات ولا خطط حقيقية)، " +
-            "فمتحاولش تجاوب على أسئلة عن بيانات حقيقية جوه النظام أو تدّعي إنك عارفها.";
+            "You are a general fitness assistant for a gym app. Give general fitness/nutrition info only. " +
+            "You are not a doctor and this is not medical advice. " +
+            "You have no access to real member/gym data - never claim otherwise.";
 
-        public AiChatService(
-            IHttpClientFactory httpClientFactory,
-            IConfiguration configuration,
-            ILogger<AiChatService> logger)
+        public AiChatService(HttpClient httpClient, IConfiguration configuration, ILogger<AiChatService> logger)
         {
-            _httpClientFactory = httpClientFactory;
+            _httpClient = httpClient;
             _configuration = configuration;
             _logger = logger;
         }
 
         public async Task<string> GetReplyAsync(List<AiChatMessageViewModel> history, string userMessage)
         {
-            // القيم دي بتيجي من appsettings.json / User Secrets / Environment Variables فقط.
-            // مفيش أي مفتاح API متكتوب هنا في الكود أبدًا.
             var endpoint = _configuration["AiSettings:Endpoint"];
             var apiKey = _configuration["AiSettings:ApiKey"];
             var model = _configuration["AiSettings:Model"];
 
             if (string.IsNullOrWhiteSpace(endpoint) || string.IsNullOrWhiteSpace(apiKey))
             {
-                _logger.LogWarning("AiSettings مش متظبطة (Endpoint/ApiKey مفقودين)");
-                return "المساعد مش متاح دلوقتي، حاول تاني بعدين.";
+                _logger.LogWarning("AiSettings not configured");
+                return "المساعد مش متاح دلوقتي.";
             }
 
-            if (string.IsNullOrWhiteSpace(userMessage))
-            {
-                return "من فضلك اكتب رسالة.";
-            }
-
-            var client = _httpClientFactory.CreateClient("AiApi");
-            client.DefaultRequestHeaders.Authorization =
+            _httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", apiKey);
 
-            var messages = new List<object>
-            {
-                new { role = "system", content = SystemPrompt }
-            };
-
+            var messages = new List<object> { new { role = "system", content = SystemPrompt } };
             foreach (var msg in history.TakeLast(10))
             {
                 messages.Add(new { role = msg.Role, content = msg.Text });
             }
 
-            var requestBody = new
-            {
-                model,
-                messages,
-                max_tokens = 300
-            };
-
-            var json = JsonSerializer.Serialize(requestBody);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var requestBody = new { model, messages, max_tokens = 300 };
+            var content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
 
             try
             {
-                var response = await client.PostAsync(endpoint, content);
+                var response = await _httpClient.PostAsync(endpoint, content);
                 var responseText = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    // بنسجل التفاصيل في الـ Log بس، ومنكشفهاش للمستخدم
                     _logger.LogError("AI API error {StatusCode}: {Body}", response.StatusCode, responseText);
-                    return "معلش، حصلت مشكلة وأنا بحاول أرد، جرب تاني.";
+                    return "معلش، حصلت مشكلة، جرب تاني.";
                 }
 
                 using var doc = JsonDocument.Parse(responseText);
@@ -102,15 +74,22 @@ namespace GymMvc.Services
                     .GetProperty("content")
                     .GetString();
 
-                return string.IsNullOrWhiteSpace(reply)
-                    ? "معلش، مقدرتش أفهم قصدك، ممكن تعيد صياغة السؤال؟"
-                    : reply.Trim();
+                return string.IsNullOrWhiteSpace(reply) ? "معلش، ممكن تعيد صياغة السؤال؟" : reply.Trim();
             }
-            catch (Exception ex)
+            catch (TaskCanceledException ex)
             {
-                // مفيش تفاصيل الـ Exception بترجع للمستخدم أبدًا
-                _logger.LogError(ex, "فشل الاتصال بالـ AI API");
+                _logger.LogError(ex, "AI API timeout");
+                return "المساعد بياخد وقت أكتر من المتوقع، جرب تاني.";
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "AI API network error");
                 return "معلش، مش قادر أتواصل مع المساعد دلوقتي.";
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "AI API returned malformed JSON");
+                return "معلش، حصلت مشكلة في الرد، جرب تاني.";
             }
         }
     }

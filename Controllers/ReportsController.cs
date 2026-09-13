@@ -9,8 +9,6 @@ using GymMvc.ViewModels;
 
 namespace GymMvc.Controllers
 {
-    // ⚠️ الصفحة دي بتعتمد على Models بتاعة مروان (Payment, Subscription, Booking, GymClass)
-    // القيم المفترضة (Status == "Active"/"Attended") لازم تتأكد منها معاه.
     [Authorize(Roles = "Admin")]
     public class ReportsController : Controller
     {
@@ -23,7 +21,6 @@ namespace GymMvc.Controllers
             _context = context;
         }
 
-        // GET: /Reports
         public async Task<IActionResult> Index()
         {
             var now = DateTime.Now;
@@ -48,19 +45,25 @@ namespace GymMvc.Controllers
                         .Sum(p => p.Amount))
                     .ToList(),
 
-                // ⚠️ افتراض: "نشط في شهر معين" = فيه اشتراك حالته Active وبيغطي الشهر ده
                 MembersData = months
                     .Select(m => subscriptions
-                        .Count(s => s.StartDate <= m && s.EndDate >= m && s.Status == "Active"))
+                        .Where(s => s.StartDate <= m && s.EndDate >= m && s.Status == "Active")
+                        .Select(s => s.MemberId)
+                        .Distinct()
+                        .Count())
                     .ToList(),
 
                 MonthlyIncome = payments
                     .Where(p => p.PaymentDate.Year == now.Year && p.PaymentDate.Month == now.Month)
                     .Sum(p => p.Amount),
 
-                ActiveMembers = subscriptions.Count(s => s.Status == "Active"),
+                // Distinct members, not subscription rows - a member can have more than one.
+                ActiveMembers = subscriptions
+                    .Where(s => s.Status == "Active")
+                    .Select(s => s.MemberId)
+                    .Distinct()
+                    .Count(),
 
-                // الاشتراكات اللي هتنتهي خلال 7 أيام قادمة ولسه Active
                 ExpiringMembershipsThisWeek = subscriptions
                     .Where(s => s.Status == "Active" && s.EndDate >= now && s.EndDate <= now.AddDays(7))
                     .Select(s => new ExpiringMembershipViewModel
@@ -73,12 +76,12 @@ namespace GymMvc.Controllers
                     .ToList()
             };
 
-            // أكتر الكلاسات حجزًا (بغض النظر عن حالة الحجز)
             model.MostPopularClasses = await _context.GymClasses
                 .Select(c => new PopularClassViewModel
                 {
                     ClassName = c.Name,
-                    BookingsCount = c.Bookings.Count
+                    // Cancelled bookings don't count as popularity.
+                    BookingsCount = c.Bookings.Count(b => b.Status != "Cancelled")
                 })
                 .OrderByDescending(c => c.BookingsCount)
                 .Take(TopClassesCount)

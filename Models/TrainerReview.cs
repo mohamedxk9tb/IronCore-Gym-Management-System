@@ -1,8 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace GymMvc.Models
 {
+    // Prevents duplicate reviews at the database level, even under concurrent requests.
+    [Index(nameof(TrainerId), nameof(MemberId), IsUnique = true)]
     public class TrainerReview
     {
         public int Id { get; set; }
@@ -13,7 +16,7 @@ namespace GymMvc.Models
 
         [ForeignKey(nameof(Member))]
         public int MemberId { get; set; }
-        public Member Member { get; set; } = null!; // بتاع محمد
+        public Member Member { get; set; } = null!;
 
         [Range(1, 5)]
         public int Rating { get; set; }

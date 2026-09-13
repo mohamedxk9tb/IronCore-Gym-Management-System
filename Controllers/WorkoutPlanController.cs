@@ -6,40 +6,51 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GymMvc.Data;
 using GymMvc.Models;
+using GymMvc.Services;
 using GymMvc.ViewModels;
 
 namespace GymMvc.Controllers
 {
-    // صفحة Workout & Diet Plan: المدرب يكتب خطة تمرين/غذاء لعضو، والعضو يشوفها
     public class WorkoutPlanController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ICurrentUserService _currentUser;
 
-        public WorkoutPlanController(ApplicationDbContext context)
+        public WorkoutPlanController(ApplicationDbContext context, ICurrentUserService currentUser)
         {
             _context = context;
+            _currentUser = currentUser;
         }
 
-        // GET: /WorkoutPlan/Create
         [Authorize(Roles = "Trainer")]
         public async Task<IActionResult> Create()
         {
+            var trainerId = await _currentUser.GetCurrentTrainerIdAsync();
+            if (trainerId == null)
+            {
+                return Forbid();
+            }
+
             var model = new WorkoutDietPlanFormViewModel
             {
-                TrainerId = GetCurrentTrainerId(),
+                TrainerId = trainerId.Value,
                 Members = await GetMembersSelectListAsync()
             };
 
             return View(model);
         }
 
-        // POST: /WorkoutPlan/Create
         [HttpPost]
         [Authorize(Roles = "Trainer")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(WorkoutDietPlanFormViewModel model)
         {
-            // التحقق إن العضو المختار فعلاً موجود - منمنعش الـ ID من غير تحقق
+            var trainerId = await _currentUser.GetCurrentTrainerIdAsync();
+            if (trainerId == null)
+            {
+                return Forbid();
+            }
+
             var memberExists = await _context.Members.AnyAsync(m => m.Id == model.MemberId);
             if (!memberExists)
             {
@@ -54,8 +65,8 @@ namespace GymMvc.Controllers
 
             var plan = new WorkoutPlan
             {
-                // TrainerId من اليوزر المسجل دخوله، مش من الفورم
-                TrainerId = GetCurrentTrainerId(),
+                // TrainerId resolved server-side - never trusted from the form.
+                TrainerId = trainerId.Value,
                 MemberId = model.MemberId,
                 Exercises = model.Exercises.Select(e => new WorkoutExercise
                 {
@@ -77,7 +88,6 @@ namespace GymMvc.Controllers
             return RedirectToAction(nameof(Details), new { id = plan.Id });
         }
 
-        // GET: /WorkoutPlan/Details/5
         [Authorize(Roles = "Member,Trainer")]
         public async Task<IActionResult> Details(int id)
         {
@@ -92,10 +102,22 @@ namespace GymMvc.Controllers
                 return NotFound();
             }
 
-            // ownership check: عضو مينفعش يشوف خطة عضو تاني
-            if (User.IsInRole("Member") && plan.MemberId != GetCurrentMemberId())
+            if (User.IsInRole("Member"))
             {
-                return Forbid();
+                var memberId = await _currentUser.GetCurrentMemberIdAsync();
+                if (memberId == null || plan.MemberId != memberId)
+                {
+                    return Forbid();
+                }
+            }
+
+            if (User.IsInRole("Trainer"))
+            {
+                var trainerId = await _currentUser.GetCurrentTrainerIdAsync();
+                if (trainerId == null || plan.TrainerId != trainerId)
+                {
+                    return Forbid();
+                }
             }
 
             var model = new WorkoutDietPlanDetailsViewModel
@@ -123,25 +145,8 @@ namespace GymMvc.Controllers
         private async Task<System.Collections.Generic.List<SelectListItem>> GetMembersSelectListAsync()
         {
             return await _context.Members
-                .Select(m => new SelectListItem
-                {
-                    Value = m.Id.ToString(),
-                    Text = m.FullName
-                })
+                .Select(m => new SelectListItem { Value = m.Id.ToString(), Text = m.FullName })
                 .ToListAsync();
-        }
-
-        // ⚠️ placeholders - نفس نقطة التنسيق المطلوبة مع محمد بخصوص ربط اليوزر بـ Trainer/Member
-        private int GetCurrentTrainerId()
-        {
-            var claim = User.FindFirst("TrainerId")?.Value;
-            return int.TryParse(claim, out var trainerId) ? trainerId : 0;
-        }
-
-        private int GetCurrentMemberId()
-        {
-            var claim = User.FindFirst("MemberId")?.Value;
-            return int.TryParse(claim, out var memberId) ? memberId : 0;
         }
     }
 }

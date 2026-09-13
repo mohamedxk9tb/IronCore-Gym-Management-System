@@ -16,11 +16,13 @@ namespace GymMvc.Models
         [StringLength(250)]
         public string Certificates { get; set; } = string.Empty;
 
-        // ------ Navigation Properties ------
+        // Links this Trainer row to the logged-in Identity user.
+        // Required for reliable current-trainer resolution (no unverified claims).
+        [StringLength(450)]
+        public string? ApplicationUserId { get; set; }
+
         public ICollection<WorkoutPlan> WorkoutPlans { get; set; } = new List<WorkoutPlan>();
         public ICollection<TrainerReview> Reviews { get; set; } = new List<TrainerReview>();
-
-        // GymClass نفسه بتاع مروان - إحنا محتاجين الـ navigation بس عشان علاقة TEACHES
         public ICollection<GymClass> GymClasses { get; set; } = new List<GymClass>();
     }
 }

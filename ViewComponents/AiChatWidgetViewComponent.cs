@@ -7,16 +7,12 @@ namespace GymMvc.ViewComponents
 {
     public class AiChatWidgetViewComponent : ViewComponent
     {
-        private const string SessionKey = "AiChatHistory";
-
         public IViewComponentResult Invoke()
         {
-            var history = HttpContext.Session.GetObject<List<AiChatMessageViewModel>>(SessionKey)
+            var history = HttpContext.Session.GetObject<List<AiChatMessageViewModel>>(SessionExtensions.AiChatHistoryKey)
                           ?? new List<AiChatMessageViewModel>();
 
-            var model = new AiChatViewModel { Messages = history };
-
-            return View(model);
+            return View(new AiChatViewModel { Messages = history });
         }
     }
 }

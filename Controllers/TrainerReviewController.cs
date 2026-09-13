@@ -4,23 +4,24 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GymMvc.Data;
 using GymMvc.Models;
+using GymMvc.Services;
 using GymMvc.ViewModels;
 
 namespace GymMvc.Controllers
 {
-    // ⚠️ ده الاسم الرسمي (جمع). لو عندك TrainerReviewController.cs بالمفرد، امسحه.
     [Authorize(Roles = "Member")]
     [Route("TrainerReviews")]
     public class TrainerReviewsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ICurrentUserService _currentUser;
 
-        public TrainerReviewsController(ApplicationDbContext context)
+        public TrainerReviewsController(ApplicationDbContext context, ICurrentUserService currentUser)
         {
             _context = context;
+            _currentUser = currentUser;
         }
 
-        // GET: /TrainerReviews/Create/5  (5 = TrainerId)
         [HttpGet("Create/{trainerId:int}")]
         public async Task<IActionResult> Create(int trainerId)
         {
@@ -39,7 +40,6 @@ namespace GymMvc.Controllers
             return View(model);
         }
 
-        // POST: /TrainerReviews/Create
         [HttpPost("Create")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(TrainerReviewFormViewModel model)
@@ -49,8 +49,11 @@ namespace GymMvc.Controllers
                 return View(model);
             }
 
-            // MemberId من اليوزر المسجل دخوله - مش من الفورم
-            var memberId = GetCurrentMemberId();
+            var memberId = await _currentUser.GetCurrentMemberIdAsync();
+            if (memberId == null)
+            {
+                return Forbid();
+            }
 
             var alreadyReviewed = await _context.TrainerReviews
                 .AnyAsync(r => r.TrainerId == model.TrainerId && r.MemberId == memberId);
@@ -65,22 +68,26 @@ namespace GymMvc.Controllers
             var review = new TrainerReview
             {
                 TrainerId = model.TrainerId,
-                MemberId = memberId,
+                MemberId = memberId.Value,
                 Rating = model.Rating,
                 Comment = model.Comment
             };
 
             _context.TrainerReviews.Add(review);
-            await _context.SaveChangesAsync();
+
+            // DB unique index (TrainerId+MemberId) is the final safety net for races.
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                ModelState.AddModelError(string.Empty, "إنت قيّمت المدرب ده قبل كده");
+                model.TrainerName = (await _context.Trainers.FindAsync(model.TrainerId))?.FullName ?? model.TrainerName;
+                return View(model);
+            }
 
             return RedirectToAction("Details", "Trainers", new { id = model.TrainerId });
-        }
-
-        // ⚠️ placeholder - نفس نقطة التنسيق المطلوبة مع محمد
-        private int GetCurrentMemberId()
-        {
-            var claim = User.FindFirst("MemberId")?.Value;
-            return int.TryParse(claim, out var memberId) ? memberId : 0;
         }
     }
 }

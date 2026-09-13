@@ -5,34 +5,37 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GymMvc.Data;
+using GymMvc.Services;
 using GymMvc.ViewModels;
 
 namespace GymMvc.Controllers
 {
-    // صفحة Trainer Dashboard: كلاسات المدرب اليوم + تسجيل حضور الأعضاء.
-    // الحضور بيتسجل عن طريق تحديث Booking.Status (مفيش جدول Attendance منفصل).
     [Authorize(Roles = "Trainer")]
     public class TrainerDashboardController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ICurrentUserService _currentUser;
 
-        public TrainerDashboardController(ApplicationDbContext context)
+        public TrainerDashboardController(ApplicationDbContext context, ICurrentUserService currentUser)
         {
             _context = context;
+            _currentUser = currentUser;
         }
 
-        // GET: /TrainerDashboard/Dashboard
         public async Task<IActionResult> Dashboard()
         {
-            var trainerId = GetCurrentTrainerId();
+            var trainerId = await _currentUser.GetCurrentTrainerIdAsync();
+            if (trainerId == null)
+            {
+                return Forbid();
+            }
 
-            var trainer = await _context.Trainers.FindAsync(trainerId);
+            var trainer = await _context.Trainers.FindAsync(trainerId.Value);
             if (trainer == null)
             {
                 return NotFound();
             }
 
-            // ⚠️ افتراض: GymClass.DayOfWeek متخزن كنص مطابق لاسم اليوم بالإنجليزي ("Monday")
             var todayName = DateTime.Now.DayOfWeek.ToString();
 
             var todayClasses = await _context.GymClasses
@@ -48,9 +51,9 @@ namespace GymMvc.Controllers
                 {
                     Id = c.Id,
                     ClassName = c.Name,
-                    Time = todayName, // مفيش حقل وقت في GymClass دلوقتي - محتاج StartTime من مروان
+                    // GymClass.StartTime is assumed TimeSpan - adjust format if it's DateTime
+                    Time = c.StartTime.ToString(@"hh\:mm"),
                     Members = c.Bookings
-                        // بنعرض الحجوزات الفعلية بس (مش الملغية)
                         .Where(b => b.Status != "Cancelled")
                         .Select(b => new MemberAttendanceViewModel
                         {
@@ -65,12 +68,15 @@ namespace GymMvc.Controllers
             return View(model);
         }
 
-        // POST: /TrainerDashboard/MarkAttendance
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> MarkAttendance(int bookingId, bool isPresent)
         {
-            var trainerId = GetCurrentTrainerId();
+            var trainerId = await _currentUser.GetCurrentTrainerIdAsync();
+            if (trainerId == null)
+            {
+                return Forbid();
+            }
 
             var booking = await _context.Bookings
                 .Include(b => b.GymClass)
@@ -81,7 +87,6 @@ namespace GymMvc.Controllers
                 return NotFound();
             }
 
-            // ownership check: المدرب مينفعش يعدّل حضور Booking لكلاس مدرب تاني
             if (booking.GymClass.TrainerId != trainerId)
             {
                 return Forbid();
@@ -91,14 +96,6 @@ namespace GymMvc.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Dashboard));
-        }
-
-        // ⚠️ placeholder - لازم يتظبط حسب نظام الـ Identity بتاع محمد
-        // (إزاي المدرب المسجل دخوله مربوط بصف في جدول Trainer؟)
-        private int GetCurrentTrainerId()
-        {
-            var claim = User.FindFirst("TrainerId")?.Value;
-            return int.TryParse(claim, out var trainerId) ? trainerId : 0;
         }
     }
 }
