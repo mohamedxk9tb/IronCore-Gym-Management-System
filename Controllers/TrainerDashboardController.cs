@@ -1,73 +1,104 @@
-using GymMvc.ViewModels;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using GymMvc.Data;
+using GymMvc.ViewModels;
 
 namespace GymMvc.Controllers
 {
+    // صفحة Trainer Dashboard: كلاسات المدرب اليوم + تسجيل حضور الأعضاء.
+    // الحضور بيتسجل عن طريق تحديث Booking.Status (مفيش جدول Attendance منفصل).
+    [Authorize(Roles = "Trainer")]
     public class TrainerDashboardController : Controller
     {
-        private static readonly List<ClassViewModel> Classes = new()
-        {
-            new ClassViewModel
-            {
-                Id = 1,
-                ClassName = "Strength Fundamentals",
-                Time = "06:00 PM",
-                Members = new List<MemberAttendanceViewModel>
-                {
-                    new MemberAttendanceViewModel
-                    {
-                        MemberId = 1,
-                        MemberName = "Ahmed Ali"
-                    },
-                    new MemberAttendanceViewModel
-                    {
-                        MemberId = 2,
-                        MemberName = "Mohamed Hassan"
-                    }
-                }
-            },
+        private readonly ApplicationDbContext _context;
 
-            new ClassViewModel
+        public TrainerDashboardController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        // GET: /TrainerDashboard/Dashboard
+        public async Task<IActionResult> Dashboard()
+        {
+            var trainerId = GetCurrentTrainerId();
+
+            var trainer = await _context.Trainers.FindAsync(trainerId);
+            if (trainer == null)
             {
-                Id = 2,
-                ClassName = "Bodybuilding",
-                Time = "08:00 PM",
-                Members = new List<MemberAttendanceViewModel>
-                {
-                    new MemberAttendanceViewModel
-                    {
-                        MemberId = 3,
-                        MemberName = "Omar Khaled"
-                    }
-                }
+                return NotFound();
             }
-        };
 
-        public IActionResult Index()
-        {
+            // ⚠️ افتراض: GymClass.DayOfWeek متخزن كنص مطابق لاسم اليوم بالإنجليزي ("Monday")
+            var todayName = DateTime.Now.DayOfWeek.ToString();
+
+            var todayClasses = await _context.GymClasses
+                .Where(c => c.TrainerId == trainerId && c.DayOfWeek == todayName)
+                .Include(c => c.Bookings)
+                    .ThenInclude(b => b.Member)
+                .ToListAsync();
+
             var model = new TrainerDashboardViewModel
             {
-                TrainerName = "Ahmed Ali",
-                Classes = Classes
+                TrainerName = trainer.FullName,
+                Classes = todayClasses.Select(c => new ClassViewModel
+                {
+                    Id = c.Id,
+                    ClassName = c.Name,
+                    Time = todayName, // مفيش حقل وقت في GymClass دلوقتي - محتاج StartTime من مروان
+                    Members = c.Bookings
+                        // بنعرض الحجوزات الفعلية بس (مش الملغية)
+                        .Where(b => b.Status != "Cancelled")
+                        .Select(b => new MemberAttendanceViewModel
+                        {
+                            BookingId = b.Id,
+                            MemberId = b.MemberId,
+                            MemberName = b.Member.FullName,
+                            IsPresent = b.Status == "Attended"
+                        }).ToList()
+                }).ToList()
             };
 
             return View(model);
         }
 
+        // POST: /TrainerDashboard/MarkAttendance
         [HttpPost]
-        public IActionResult MarkAttendance(int classId, int memberId)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MarkAttendance(int bookingId, bool isPresent)
         {
-            var gymClass = Classes.FirstOrDefault(x => x.Id == classId);
+            var trainerId = GetCurrentTrainerId();
 
-            var member = gymClass?.Members
-                .FirstOrDefault(x => x.MemberId == memberId);
+            var booking = await _context.Bookings
+                .Include(b => b.GymClass)
+                .FirstOrDefaultAsync(b => b.Id == bookingId);
 
-            if (member != null)
+            if (booking == null)
             {
-                member.IsPresent = true;
+                return NotFound();
             }
 
-            return RedirectToAction(nameof(Index));
+            // ownership check: المدرب مينفعش يعدّل حضور Booking لكلاس مدرب تاني
+            if (booking.GymClass.TrainerId != trainerId)
+            {
+                return Forbid();
+            }
+
+            booking.Status = isPresent ? "Attended" : "Booked";
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Dashboard));
+        }
+
+        // ⚠️ placeholder - لازم يتظبط حسب نظام الـ Identity بتاع محمد
+        // (إزاي المدرب المسجل دخوله مربوط بصف في جدول Trainer؟)
+        private int GetCurrentTrainerId()
+        {
+            var claim = User.FindFirst("TrainerId")?.Value;
+            return int.TryParse(claim, out var trainerId) ? trainerId : 0;
         }
     }
 }

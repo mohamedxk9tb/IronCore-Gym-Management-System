@@ -1,108 +1,134 @@
-using GymMvc.Models;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using GymMvc.Data;
+using GymMvc.Models;
+using GymMvc.ViewModels;
 
 namespace GymMvc.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class AdminTrainersController : Controller
     {
-        private static readonly List<Trainer> Trainers = new()
-        {
-            new Trainer
-            {
-                Id = 1,
-                FullName = "Ahmed Hassan",
-                Specialty = "Strength Training"
-            },
-            new Trainer
-            {
-                Id = 2,
-                FullName = "Omar Ali",
-                Specialty = "Bodybuilding"
-            },
-            new Trainer
-            {
-                Id = 3,
-                FullName = "Youssef Mohamed",
-                Specialty = "Fitness & Cardio"
-            }
-        };
+        private readonly ApplicationDbContext _context;
 
-        public IActionResult Index()
+        public AdminTrainersController(ApplicationDbContext context)
         {
-            return View(Trainers);
+            _context = context;
         }
 
+        // GET: /AdminTrainers
+        public async Task<IActionResult> Index()
+        {
+            var trainers = await _context.Trainers.ToListAsync();
+            return View(trainers);
+        }
+
+        // GET: /AdminTrainers/Create
         public IActionResult Create()
         {
-            return View();
+            return View(new TrainerFormViewModel());
         }
 
+        // POST: /AdminTrainers/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Trainer trainer)
+        public async Task<IActionResult> Create(TrainerFormViewModel model)
         {
             if (!ModelState.IsValid)
-                return View(trainer);
+            {
+                return View(model);
+            }
 
-            trainer.Id = Trainers.Count == 0
-                ? 1
-                : Trainers.Max(t => t.Id) + 1;
+            var trainer = new Trainer
+            {
+                FullName = model.FullName,
+                Specialty = model.Specialty,
+                Certificates = model.Certificates
+            };
 
-            Trainers.Add(trainer);
+            _context.Trainers.Add(trainer);
+            await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Edit(int id)
+        // GET: /AdminTrainers/Edit/5
+        public async Task<IActionResult> Edit(int id)
         {
-            var trainer = Trainers.FirstOrDefault(t => t.Id == id);
-
+            var trainer = await _context.Trainers.FindAsync(id);
             if (trainer == null)
+            {
                 return NotFound();
+            }
 
-            return View(trainer);
+            var model = new TrainerFormViewModel
+            {
+                Id = trainer.Id,
+                FullName = trainer.FullName,
+                Specialty = trainer.Specialty,
+                Certificates = trainer.Certificates
+            };
+
+            return View(model);
         }
 
+        // POST: /AdminTrainers/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, Trainer trainer)
+        public async Task<IActionResult> Edit(int id, TrainerFormViewModel model)
         {
-            if (id != trainer.Id)
+            if (id != model.Id)
+            {
                 return BadRequest();
+            }
 
             if (!ModelState.IsValid)
-                return View(trainer);
+            {
+                return View(model);
+            }
 
-            var existingTrainer =
-                Trainers.FirstOrDefault(t => t.Id == id);
-
-            if (existingTrainer == null)
+            var trainer = await _context.Trainers.FindAsync(id);
+            if (trainer == null)
+            {
                 return NotFound();
+            }
 
-            existingTrainer.FullName = trainer.FullName;
-            existingTrainer.Specialty = trainer.Specialty;
+            trainer.FullName = model.FullName;
+            trainer.Specialty = model.Specialty;
+            trainer.Certificates = model.Certificates;
+
+            await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Delete(int id)
+        // GET: /AdminTrainers/Delete/5
+        public async Task<IActionResult> Delete(int id)
         {
-            var trainer = Trainers.FirstOrDefault(t => t.Id == id);
-
+            var trainer = await _context.Trainers.FindAsync(id);
             if (trainer == null)
+            {
                 return NotFound();
+            }
 
             return View(trainer);
         }
 
+        // POST: /AdminTrainers/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var trainer = Trainers.FirstOrDefault(t => t.Id == id);
+            var trainer = await _context.Trainers.FindAsync(id);
+            if (trainer == null)
+            {
+                return NotFound();
+            }
 
-            if (trainer != null)
-                Trainers.Remove(trainer);
+            _context.Trainers.Remove(trainer);
+            await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }

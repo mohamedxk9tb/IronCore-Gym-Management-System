@@ -1,7 +1,11 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using GymMvc.ViewModels;
+
 namespace GymMvc.Services
 {
     public interface IAiChatService
     {
-        Task<string> GetResponseAsync(string message);
+        Task<string> GetReplyAsync(List<AiChatMessageViewModel> history, string userMessage);
     }
 }
