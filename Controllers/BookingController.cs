@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using GymMvc.Data;
 using GymMvc.Models;
+using GymMvc.ViewModels;
 
 namespace GymMvc.Controllers;
 
@@ -13,7 +14,9 @@ public class BookingController : Controller
     private readonly ApplicationDbContext _context;
     private readonly UserManager<ApplicationUser> _userManager;
 
-    public BookingController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+    public BookingController(
+        ApplicationDbContext context,
+        UserManager<ApplicationUser> userManager)
     {
         _context = context;
         _userManager = userManager;
@@ -33,12 +36,28 @@ public class BookingController : Controller
 
         var bookings = await _context.Bookings
             .Include(b => b.GymClass)
-            .ThenInclude(c => c.Trainer)
+                .ThenInclude(c => c.Trainer)
             .Where(b => b.MemberId == member.Id)
             .OrderByDescending(b => b.BookedAt)
             .ToListAsync();
 
-        return View(bookings);
+        var viewModel = new BookingListViewModel();
+
+        foreach (var booking in bookings)
+        {
+            viewModel.Bookings.Add(new BookingRowViewModel
+            {
+                Booking = booking,
+                ClassName = booking.GymClass.Name,
+                TrainerName = booking.GymClass.Trainer.FullName,
+                DayOfWeek = booking.GymClass.DayOfWeek,
+                StartTime = booking.GymClass.StartTime,
+                IsCancelled = booking.Status == "Cancelled",
+                IsAttended = booking.Status == "Attended"
+            });
+        }
+
+        return View(viewModel);
     }
 
     [HttpPost]
@@ -48,7 +67,7 @@ public class BookingController : Controller
         var currentUserId = _userManager.GetUserId(User);
 
         var member = await _context.Members
-           .FirstOrDefaultAsync(m => m.ApplicationUserId == currentUserId);
+            .FirstOrDefaultAsync(m => m.ApplicationUserId == currentUserId);
 
         if (member == null)
         {

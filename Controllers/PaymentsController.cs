@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using GymMvc.Data;
 using GymMvc.Models;
+using GymMvc.ViewModels;
 
 namespace GymMvc.Controllers;
 
@@ -13,7 +14,9 @@ public class PaymentsController : Controller
     private readonly ApplicationDbContext _context;
     private readonly UserManager<ApplicationUser> _userManager;
 
-    public PaymentsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+    public PaymentsController(
+        ApplicationDbContext context,
+        UserManager<ApplicationUser> userManager)
     {
         _context = context;
         _userManager = userManager;
@@ -38,7 +41,18 @@ public class PaymentsController : Controller
             .OrderByDescending(p => p.PaymentDate)
             .ToListAsync();
 
-        return View(payments);
+        var viewModel = new PaymentListViewModel();
+
+        foreach (var payment in payments)
+        {
+            viewModel.Payments.Add(new PaymentRowViewModel
+            {
+                Payment = payment,
+                PlanName = payment.Subscription.Plan.Name
+            });
+        }
+
+        return View(viewModel);
     }
 
     [HttpGet]
@@ -53,7 +67,14 @@ public class PaymentsController : Controller
             return NotFound();
         }
 
-        return View(subscription);
+        var viewModel = new PaymentCreateViewModel
+        {
+            Subscription = subscription,
+            PlanName = subscription.Plan.Name,
+            PlanPrice = subscription.Plan.Price
+        };
+
+        return View(viewModel);
     }
 
     [HttpPost]

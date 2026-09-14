@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using GymMvc.Data;
 using GymMvc.Models;
+using GymMvc.ViewModels;
 
 namespace GymMvc.Controllers;
 
@@ -13,7 +14,9 @@ public class SubscriptionsController : Controller
     private readonly ApplicationDbContext _context;
     private readonly UserManager<ApplicationUser> _userManager;
 
-    public SubscriptionsController(ApplicationDbContext context,UserManager<ApplicationUser> userManager)
+    public SubscriptionsController(
+        ApplicationDbContext context,
+        UserManager<ApplicationUser> userManager)
     {
         _context = context;
         _userManager = userManager;
@@ -37,7 +40,23 @@ public class SubscriptionsController : Controller
             .OrderByDescending(s => s.StartDate)
             .ToListAsync();
 
-        return View(subscriptions);
+        var viewModel = new SubscriptionListViewModel();
+
+        foreach (var subscription in subscriptions)
+        {
+            var daysRemaining = (subscription.EndDate - DateTime.Now).Days;
+
+            viewModel.Subscriptions.Add(new SubscriptionRowViewModel
+            {
+                Subscription = subscription,
+                PlanName = subscription.Plan.Name,
+                PlanPrice = subscription.Plan.Price,
+                DaysRemaining = daysRemaining > 0 ? daysRemaining : 0,
+                IsExpired = subscription.EndDate < DateTime.Now
+            });
+        }
+
+        return View(viewModel);
     }
 
     [HttpGet]
@@ -50,7 +69,12 @@ public class SubscriptionsController : Controller
             return NotFound();
         }
 
-        return View(plan);
+        var viewModel = new SubscriptionCreateViewModel
+        {
+            Plan = plan
+        };
+
+        return View(viewModel);
     }
 
     [HttpPost]
