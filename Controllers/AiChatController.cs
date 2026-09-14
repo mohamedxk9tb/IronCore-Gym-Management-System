@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using GymMvc.Helpers;
@@ -9,19 +10,19 @@ using GymMvc.ViewModels;
 
 namespace GymMvc.Controllers
 {
-    // AI chat is member-only. Change this if public chat is the final decision
-    // (and add rate limiting if so).
     [Authorize(Roles = "Member")]
     [Route("AiChat")]
     public class AiChatController : Controller
     {
         private readonly IAiChatService _aiChatService;
+        private readonly IAntiforgery _antiforgery;
         private const int MaxStoredMessages = 20;
         private const int MaxMessageLength = 500;
 
-        public AiChatController(IAiChatService aiChatService)
+        public AiChatController(IAiChatService aiChatService, IAntiforgery antiforgery)
         {
             _aiChatService = aiChatService;
+            _antiforgery = antiforgery;
         }
 
         public class SendMessageRequest
@@ -32,6 +33,11 @@ namespace GymMvc.Controllers
         [HttpPost("SendMessage")]
         public async Task<IActionResult> SendMessage([FromBody] SendMessageRequest request)
         {
+            if (!await IsValidCsrfAsync())
+            {
+                return BadRequest(new { error = "Invalid request token" });
+            }
+
             var message = request?.Message?.Trim();
 
             if (string.IsNullOrWhiteSpace(message))
@@ -64,10 +70,33 @@ namespace GymMvc.Controllers
         }
 
         [HttpPost("ClearChat")]
-        public IActionResult ClearChat()
+        public async Task<IActionResult> ClearChat()
         {
+            if (!await IsValidCsrfAsync())
+            {
+                return BadRequest(new { error = "Invalid request token" });
+            }
+
             HttpContext.Session.Remove(SessionExtensions.AiChatHistoryKey);
             return Json(new { success = true });
+        }
+
+        // Validates the antiforgery token from the request header. This works for
+        // AJAX/JSON POSTs (unlike [ValidateAntiForgeryToken], which expects a form field).
+        // Requires Program.cs to configure a header name, e.g.:
+        // services.AddAntiforgery(o => o.HeaderName = "RequestVerificationToken");
+        // The View's JS must send that header with the token from @Html.AntiForgeryToken().
+        private async Task<bool> IsValidCsrfAsync()
+        {
+            try
+            {
+                await _antiforgery.ValidateRequestAsync(HttpContext);
+                return true;
+            }
+            catch (AntiforgeryValidationException)
+            {
+                return false;
+            }
         }
     }
 }

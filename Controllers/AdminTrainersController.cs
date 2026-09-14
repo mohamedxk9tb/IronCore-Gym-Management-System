@@ -18,20 +18,17 @@ namespace GymMvc.Controllers
             _context = context;
         }
 
-        // GET: /AdminTrainers
         public async Task<IActionResult> Index()
         {
             var trainers = await _context.Trainers.ToListAsync();
             return View(trainers);
         }
 
-        // GET: /AdminTrainers/Create
         public IActionResult Create()
         {
             return View(new TrainerFormViewModel());
         }
 
-        // POST: /AdminTrainers/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(TrainerFormViewModel model)
@@ -54,7 +51,6 @@ namespace GymMvc.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: /AdminTrainers/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
             var trainer = await _context.Trainers.FindAsync(id);
@@ -74,7 +70,6 @@ namespace GymMvc.Controllers
             return View(model);
         }
 
-        // POST: /AdminTrainers/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, TrainerFormViewModel model)
@@ -104,7 +99,6 @@ namespace GymMvc.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: /AdminTrainers/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
             var trainer = await _context.Trainers.FindAsync(id);
@@ -116,7 +110,6 @@ namespace GymMvc.Controllers
             return View(trainer);
         }
 
-        // POST: /AdminTrainers/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -128,7 +121,20 @@ namespace GymMvc.Controllers
             }
 
             _context.Trainers.Remove(trainer);
-            await _context.SaveChangesAsync();
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                // Trainer has related GymClass/WorkoutPlan/TrainerReview rows and the
+                // configured delete behavior does not allow removal. Fail safely
+                // instead of crashing or guessing cascade behavior here.
+                ModelState.AddModelError(string.Empty,
+                    "معلش، مينفعش تمسح المدرب ده لأن ليه بيانات مرتبطة (كلاسات/خطط/تقييمات).");
+                return View("Delete", trainer);
+            }
 
             return RedirectToAction(nameof(Index));
         }

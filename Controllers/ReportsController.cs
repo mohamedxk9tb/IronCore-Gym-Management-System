@@ -24,68 +24,78 @@ namespace GymMvc.Controllers
         public async Task<IActionResult> Index()
         {
             var now = DateTime.Now;
-
-            var payments = await _context.Payments.ToListAsync();
-            var subscriptions = await _context.Subscriptions
-                .Include(s => s.Member)
-                .Include(s => s.Plan)
-                .ToListAsync();
+            var rangeStart = now.AddMonths(-(MonthsToShow - 1)).Date;
 
             var months = Enumerable.Range(0, MonthsToShow)
                 .Select(i => now.AddMonths(-(MonthsToShow - 1 - i)))
                 .ToList();
+
+            // Only pull what's needed for the chart range - aggregation done in memory
+            // per month bucket (SQL Server has no simple portable "group by month" here
+            // without extra complexity, and the row count in this range is small).
+            var paymentsInRange = await _context.Payments
+                .Where(p => p.PaymentDate >= rangeStart)
+                .Select(p => new { p.Amount, p.PaymentDate })
+                .ToListAsync();
+
+            var subscriptionsInRange = await _context.Subscriptions
+                .Where(s => s.EndDate >= rangeStart)
+                .Select(s => new { s.MemberId, s.StartDate, s.EndDate, s.Status })
+                .ToListAsync();
 
             var model = new ReportsViewModel
             {
                 Months = months.Select(m => m.ToString("MMM yyyy")).ToList(),
 
                 IncomeData = months
-                    .Select(m => payments
+                    .Select(m => paymentsInRange
                         .Where(p => p.PaymentDate.Year == m.Year && p.PaymentDate.Month == m.Month)
                         .Sum(p => p.Amount))
                     .ToList(),
 
                 MembersData = months
-                    .Select(m => subscriptions
+                    .Select(m => subscriptionsInRange
                         .Where(s => s.StartDate <= m && s.EndDate >= m && s.Status == "Active")
                         .Select(s => s.MemberId)
                         .Distinct()
                         .Count())
                     .ToList(),
 
-                MonthlyIncome = payments
+                MonthlyIncome = await _context.Payments
                     .Where(p => p.PaymentDate.Year == now.Year && p.PaymentDate.Month == now.Month)
-                    .Sum(p => p.Amount),
+                    .SumAsync(p => p.Amount),
 
-                // Distinct members, not subscription rows - a member can have more than one.
-                ActiveMembers = subscriptions
-                    .Where(s => s.Status == "Active")
+                // Bug fix: a subscription with Status == "Active" whose EndDate has already
+                // passed must not count as an active member.
+                ActiveMembers = await _context.Subscriptions
+                    .Where(s => s.Status == "Active" && s.EndDate >= now)
                     .Select(s => s.MemberId)
                     .Distinct()
-                    .Count(),
+                    .CountAsync(),
 
-                ExpiringMembershipsThisWeek = subscriptions
+                ExpiringMembershipsThisWeek = await _context.Subscriptions
+                    .Include(s => s.Member)
+                    .Include(s => s.Plan)
                     .Where(s => s.Status == "Active" && s.EndDate >= now && s.EndDate <= now.AddDays(7))
+                    .OrderBy(s => s.EndDate)
                     .Select(s => new ExpiringMembershipViewModel
                     {
                         MemberName = s.Member.FullName,
                         PlanName = s.Plan.Name,
                         EndDate = s.EndDate
                     })
-                    .OrderBy(e => e.EndDate)
-                    .ToList()
-            };
+                    .ToListAsync(),
 
-            model.MostPopularClasses = await _context.GymClasses
-                .Select(c => new PopularClassViewModel
-                {
-                    ClassName = c.Name,
-                    // Cancelled bookings don't count as popularity.
-                    BookingsCount = c.Bookings.Count(b => b.Status != "Cancelled")
-                })
-                .OrderByDescending(c => c.BookingsCount)
-                .Take(TopClassesCount)
-                .ToListAsync();
+                MostPopularClasses = await _context.GymClasses
+                    .Select(c => new PopularClassViewModel
+                    {
+                        ClassName = c.Name,
+                        BookingsCount = c.Bookings.Count(b => b.Status != "Cancelled")
+                    })
+                    .OrderByDescending(c => c.BookingsCount)
+                    .Take(TopClassesCount)
+                    .ToListAsync()
+            };
 
             return View(model);
         }

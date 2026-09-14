@@ -51,8 +51,8 @@ namespace GymMvc.Controllers
                 {
                     Id = c.Id,
                     ClassName = c.Name,
-                    // GymClass.StartTime is assumed TimeSpan - adjust format if it's DateTime
-                    Time = c.StartTime.ToString(@"hh\:mm"),
+                    // 24-hour, unambiguous format (works for TimeSpan or DateTime alike).
+                    Time = $"{c.StartTime.Hours:D2}:{c.StartTime.Minutes:D2}",
                     Members = c.Bookings
                         .Where(b => b.Status != "Cancelled")
                         .Select(b => new MemberAttendanceViewModel
@@ -90,6 +90,11 @@ namespace GymMvc.Controllers
             if (booking.GymClass.TrainerId != trainerId)
             {
                 return Forbid();
+            }
+
+            if (booking.Status == "Cancelled")
+            {
+                return BadRequest(new { error = "الحجز ده اتلغى، مينفعش يتسجله حضور" });
             }
 
             booking.Status = isPresent ? "Attended" : "Booked";

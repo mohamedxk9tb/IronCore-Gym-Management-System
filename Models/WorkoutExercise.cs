@@ -14,7 +14,10 @@ namespace GymMvc.Models
         [Required, StringLength(100)]
         public string ExerciseName { get; set; } = string.Empty;
 
+        [Range(1, 50)]
         public int Sets { get; set; }
+
+        [Range(1, 100)]
         public int Reps { get; set; }
     }
 }

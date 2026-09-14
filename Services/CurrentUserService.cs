@@ -23,12 +23,10 @@ namespace GymMvc.Services
             var userId = GetIdentityUserId();
             if (userId == null) return null;
 
-            var trainer = await _context.Trainers
+            return await _context.Trainers
                 .Where(t => t.ApplicationUserId == userId)
                 .Select(t => (int?)t.Id)
                 .FirstOrDefaultAsync();
-
-            return trainer;
         }
 
         public async Task<int?> GetCurrentMemberIdAsync()
@@ -36,14 +34,10 @@ namespace GymMvc.Services
             var userId = GetIdentityUserId();
             if (userId == null) return null;
 
-            // NOTE: requires Member.ApplicationUserId (Mohamed's model).
-            // Until that field exists, this will not resolve correctly.
-            var member = await _context.Members
-                .Where(m => EF.Property<string>(m, "ApplicationUserId") == userId)
+            return await _context.Members
+                .Where(m => m.ApplicationUserId == userId)
                 .Select(m => (int?)m.Id)
                 .FirstOrDefaultAsync();
-
-            return member;
         }
 
         private string? GetIdentityUserId()

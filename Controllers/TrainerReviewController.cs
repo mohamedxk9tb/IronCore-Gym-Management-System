@@ -44,8 +44,15 @@ namespace GymMvc.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(TrainerReviewFormViewModel model)
         {
+            var trainer = await _context.Trainers.FindAsync(model.TrainerId);
+            if (trainer == null)
+            {
+                return NotFound();
+            }
+
             if (!ModelState.IsValid)
             {
+                model.TrainerName = trainer.FullName;
                 return View(model);
             }
 
@@ -61,7 +68,7 @@ namespace GymMvc.Controllers
             if (alreadyReviewed)
             {
                 ModelState.AddModelError(string.Empty, "إنت قيّمت المدرب ده قبل كده");
-                model.TrainerName = (await _context.Trainers.FindAsync(model.TrainerId))?.FullName ?? model.TrainerName;
+                model.TrainerName = trainer.FullName;
                 return View(model);
             }
 
@@ -75,15 +82,22 @@ namespace GymMvc.Controllers
 
             _context.TrainerReviews.Add(review);
 
-            // DB unique index (TrainerId+MemberId) is the final safety net for races.
             try
             {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
-                ModelState.AddModelError(string.Empty, "إنت قيّمت المدرب ده قبل كده");
-                model.TrainerName = (await _context.Trainers.FindAsync(model.TrainerId))?.FullName ?? model.TrainerName;
+                // Re-check whether this was actually a duplicate (race condition against
+                // the unique index) instead of assuming that's always the cause.
+                var isDuplicateNow = await _context.TrainerReviews
+                    .AnyAsync(r => r.TrainerId == model.TrainerId && r.MemberId == memberId);
+
+                model.TrainerName = trainer.FullName;
+                ModelState.AddModelError(string.Empty, isDuplicateNow
+                    ? "إنت قيّمت المدرب ده قبل كده"
+                    : "معلش، حصلت مشكلة أثناء حفظ التقييم، حاول تاني.");
+
                 return View(model);
             }
 
