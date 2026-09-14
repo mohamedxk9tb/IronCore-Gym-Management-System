@@ -8,7 +8,7 @@ using GymMvc.ViewModels;
 
 namespace GymMvc.Controllers;
 
-[Authorize]
+[Authorize(Roles = "Member")]
 public class PaymentsController : Controller
 {
     private readonly ApplicationDbContext _context;
@@ -24,10 +24,7 @@ public class PaymentsController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var currentUserId = _userManager.GetUserId(User);
-
-        var member = await _context.Members
-            .FirstOrDefaultAsync(m => m.ApplicationUserId == currentUserId);
+        var member = await GetCurrentMemberAsync();
 
         if (member == null)
         {
@@ -58,11 +55,23 @@ public class PaymentsController : Controller
     [HttpGet]
     public async Task<IActionResult> Create(int subscriptionId)
     {
+        var member = await GetCurrentMemberAsync();
+
+        if (member == null)
+        {
+            return NotFound();
+        }
+
         var subscription = await _context.Subscriptions
             .Include(s => s.Plan)
             .FirstOrDefaultAsync(s => s.Id == subscriptionId);
 
         if (subscription == null)
+        {
+            return NotFound();
+        }
+
+        if (subscription.MemberId != member.Id)
         {
             return NotFound();
         }
@@ -79,9 +88,17 @@ public class PaymentsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(int subscriptionId, decimal amount)
+    public async Task<IActionResult> Create(int subscriptionId)
     {
+        var member = await GetCurrentMemberAsync();
+
+        if (member == null)
+        {
+            return NotFound();
+        }
+
         var subscription = await _context.Subscriptions
+            .Include(s => s.Plan)
             .FirstOrDefaultAsync(s => s.Id == subscriptionId);
 
         if (subscription == null)
@@ -89,16 +106,35 @@ public class PaymentsController : Controller
             return NotFound();
         }
 
+        if (subscription.MemberId != member.Id)
+        {
+            return NotFound();
+        }
+
         var payment = new Payment
         {
             SubscriptionId = subscription.Id,
-            Amount = amount,
+            Amount = subscription.Plan.Price,
             PaymentDate = DateTime.Now
         };
 
         _context.Payments.Add(payment);
         await _context.SaveChangesAsync();
 
+        TempData["Success"] = "Payment recorded successfully.";
         return RedirectToAction(nameof(Index));
+    }
+
+    private async Task<Member?> GetCurrentMemberAsync()
+    {
+        var currentUserId = _userManager.GetUserId(User);
+
+        if (currentUserId == null)
+        {
+            return null;
+        }
+
+        return await _context.Members
+            .FirstOrDefaultAsync(m => m.ApplicationUserId == currentUserId);
     }
 }

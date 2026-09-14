@@ -25,8 +25,8 @@ public class PlansController : Controller
             .OrderBy(p => p.Price)
             .ToListAsync();
 
-        var currentUserId = _userManager.GetUserId(User);
         int? memberId = null;
+        var currentUserId = _userManager.GetUserId(User);
 
         if (currentUserId != null)
         {
@@ -39,28 +39,30 @@ public class PlansController : Controller
             }
         }
 
+        var activeSubscriptions = await _context.Subscriptions
+            .Where(s => s.Status == "Active")
+            .ToListAsync();
+
+        var activeCountByPlan = activeSubscriptions
+            .GroupBy(s => s.PlanId)
+            .ToDictionary(g => g.Key, g => g.Count());
+
+        var subscribedPlanIds = memberId != null
+            ? activeSubscriptions
+                .Where(s => s.MemberId == memberId)
+                .Select(s => s.PlanId)
+                .ToHashSet()
+            : new HashSet<int>();
+
         var viewModel = new PlanListViewModel();
 
         foreach (var plan in plans)
         {
-            var isSubscribed = false;
-
-            if (memberId != null)
-            {
-                isSubscribed = await _context.Subscriptions
-                    .AnyAsync(s => s.PlanId == plan.Id
-                        && s.MemberId == memberId
-                        && s.Status == "Active");
-            }
-
-            var activeCount = await _context.Subscriptions
-                .CountAsync(s => s.PlanId == plan.Id && s.Status == "Active");
-
             viewModel.Plans.Add(new PlanCardViewModel
             {
                 Plan = plan,
-                IsSubscribed = isSubscribed,
-                ActiveSubscribersCount = activeCount
+                IsSubscribed = subscribedPlanIds.Contains(plan.Id),
+                ActiveSubscribersCount = activeCountByPlan.TryGetValue(plan.Id, out var count) ? count : 0
             });
         }
 

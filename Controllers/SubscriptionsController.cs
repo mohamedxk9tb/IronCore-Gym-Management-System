@@ -8,7 +8,7 @@ using GymMvc.ViewModels;
 
 namespace GymMvc.Controllers;
 
-[Authorize]
+[Authorize(Roles = "Member")]
 public class SubscriptionsController : Controller
 {
     private readonly ApplicationDbContext _context;
@@ -24,10 +24,7 @@ public class SubscriptionsController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var currentUserId = _userManager.GetUserId(User);
-
-        var member = await _context.Members
-            .FirstOrDefaultAsync(m => m.ApplicationUserId == currentUserId);
+        var member = await GetCurrentMemberAsync();
 
         if (member == null)
         {
@@ -79,12 +76,9 @@ public class SubscriptionsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(int planId, string status)
+    public async Task<IActionResult> Create(int planId)
     {
-        var currentUserId = _userManager.GetUserId(User);
-
-        var member = await _context.Members
-            .FirstOrDefaultAsync(m => m.ApplicationUserId == currentUserId);
+        var member = await GetCurrentMemberAsync();
 
         if (member == null)
         {
@@ -98,18 +92,46 @@ public class SubscriptionsController : Controller
             return NotFound();
         }
 
+        var now = DateTime.Now;
+
+        var hasActiveSubscription = await _context.Subscriptions
+            .AnyAsync(s => s.MemberId == member.Id
+                && s.Status == "Active"
+                && s.StartDate <= now
+                && s.EndDate >= now);
+
+        if (hasActiveSubscription)
+        {
+            TempData["Error"] = "You already have an active subscription.";
+            return RedirectToAction(nameof(Index));
+        }
+
         var subscription = new Subscription
         {
             MemberId = member.Id,
             PlanId = plan.Id,
-            StartDate = DateTime.Now,
-            EndDate = DateTime.Now.AddMonths(plan.DurationMonths),
+            StartDate = now,
+            EndDate = now.AddMonths(plan.DurationMonths),
             Status = "Active"
         };
 
         _context.Subscriptions.Add(subscription);
         await _context.SaveChangesAsync();
 
+        TempData["Success"] = "Subscription created successfully.";
         return RedirectToAction(nameof(Index));
+    }
+
+    private async Task<Member?> GetCurrentMemberAsync()
+    {
+        var currentUserId = _userManager.GetUserId(User);
+
+        if (currentUserId == null)
+        {
+            return null;
+        }
+
+        return await _context.Members
+            .FirstOrDefaultAsync(m => m.ApplicationUserId == currentUserId);
     }
 }

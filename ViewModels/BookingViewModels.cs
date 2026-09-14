@@ -11,6 +11,8 @@ namespace GymMvc.ViewModels
         public TimeSpan StartTime { get; set; }
         public bool IsCancelled { get; set; }
         public bool IsAttended { get; set; }
+        public DateTime? ClassDateTime { get; set; }
+        public bool CanCancel { get; set; }
     }
 
     public class BookingListViewModel

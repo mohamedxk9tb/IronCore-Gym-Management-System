@@ -15,5 +15,11 @@ namespace GymMvc.ViewModels
     public class ClassListViewModel
     {
         public List<ClassCardViewModel> Classes { get; set; } = new List<ClassCardViewModel>();
+
+        public string? CurrentSearch { get; set; }
+        public string? CurrentDay { get; set; }
+        public string? CurrentSort { get; set; }
+        public int CurrentPage { get; set; } = 1;
+        public int TotalPages { get; set; } = 1;
     }
 }
