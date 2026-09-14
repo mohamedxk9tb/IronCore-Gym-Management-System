@@ -39,16 +39,21 @@ public class PlansController : Controller
             }
         }
 
-        var activeSubscriptions = await _context.Subscriptions
-            .Where(s => s.Status == "Active")
+        var now = DateTime.Now;
+
+        var activeSubscriptionInfo = await _context.Subscriptions
+            .Where(s => s.Status == "Active"
+                && s.StartDate <= now
+                && s.EndDate >= now)
+            .Select(s => new { s.PlanId, s.MemberId })
             .ToListAsync();
 
-        var activeCountByPlan = activeSubscriptions
+        var activeCountByPlan = activeSubscriptionInfo
             .GroupBy(s => s.PlanId)
             .ToDictionary(g => g.Key, g => g.Count());
 
         var subscribedPlanIds = memberId != null
-            ? activeSubscriptions
+            ? activeSubscriptionInfo
                 .Where(s => s.MemberId == memberId)
                 .Select(s => s.PlanId)
                 .ToHashSet()
