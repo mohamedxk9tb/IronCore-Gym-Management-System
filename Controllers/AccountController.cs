@@ -92,10 +92,19 @@ public class AccountController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> SignUp(
+        string fullName,
         string email,
         string password,
-        string confirmPassword)
+        string confirmPassword,
+        string fitnessLevel)
     {
+        if (string.IsNullOrWhiteSpace(fullName))
+        {
+            ModelState.AddModelError(
+                nameof(fullName),
+                "Full name is required.");
+        }
+
         if (string.IsNullOrWhiteSpace(email))
         {
             ModelState.AddModelError(
@@ -110,11 +119,24 @@ public class AccountController : Controller
                 "Password is required.");
         }
 
-        if (password != confirmPassword)
+        if (string.IsNullOrWhiteSpace(confirmPassword))
+        {
+            ModelState.AddModelError(
+                nameof(confirmPassword),
+                "Please confirm your password.");
+        }
+        else if (password != confirmPassword)
         {
             ModelState.AddModelError(
                 nameof(confirmPassword),
                 "Passwords do not match.");
+        }
+
+        if (string.IsNullOrWhiteSpace(fitnessLevel))
+        {
+            ModelState.AddModelError(
+                nameof(fitnessLevel),
+                "Please select your fitness level.");
         }
 
         if (!ModelState.IsValid)
@@ -135,9 +157,9 @@ public class AccountController : Controller
 
         var user = new ApplicationUser
         {
-            UserName = email,
-            Email = email,
-            FullName = email
+            UserName = email.Trim(),
+            Email = email.Trim(),
+            FullName = fullName.Trim()
         };
 
         var createResult = await _userManager.CreateAsync(
@@ -158,9 +180,9 @@ public class AccountController : Controller
 
         var member = new Member
         {
-            FullName = user.FullName,
-            Email = user.Email!,
-            ApplicationUserId = user.Id
+            FullName = fullName.Trim(),
+            Email = email.Trim(),
+            FitnessLevel = fitnessLevel
         };
 
         _context.Members.Add(member);
@@ -168,9 +190,16 @@ public class AccountController : Controller
         try
         {
             await _context.SaveChangesAsync();
+
+            member.ApplicationUserId = user.Id;
+
+            await _context.SaveChangesAsync();
         }
         catch
         {
+            _context.Members.Remove(member);
+            await _context.SaveChangesAsync();
+
             await _userManager.DeleteAsync(user);
 
             ModelState.AddModelError(
@@ -192,6 +221,11 @@ public class AccountController : Controller
                     string.Empty,
                     error.Description);
             }
+
+            _context.Members.Remove(member);
+            await _context.SaveChangesAsync();
+
+            await _userManager.DeleteAsync(user);
 
             return View();
         }

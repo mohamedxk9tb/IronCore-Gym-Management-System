@@ -128,7 +128,8 @@ public class MemberController : Controller
             Email = member.Email,
             Height = member.Height,
             Weight = member.Weight,
-            Goal = member.Goal
+            Goal = member.Goal,
+            FitnessLevel = member.FitnessLevel
         };
 
         return View(model);
@@ -165,6 +166,7 @@ public class MemberController : Controller
         member.Height = model.Height;
         member.Weight = model.Weight;
         member.Goal = model.Goal;
+        member.FitnessLevel = model.FitnessLevel;
 
         user.FullName = model.FullName;
         user.Email = model.Email;

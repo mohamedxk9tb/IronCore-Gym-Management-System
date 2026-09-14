@@ -21,4 +21,21 @@ public class MemberDashboardViewModel
     public DateTime? LastCheckIn { get; set; }
 
     public DateTime? LastWeightLog { get; set; }
+
+    // Active Subscription
+    public string SubscriptionStatus { get; set; } =
+        "No Active Subscription";
+
+    public string? PlanName { get; set; }
+
+    public DateTime? SubscriptionEndDate { get; set; }
+
+    public int DaysRemaining { get; set; }
+
+    // Next Booked Class
+    public string? NextClassName { get; set; }
+
+    public DateTime? NextClassDateTime { get; set; }
+
+    public int? NextClassAvailableSpots { get; set; }
 }

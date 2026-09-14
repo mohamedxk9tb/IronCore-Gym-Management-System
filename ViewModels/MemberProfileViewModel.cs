@@ -25,4 +25,9 @@ public class MemberProfileViewModel
     [StringLength(250)]
     [Display(Name = "Fitness goal")]
     public string Goal { get; set; } = string.Empty;
+
+    [Required]
+    [StringLength(50)]
+    [Display(Name = "Fitness level")]
+    public string FitnessLevel { get; set; } = string.Empty;
 }

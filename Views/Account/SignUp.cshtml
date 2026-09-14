@@ -65,7 +65,7 @@
                 </h2>
 
                 <p class="auth-form-intro">
-                    Three details. A better training rhythm.
+                    Start with the basics. Build your profile next.
                 </p>
 
                 @if (!ViewData.ModelState.IsValid)
@@ -87,6 +87,23 @@
 
                     <div class="auth-field">
 
+                        <label for="FullName">
+                            Full Name
+                        </label>
+
+                        <input class="auth-input"
+                               id="FullName"
+                               name="fullName"
+                               type="text"
+                               autocomplete="name"
+                               placeholder="Your full name"
+                               maxlength="100"
+                               required />
+
+                    </div>
+
+                    <div class="auth-field">
+
                         <label for="Email">
                             Email
                         </label>
@@ -97,7 +114,39 @@
                                type="email"
                                autocomplete="email"
                                placeholder="you@example.com"
+                               maxlength="150"
                                required />
+
+                    </div>
+
+                    <div class="auth-field">
+
+                        <label for="FitnessLevel">
+                            Fitness Level
+                        </label>
+
+                        <select class="auth-input"
+                                id="FitnessLevel"
+                                name="fitnessLevel"
+                                required>
+
+                            <option value="">
+                                Select your level
+                            </option>
+
+                            <option value="Beginner">
+                                Beginner
+                            </option>
+
+                            <option value="Intermediate">
+                                Intermediate
+                            </option>
+
+                            <option value="Advanced">
+                                Advanced
+                            </option>
+
+                        </select>
 
                     </div>
 
@@ -115,6 +164,7 @@
                                    type="password"
                                    autocomplete="new-password"
                                    placeholder="Create a password"
+                                   minlength="6"
                                    required />
 
                             <button class="auth-visibility"
@@ -139,7 +189,7 @@
                             </div>
 
                             <span class="auth-strength-label">
-                                Use 8+ characters with a mix of letters and numbers
+                                Use 6+ characters with a mix of letters and numbers
                             </span>
 
                         </div>

@@ -1,13 +1,61 @@
-@model IReadOnlyList<TrainerProfile>
+@model List<GymMvc.ViewModels.TrainerListItemViewModel>
+
 @{
     ViewData["Title"] = "Coaches";
 }
+
 <section class="page-surface container-xxl">
-    <header class="public-page-header"><p class="section-kicker">The coach team</p><h1>People who know the work.</h1><p>Specialists in strength, conditioning, mobility, and the discipline between sessions.</p></header>
-    <div class="row g-4 trainer-grid">
-        @foreach (var trainer in Model)
+    <header class="public-page-header">
+        <p class="section-kicker">The coach team</p>
+        <h1>People who know the work.</h1>
+        <p>
+            Specialists in strength, conditioning, mobility, and the discipline between sessions.
+        </p>
+    </header>
+
+    @if (Model.Count == 0)
+    {
+        @await Html.PartialAsync("_EmptyState", new Dictionary<string, string>
         {
-            <div class="col-sm-6 col-lg-3"><article class="trainer-card"><img src="~/images/trainers/@trainer.ImageFile" alt="@trainer.Name, IRONCORE coach" onerror="this.hidden=true" /><div><p class="section-kicker">@trainer.Specialty</p><h2>@trainer.Name</h2><p class="trainer-rating">Rating @trainer.Rating / 5</p><a class="text-link" asp-controller="Trainers" asp-action="Details" asp-route-id="@trainer.Id">View profile</a></div></article></div>
-        }
-    </div>
+            ["Title"] = "No coaches available",
+            ["Description"] = "Trainer profiles will appear here once coaches are added."
+        })
+    }
+    else
+    {
+        <div class="row g-4 trainer-grid">
+            @foreach (var trainer in Model)
+            {
+                <div class="col-sm-6 col-lg-3">
+                    <article class="trainer-card">
+                        <div class="trainer-card-media">
+                            <img src="~/images/trainers/trainer-placeholder.png"
+                                 alt="@trainer.FullName, IRONCORE coach"
+                                 onerror="this.hidden=true" />
+                        </div>
+
+                        <div>
+                            <p class="section-kicker">@trainer.Specialty</p>
+
+                            <h2>@trainer.FullName</h2>
+
+                            <p class="trainer-rating">
+                                ★ @trainer.AverageRating.ToString("0.0") / 5
+                                <span class="text-muted">
+                                    (@trainer.ReviewsCount reviews)
+                                </span>
+                            </p>
+
+                            <a class="text-link"
+                               asp-controller="Trainers"
+                               asp-action="Details"
+                               asp-route-id="@trainer.Id">
+                                View profile
+                            </a>
+                        </div>
+                    </article>
+                </div>
+            }
+        </div>
+    }
 </section>

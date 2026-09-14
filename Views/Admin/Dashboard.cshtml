@@ -1,4 +1,118 @@
-@{ ViewData["Title"] = "Operations dashboard"; ViewData["Section"] = "Admin"; ViewData["Dashboard"] = true; }
-<header class="page-header"><div><p class="section-kicker">IRONCORE operations</p><h1>Facility at a glance.</h1><p>Static demo signals for members, classes, and revenue today.</p></div><a class="btn btn-iron" asp-controller="Admin" asp-action="Reports">View reports</a></header>
-<div class="row g-3 mb-4"><div class="col-sm-6 col-xl"><article class="stat-card"><span>Total members</span><strong>842</strong><p>24 added this month</p></article></div><div class="col-sm-6 col-xl"><article class="stat-card"><span>Active subscriptions</span><strong>716</strong><p>85% active base</p></article></div><div class="col-sm-6 col-xl"><article class="stat-card"><span>Today's classes</span><strong>12</strong><p>154 booked members</p></article></div><div class="col-sm-6 col-xl"><article class="stat-card"><span>Today's check-ins</span><strong>96</strong><p>Up 8% from Tuesday</p></article></div><div class="col-sm-6 col-xl"><article class="stat-card"><span>Revenue</span><strong>$58K</strong><p>Month to date</p></article></div></div>
-<div class="row g-4"><div class="col-lg-7"><section class="content-panel h-100"><h2 class="panel-title">Recent members</h2><div class="table-responsive"><table class="table table-iron"><thead><tr><th>Member</th><th>Plan</th><th>Joined</th><th>Status</th></tr></thead><tbody><tr><td>Alex Morgan</td><td>Performance</td><td>Today</td><td><span class="status-pill">Active</span></td></tr><tr><td>Samira Khan</td><td>Coached</td><td>Yesterday</td><td><span class="status-pill">Active</span></td></tr></tbody></table></div></section></div><div class="col-lg-5"><section class="content-panel h-100"><h2 class="panel-title">Upcoming classes</h2><div class="timeline"><p><strong>17:00</strong> — HYROX Performance · 24 / 24 booked</p><p><strong>18:30</strong> — Olympic Barbell · 12 / 16 booked</p><p><strong>19:30</strong> — Mobility Reset · 8 / 12 booked</p></div><a class="text-link" asp-controller="Admin" asp-action="Classes">Open class management</a></section></div><div class="col-lg-7"><section class="content-panel h-100"><h2 class="panel-title">Recent payments</h2><div class="table-responsive"><table class="table table-iron"><thead><tr><th>Member</th><th>Amount</th><th>Method</th><th>Status</th></tr></thead><tbody><tr><td>Alex Morgan</td><td>$79.00</td><td>Card</td><td><span class="status-pill">Paid</span></td></tr><tr><td>Samira Khan</td><td>$1,299.00</td><td>Transfer</td><td><span class="status-pill">Paid</span></td></tr></tbody></table></div></section></div><div class="col-lg-5"><section class="content-panel h-100"><h2 class="panel-title">Quick actions</h2><div class="quick-actions"><a asp-controller="Admin" asp-action="MembersCreate">Add member</a><a asp-controller="Admin" asp-action="ClassesCreate">Create class</a><a asp-controller="Admin" asp-action="Subscriptions">Review expiring subscriptions</a></div></section></div></div>
+@{
+    ViewData["Title"] = "Operations dashboard"; ViewData["Section"] = "Admin"; ViewData["Dashboard"] = true;
+}
+<header class="page-header">
+    <div>
+        <p class="section-kicker">IRONCORE operations</p>
+        <h1>Facility at a glance.</h1>
+        <p>Static demo signals for members, classes, and revenue today.</p>
+    </div><a class="btn btn-iron" asp-controller="Admin" asp-action="Reports">View reports</a>
+</header>
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl">
+        <article class="stat-card"><span>Total members</span><strong>842</strong>
+            <p>24 added this month</p>
+        </article>
+    </div>
+    <div class="col-sm-6 col-xl">
+        <article class="stat-card"><span>Active subscriptions</span><strong>716</strong>
+            <p>85% active base</p>
+        </article>
+    </div>
+    <div class="col-sm-6 col-xl">
+        <article class="stat-card"><span>Today's classes</span><strong>12</strong>
+            <p>154 booked members</p>
+        </article>
+    </div>
+    <div class="col-sm-6 col-xl">
+        <article class="stat-card"><span>Today's check-ins</span><strong>96</strong>
+            <p>Up 8% from Tuesday</p>
+        </article>
+    </div>
+    <div class="col-sm-6 col-xl">
+        <article class="stat-card"><span>Revenue</span><strong>$58K</strong>
+            <p>Month to date</p>
+        </article>
+    </div>
+</div>
+<div class="row g-4">    <div class="col-lg-7">
+    <section class="content-panel h-100">
+        <h2 class="panel-title">Recent members</h2>
+        <div class="table-responsive">
+            <table class="table table-iron">
+                <thead>
+                    <tr>
+                        <th>Member</th>
+                        <th>Plan</th>
+                        <th>Joined</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Alex Morgan</td>
+                        <td>Performance</td>
+                        <td>Today</td>
+                        <td><span class="status-pill">Active</span></td>
+                    </tr>
+                    <tr>
+                        <td>Samira Khan</td>
+                        <td>Coached</td>
+                        <td>Yesterday</td>
+                        <td><span class="status-pill">Active</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+<div class="col-lg-5">
+    <section class="content-panel h-100">
+        <h2 class="panel-title">Upcoming classes</h2>
+        <div class="timeline">
+            <p><strong>17:00</strong> ï¿½ HYROX Performance ï¿½ 24 / 24 booked</p>
+            <p><strong>18:30</strong> ï¿½ Olympic Barbell ï¿½ 12 / 16 booked</p>
+            <p><strong>19:30</strong> ï¿½ Mobility Reset ï¿½ 8 / 12 booked</p>
+        </div><a class="text-link" asp-controller="Admin" asp-action="Classes">Open class management</a>
+    </section>
+</div>
+<div class="col-lg-7">
+    <section class="content-panel h-100">
+        <h2 class="panel-title">Recent payments</h2>
+        <div class="table-responsive">
+            <table class="table table-iron">
+                <thead>
+                    <tr>
+                        <th>Member</th>
+                        <th>Amount</th>
+                        <th>Method</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Alex Morgan</td>
+                        <td>$79.00</td>
+                        <td>Card</td>
+                        <td><span class="status-pill">Paid</span></td>
+                    </tr>
+                    <tr>
+                        <td>Samira Khan</td>
+                        <td>$1,299.00</td>
+                        <td>Transfer</td>
+                        <td><span class="status-pill">Paid</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+<div class="col-lg-5">
+    <section class="content-panel h-100">
+        <h2 class="panel-title">Quick actions</h2>
+        <div class="quick-actions"><a asp-controller="Admin" asp-action="MembersCreate">Add member</a><a
+            asp-controller="Admin" asp-action="ClassesCreate">Create class</a><a asp-controller="Admin"
+                                                                                 asp-action="Subscriptions">Review expiring subscriptions</a></div>
+        </section>
+    </div>
+</div>

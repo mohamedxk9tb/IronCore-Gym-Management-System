@@ -24,6 +24,10 @@ public class Member
     [StringLength(250)]
     public string Goal { get; set; } = string.Empty;
 
+    [Required]
+    [StringLength(50)]
+    public string FitnessLevel { get; set; } = string.Empty;
+
     public string? ApplicationUserId { get; set; }
 
     public ApplicationUser? ApplicationUser { get; set; }

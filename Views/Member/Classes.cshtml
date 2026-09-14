@@ -1,3 +1,65 @@
-@{ ViewData["Title"] = "Class Schedule"; ViewData["Dashboard"] = true; }
-<partial name="_PageHeader" model='new Dictionary<string, string> { ["Title"] = "Class schedule", ["Description"] = "Find the session that fits your week.", ["Eyebrow"] = "Member area" }' />
-<section class="content-panel"><div class="admin-toolbar flex-wrap"><div class="d-flex flex-wrap gap-2"><select class="form-select" aria-label="Filter by day"><option>Monday 14 October</option><option>Tuesday 15 October</option></select><select class="form-select" aria-label="Filter by class type"><option>All class types</option><option>Strength</option><option>Conditioning</option></select><select class="form-select" aria-label="Filter by trainer"><option>All trainers</option><option>Omar Hassan</option><option>Sarah Nabil</option></select></div><span class="text-secondary small">8 sessions · 42 seats available</span></div><div class="table-responsive"><table class="table table-iron align-middle"><thead><tr><th>Class</th><th>Trainer</th><th>Date &amp; time</th><th>Duration</th><th>Capacity</th><th>Available</th><th></th></tr></thead><tbody><tr><td><strong>Strength Foundations</strong><br /><small class="text-secondary">Studio Alpha</small></td><td>Omar Hassan</td><td>14 Oct · 06:30</td><td>60 min</td><td>16</td><td>8 spots</td><td><button class="btn btn-iron btn-sm" type="button">Book</button></td></tr><tr><td><strong>Engine Room</strong><br /><small class="text-secondary">Conditioning Floor</small></td><td>Sarah Nabil</td><td>14 Oct · 18:00</td><td>60 min</td><td>24</td><td>4 spots</td><td><button class="btn btn-iron btn-sm" type="button">Book</button></td></tr><tr><td><strong>Mobility Reset</strong><br /><small class="text-secondary">Recovery Studio</small></td><td>Adam Kareem</td><td>14 Oct · 19:30</td><td>45 min</td><td>12</td><td>Full</td><td><button class="btn btn-secondary btn-sm" type="button" disabled>Full</button></td></tr></tbody></table></div></section>
+@{
+    ViewData["Title"] = "Class Schedule"; ViewData["Dashboard"] = true;
+}
+<partial name="_PageHeader"
+         model='new Dictionary<string, string> { ["Title"] = "Class schedule", ["Description"] = "Find the session that fits your week.", ["Eyebrow"] = "Member area" }' />
+<section class="content-panel">    <div class="admin-toolbar flex-wrap">
+    <div class="d-flex flex-wrap gap-2"><select class="form-select" aria-label="Filter by day">
+        <option>Monday 14 October</option>
+        <option>Tuesday 15 October</option>
+    </select><select class="form-select" aria-label="Filter by class type">
+    <option>All class types</option>
+    <option>Strength</option>
+    <option>Conditioning</option>
+</select><select class="form-select" aria-label="Filter by trainer">
+<option>All trainers</option>
+<option>Omar Hassan</option>
+<option>Sarah Nabil</option>
+</select></div><span class="text-secondary small">8 sessions ï¿½ 42 seats available</span>
+</div>
+<div class="table-responsive">
+    <table class="table table-iron align-middle">
+        <thead>
+            <tr>
+                <th>Class</th>
+                <th>Trainer</th>
+                <th>Date &amp; time</th>
+                <th>Duration</th>
+                <th>Capacity</th>
+                <th>Available</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Strength Foundations</strong><br /><small class="text-secondary">Studio Alpha</small>
+                </td>
+                <td>Omar Hassan</td>
+                <td>14 Oct ï¿½ 06:30</td>
+                <td>60 min</td>
+                <td>16</td>
+                <td>8 spots</td>
+                <td><button class="btn btn-iron btn-sm" type="button">Book</button></td>
+            </tr>
+            <tr>
+                <td><strong>Engine Room</strong><br /><small class="text-secondary">Conditioning Floor</small></td>
+                <td>Sarah Nabil</td>
+                <td>14 Oct ï¿½ 18:00</td>
+                <td>60 min</td>
+                <td>24</td>
+                <td>4 spots</td>
+                <td><button class="btn btn-iron btn-sm" type="button">Book</button></td>
+            </tr>
+            <tr>
+                <td><strong>Mobility Reset</strong><br /><small class="text-secondary">Recovery Studio</small></td>
+                <td>Adam Kareem</td>
+                <td>14 Oct ï¿½ 19:30</td>
+                <td>45 min</td>
+                <td>12</td>
+                <td>Full</td>
+                <td><button class="btn btn-secondary btn-sm" type="button" disabled>Full</button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</section>
