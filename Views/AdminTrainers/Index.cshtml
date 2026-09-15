@@ -4,64 +4,148 @@
     ViewData["Title"] = "Admin - Trainers";
 }
 
-<div class="container mt-4">
+<section class="admin-trainers-page">
 
-    <h1>Admin - Trainers</h1>
+    <div class="admin-trainers-header">
+        <div>
+            <p class="admin-kicker">COACHING TEAM</p>
+            <h1>TRAINERS</h1>
+            <p class="admin-page-description">
+                Manage the coaches who lead the IRONCORE training floor.
+            </p>
+        </div>
 
-    <a asp-controller="AdminTrainers"
-       asp-action="Create"
-       class="btn btn-primary mb-3">
-        Add Trainer
-    </a>
+        <a asp-controller="AdminTrainers"
+           asp-action="Create"
+           class="iron-admin-primary">
+            ADD TRAINER
+        </a>
+    </div>
 
-    <table class="table table-bordered">
+    <div class="admin-trainers-toolbar">
+        <div>
+            <span class="toolbar-label">TRAINER DIRECTORY</span>
+            <strong>@Model.Count TRAINER@(Model.Count == 1 ? "" : "S")</strong>
+        </div>
 
-        <thead>
+        <span class="toolbar-status">
+            @(Model.Any() ? "ACTIVE DIRECTORY" : "NO TRAINERS")
+        </span>
+    </div>
 
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Specialty</th>
-                <th>Actions</th>
-            </tr>
+    @if (Model.Any())
+    {
+        <div class="admin-table-shell">
 
-        </thead>
+            <div class="admin-table-scroll">
 
-        <tbody>
+                <table class="iron-admin-table">
 
-            @foreach (var trainer in Model)
-            {
-                <tr>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>TRAINER</th>
+                            <th>SPECIALTY</th>
+                            <th>CERTIFICATIONS</th>
+                            <th class="actions-column">ACTIONS</th>
+                        </tr>
+                    </thead>
 
-                    <td>@trainer.Id</td>
+                    <tbody>
+                        @foreach (var trainer in Model)
+                        {
+                            <tr>
+                                <td class="trainer-id">
+                                    #@trainer.Id
+                                </td>
 
-                    <td>@trainer.FullName</td>
+                                <td>
+                                    <div class="trainer-name-cell">
+                                        <div class="trainer-avatar">
+                                            @trainer.FullName.Substring(
+                                                0,
+                                                Math.Min(1, trainer.FullName.Length)
+                                            ).ToUpper()
+                                        </div>
 
-                    <td>@trainer.Specialty</td>
+                                        <div>
+                                            <strong>@trainer.FullName</strong>
+                                            <span>IRONCORE COACH</span>
+                                        </div>
+                                    </div>
+                                </td>
 
-                    <td>
+                                <td>
+                                    <span class="specialty-value">
+                                        @trainer.Specialty
+                                    </span>
+                                </td>
 
-                        <a asp-controller="AdminTrainers"
-                           asp-action="Edit"
-                           asp-route-id="@trainer.Id"
-                           class="btn btn-warning btn-sm">
-                            Edit
-                        </a>
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(trainer.Certificates))
+                                    {
+                                        <span class="certificate-value">
+                                            @trainer.Certificates
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="not-listed">
+                                            NOT LISTED
+                                        </span>
+                                    }
+                                </td>
 
-                        <a asp-controller="AdminTrainers"
-                           asp-action="Delete"
-                           asp-route-id="@trainer.Id"
-                           class="btn btn-danger btn-sm">
-                            Delete
-                        </a>
+                                <td>
+                                    <div class="trainer-actions">
 
-                    </td>
+                                        <a asp-controller="AdminTrainers"
+                                           asp-action="Edit"
+                                           asp-route-id="@trainer.Id"
+                                           class="trainer-action edit">
+                                            EDIT
+                                        </a>
 
-                </tr>
-            }
+                                        <a asp-controller="AdminTrainers"
+                                           asp-action="Delete"
+                                           asp-route-id="@trainer.Id"
+                                           class="trainer-action delete">
+                                            DELETE
+                                        </a>
 
-        </tbody>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
 
-    </table>
+                </table>
 
-</div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="admin-trainers-empty">
+
+            <div class="empty-mark">+</div>
+
+            <p class="admin-kicker">COACHING TEAM</p>
+
+            <h2>NO TRAINERS YET</h2>
+
+            <p>
+                Add your first coach to start building the IRONCORE
+                training team.
+            </p>
+
+            <a asp-controller="AdminTrainers"
+               asp-action="Create"
+               class="iron-admin-primary">
+                ADD FIRST TRAINER
+            </a>
+
+        </div>
+    }
+
+</section>

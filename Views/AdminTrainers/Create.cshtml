@@ -1,21 +1,141 @@
-@model GymMvc.Models.Trainer
+@model GymMvc.ViewModels.TrainerFormViewModel
 
-<h2>Add Trainer</h2>
+@{
+    ViewData["Title"] = "Add Trainer";
+}
 
-<form asp-action="Create" method="post">
+<section class="admin-trainer-form-page">
 
-    <div>
-        <label asp-for="FullName"></label>
-        <input asp-for="FullName" />
-        <span asp-validation-for="FullName"></span>
+    <div class="admin-form-header">
+
+        <div>
+            <p class="admin-kicker">COACHING TEAM</p>
+
+            <h1>ADD TRAINER</h1>
+
+            <p>
+                Create a new profile for the IRONCORE coaching team.
+            </p>
+        </div>
+
+        <a asp-controller="AdminTrainers"
+           asp-action="Index"
+           class="iron-admin-secondary">
+            BACK TO TRAINERS
+        </a>
+
     </div>
 
-    <div>
-        <label asp-for="Specialty"></label>
-        <input asp-for="Specialty" />
-        <span asp-validation-for="Specialty"></span>
+    <div class="admin-form-card">
+
+        <div class="admin-form-intro">
+
+            <div>
+                <p class="admin-kicker">TRAINER PROFILE</p>
+
+                <h2>TRAINER INFORMATION</h2>
+
+                <p>
+                    Enter the trainer's professional information below.
+                </p>
+            </div>
+
+            <div class="form-number">
+                01
+            </div>
+
+        </div>
+
+        <form asp-controller="AdminTrainers"
+              asp-action="Create"
+              method="post">
+
+            <div asp-validation-summary="ModelOnly"
+                 class="iron-validation-summary">
+            </div>
+
+            <div class="admin-form-fields">
+
+                <div class="iron-field">
+
+                    <label asp-for="FullName">
+                        FULL NAME
+                    </label>
+
+                    <input asp-for="FullName"
+                           class="iron-form-input"
+                           placeholder="Enter trainer's full name"
+                           autocomplete="off" />
+
+                    <span asp-validation-for="FullName"
+                          class="iron-field-error">
+                    </span>
+
+                </div>
+
+                <div class="iron-field">
+
+                    <label asp-for="Specialty">
+                        SPECIALTY
+                    </label>
+
+                    <input asp-for="Specialty"
+                           class="iron-form-input"
+                           placeholder="e.g. Strength & Conditioning"
+                           autocomplete="off" />
+
+                    <span asp-validation-for="Specialty"
+                          class="iron-field-error">
+                    </span>
+
+                </div>
+
+                <div class="iron-field full-width">
+
+                    <label asp-for="Certificates">
+                        CERTIFICATIONS
+                    </label>
+
+                    <input asp-for="Certificates"
+                           class="iron-form-input"
+                           placeholder="e.g. NASM, ACE, CrossFit Level 1"
+                           autocomplete="off" />
+
+                    <span class="field-hint">
+                        Optional — separate multiple certifications with commas.
+                    </span>
+
+                    <span asp-validation-for="Certificates"
+                          class="iron-field-error">
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="admin-form-footer">
+
+                <a asp-controller="AdminTrainers"
+                   asp-action="Index"
+                   class="iron-admin-secondary">
+                    CANCEL
+                </a>
+
+                <button type="submit"
+                        class="iron-admin-primary">
+                    ADD TRAINER
+                </button>
+
+            </div>
+
+        </form>
+
     </div>
 
-    <button type="submit">Add Trainer</button>
+</section>
 
-</form>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

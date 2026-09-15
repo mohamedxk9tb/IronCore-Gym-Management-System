@@ -67,13 +67,39 @@ public class AccountController : Controller
 
         if (result.Succeeded)
         {
+            // Keep the original requested URL if it is local.
             if (!string.IsNullOrWhiteSpace(returnUrl) &&
                 Url.IsLocalUrl(returnUrl))
             {
                 return Redirect(returnUrl);
             }
 
-            return RedirectToAction("Index", "Home");
+            // Redirect users according to their role.
+            if (await _userManager.IsInRoleAsync(user, "Admin"))
+            {
+                return RedirectToAction(
+                    "Dashboard",
+                    "Admin");
+            }
+
+            if (await _userManager.IsInRoleAsync(user, "Trainer"))
+            {
+                return RedirectToAction(
+                    "Dashboard",
+                    "TrainerDashboard");
+            }
+
+            if (await _userManager.IsInRoleAsync(user, "Member"))
+            {
+                return RedirectToAction(
+                    "Dashboard",
+                    "Member");
+            }
+
+            // Fallback for users without a recognized role.
+            return RedirectToAction(
+                "Index",
+                "Home");
         }
 
         ModelState.AddModelError(
@@ -144,7 +170,8 @@ public class AccountController : Controller
             return View();
         }
 
-        var existingUser = await _userManager.FindByEmailAsync(email);
+        var existingUser =
+            await _userManager.FindByEmailAsync(email);
 
         if (existingUser is not null)
         {
@@ -162,9 +189,10 @@ public class AccountController : Controller
             FullName = fullName.Trim()
         };
 
-        var createResult = await _userManager.CreateAsync(
-            user,
-            password);
+        var createResult =
+            await _userManager.CreateAsync(
+                user,
+                password);
 
         if (!createResult.Succeeded)
         {
@@ -209,9 +237,10 @@ public class AccountController : Controller
             return View();
         }
 
-        var roleResult = await _userManager.AddToRoleAsync(
-            user,
-            "Member");
+        var roleResult =
+            await _userManager.AddToRoleAsync(
+                user,
+                "Member");
 
         if (!roleResult.Succeeded)
         {
@@ -234,7 +263,11 @@ public class AccountController : Controller
             user,
             isPersistent: false);
 
-        return RedirectToAction("Index", "Home");
+        // New accounts are Members, so send them
+        // directly to the Member dashboard.
+        return RedirectToAction(
+            "Dashboard",
+            "Member");
     }
 
     [HttpPost]
@@ -243,6 +276,8 @@ public class AccountController : Controller
     {
         await _signInManager.SignOutAsync();
 
-        return RedirectToAction("Index", "Home");
+        return RedirectToAction(
+            "Index",
+            "Home");
     }
 }
