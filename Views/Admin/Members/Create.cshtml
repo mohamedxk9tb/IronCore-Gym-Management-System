@@ -8,8 +8,8 @@
 @await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
 {
     ["Title"] = "Add member",
-    ["Description"] = "Create a new member profile.",
-    ["Eyebrow"] = "Admin / Members"
+    ["Description"] = "Create a new member profile and fitness record.",
+    ["Eyebrow"] = "Operations / Members"
 })
 
 <div class="row g-4">
@@ -20,13 +20,15 @@
 
             <form asp-controller="Admin"
                   asp-action="MembersCreate"
-                  method="post">
+                  method="post"
+                  id="createMemberForm">
 
                 @Html.AntiForgeryToken()
 
                 <div asp-validation-summary="ModelOnly"
                      class="alert alert-danger"
                      role="alert"></div>
+
 
                 <div class="row g-4">
 
@@ -39,13 +41,14 @@
                         <input asp-for="FullName"
                                class="form-control"
                                autocomplete="name"
-                               placeholder="e.g. Ahmed Hassan" />
+                               placeholder="Member full name" />
 
                         <span asp-validation-for="FullName"
                               class="text-danger">
                         </span>
 
                     </div>
+
 
                     <div class="col-md-6">
 
@@ -65,6 +68,7 @@
 
                     </div>
 
+
                     <div class="col-md-6">
 
                         <label asp-for="Height"
@@ -77,13 +81,14 @@
                                step="0.1"
                                min="0"
                                max="300"
-                               placeholder="175" />
+                               placeholder="cm" />
 
                         <span asp-validation-for="Height"
                               class="text-danger">
                         </span>
 
                     </div>
+
 
                     <div class="col-md-6">
 
@@ -97,13 +102,48 @@
                                step="0.1"
                                min="0"
                                max="500"
-                               placeholder="80" />
+                               placeholder="kg" />
 
                         <span asp-validation-for="Weight"
                               class="text-danger">
                         </span>
 
                     </div>
+
+
+                    <div class="col-md-6">
+
+                        <label asp-for="FitnessLevel"
+                               class="form-label">
+                        </label>
+
+                        <select asp-for="FitnessLevel"
+                                class="form-select">
+
+                            <option value="">
+                                Select fitness level
+                            </option>
+
+                            <option value="Beginner">
+                                Beginner
+                            </option>
+
+                            <option value="Intermediate">
+                                Intermediate
+                            </option>
+
+                            <option value="Advanced">
+                                Advanced
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="FitnessLevel"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
 
                     <div class="col-12">
 
@@ -115,7 +155,7 @@
                                   class="form-control"
                                   rows="4"
                                   maxlength="250"
-                                  placeholder="e.g. Build muscle and improve overall strength."></textarea>
+                                  placeholder="Member's primary fitness goal"></textarea>
 
                         <span asp-validation-for="Goal"
                               class="text-danger">
@@ -125,8 +165,11 @@
 
                 </div>
 
+
                 <div class="d-flex justify-content-end
-                            flex-wrap gap-2 mt-4">
+                            flex-wrap
+                            gap-2
+                            mt-4">
 
                     <a asp-controller="Admin"
                        asp-action="Members"
@@ -135,8 +178,23 @@
                     </a>
 
                     <button type="submit"
-                            class="btn btn-iron">
-                        Create member
+                            class="btn btn-iron"
+                            id="createMemberButton">
+
+                        <span id="createMemberText">
+                            Create member
+                        </span>
+
+                        <span id="createMemberLoading"
+                              class="d-none">
+
+                            <span class="spinner-border spinner-border-sm me-2"
+                                  aria-hidden="true"></span>
+
+                            Creating...
+
+                        </span>
+
                     </button>
 
                 </div>
@@ -147,12 +205,13 @@
 
     </div>
 
+
     <div class="col-lg-4">
 
         <section class="content-panel h-100">
 
             <p class="auth-kicker">
-                IRONCORE / Member
+                NEW MEMBER
             </p>
 
             <h3 class="mb-3">
@@ -160,10 +219,9 @@
             </h3>
 
             <p class="text-secondary mb-0">
-                Keep the member profile accurate.
-                Subscription and membership details
-                will be connected when the membership
-                module is integrated.
+                Add the member's core personal and fitness
+                information. Progress history and facility
+                visits are recorded separately.
             </p>
 
         </section>
@@ -172,7 +230,47 @@
 
 </div>
 
+
 @section Scripts
 {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const form =
+                document.getElementById("createMemberForm");
+
+            const button =
+                document.getElementById("createMemberButton");
+
+            const text =
+                document.getElementById("createMemberText");
+
+            const loading =
+                document.getElementById("createMemberLoading");
+
+            if (!form || !button) {
+                return;
+            }
+
+            form.addEventListener("submit", function () {
+
+                if (!form.checkValidity()) {
+                    return;
+                }
+
+                button.disabled = true;
+
+                if (text) {
+                    text.classList.add("d-none");
+                }
+
+                if (loading) {
+                    loading.classList.remove("d-none");
+                }
+            });
+
+        });
+    </script>
 }

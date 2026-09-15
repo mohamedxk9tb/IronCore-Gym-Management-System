@@ -1,50 +1,151 @@
+@model GymMvc.ViewModels.PlanListViewModel
+
 @{
     ViewData["Title"] = "Membership Plans";
+    ViewData["Dashboard"] = false;
 }
-<section class="page-surface container-xxl">
-    <header class="public-page-header">
-        <p class="section-kicker">Membership</p>
-        <h1>Choose your training base.</h1>
-        <p>Simple plans for consistent work, considered coaching, and measurable progress.</p>
-    </header>
-    <div class="row g-4 plan-cards">
-        <div class="col-lg-4">
-            <article class="plan-card">
-                <p class="section-kicker">Monthly</p>
-                <h2>Foundation</h2><strong>$49 <small>/ month</small></strong>
-                <p>Full training floor access and a coached induction.</p>
-                <ul>
-                    <li>Open gym access</li>
-                    <li>Progress check-ins</li>
-                    <li>Locker facilities</li>
-                </ul><a class="btn btn-iron-outline w-100" asp-controller="Account" asp-action="SignUp">Choose
-                foundation</a>
-            </article>
+
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = "Membership plans",
+    ["Description"] = "Choose the membership that fits your training goals.",
+    ["Eyebrow"] = "IRONCORE"
+})
+
+<section class="content-panel">
+
+    <div class="d-flex flex-column flex-lg-row
+                justify-content-between
+                align-items-lg-end
+                gap-3 mb-4">
+
+        <div>
+            <p class="section-kicker mb-1">
+                Membership
+            </p>
+
+            <h2 class="panel-title mb-1">
+                Train with intent.
+            </h2>
+
+            <p class="text-secondary mb-0">
+                Compare our current plans and choose your next commitment.
+            </p>
         </div>
-        <div class="col-lg-4">
-            <article class="plan-card plan-featured"><span class="plan-label">Most selected</span>
-                <p class="section-kicker">Quarterly</p>
-                <h2>Performance</h2><strong>$219 <small>/ quarter</small></strong>
-                <p>Unlimited coached sessions for athletes who want structure.</p>
-                <ul>
-                    <li>Everything in Foundation</li>
-                    <li>Unlimited group classes</li>
-                    <li>Monthly goal review</li>
-                </ul><a class="btn btn-iron w-100" asp-controller="Account" asp-action="SignUp">Choose performance</a>
-            </article>
-        </div>
-        <div class="col-lg-4">
-            <article class="plan-card">
-                <p class="section-kicker">Yearly</p>
-                <h2>Coached</h2><strong>$1,299 <small>/ year</small></strong>
-                <p>Personal programming, coaching, and recovery support.</p>
-                <ul>
-                    <li>Everything in Performance</li>
-                    <li>Personal programming</li>
-                    <li>Recovery consultations</li>
-                </ul><a class="btn btn-iron-outline w-100" asp-controller="Account" asp-action="SignUp">Choose
-                coached</a>
-            </article>
-        </div>
+
+        <span class="status-pill">
+            @Model.Plans.Count plan@(Model.Plans.Count == 1 ? "" : "s")
+        </span>
+
     </div>
+
+
+    @if (Model.Plans.Any())
+    {
+        <div class="row g-4">
+
+            @foreach (var item in Model.Plans)
+            {
+                <div class="col-md-6 col-xl-4">
+
+                    <article class="content-panel h-100 d-flex flex-column">
+
+                        <div class="d-flex justify-content-between
+                                    align-items-start
+                                    gap-3 mb-4">
+
+                            <div>
+
+                                <p class="section-kicker mb-1">
+                                    @item.Plan.DurationMonths
+                                    month@(item.Plan.DurationMonths == 1 ? "" : "s")
+                                </p>
+
+                                <h3 class="h2 mb-0">
+                                    @item.Plan.Name
+                                </h3>
+
+                            </div>
+
+                            @if (item.IsSubscribed)
+                            {
+                                <span class="status-pill">
+                                    Current
+                                </span>
+                            }
+
+                        </div>
+
+
+                        <div class="mb-4">
+
+                            <div class="display-5 fw-bold">
+                                @item.Plan.Price.ToString("C0")
+                            </div>
+
+                            <span class="text-secondary">
+                                total membership price
+                            </span>
+
+                        </div>
+
+
+                        <div class="d-flex justify-content-between
+                                    align-items-center
+                                    py-3
+                                    border-top
+                                    border-bottom
+                                    mb-4">
+
+                            <span class="text-secondary">
+                                Active members
+                            </span>
+
+                            <strong>
+                                @item.ActiveSubscribersCount
+                            </strong>
+
+                        </div>
+
+
+                        <div class="mt-auto">
+
+                            @if (item.IsSubscribed)
+                            {
+                                <a asp-controller="Subscriptions"
+                                   asp-action="Index"
+                                   class="btn btn-iron-outline w-100">
+                                    View my subscription
+                                </a>
+                            }
+                            else
+                            {
+                                <a asp-controller="Subscriptions"
+                                   asp-action="Create"
+                                   asp-route-planId="@item.Plan.Id"
+                                   class="btn btn-iron w-100">
+                                    Choose this plan
+                                </a>
+                            }
+
+                        </div>
+
+                    </article>
+
+                </div>
+            }
+
+        </div>
+    }
+    else
+    {
+        @await Html.PartialAsync(
+            "_EmptyState",
+            new Dictionary<string, string>
+            {
+                ["Title"] = "No plans available",
+                ["Message"] = "There are currently no membership plans available."
+            })
+    }
+
 </section>

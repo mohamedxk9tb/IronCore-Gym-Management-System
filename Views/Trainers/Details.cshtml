@@ -1,61 +1,228 @@
-@model List<GymMvc.ViewModels.TrainerListItemViewModel>
+@model GymMvc.ViewModels.TrainerProfileViewModel
 
 @{
-    ViewData["Title"] = "Coaches";
+    ViewData["Title"] = "Trainer Details";
+    ViewData["Dashboard"] = false;
 }
 
-<section class="page-surface container-xxl">
-    <header class="public-page-header">
-        <p class="section-kicker">The coach team</p>
-        <h1>People who know the work.</h1>
-        <p>
-            Specialists in strength, conditioning, mobility, and the discipline between sessions.
-        </p>
-    </header>
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = Model.Trainer.FullName,
+    ["Description"] = "Trainer profile, specialty, classes, and member feedback.",
+    ["Eyebrow"] = "Our team / Trainer"
+})
 
-    @if (Model.Count == 0)
-    {
-        @await Html.PartialAsync("_EmptyState", new Dictionary<string, string>
-        {
-            ["Title"] = "No coaches available",
-            ["Description"] = "Trainer profiles will appear here once coaches are added."
-        })
-    }
-    else
-    {
-        <div class="row g-4 trainer-grid">
-            @foreach (var trainer in Model)
+<div class="row g-4">
+
+    <!-- Trainer Profile -->
+
+    <div class="col-lg-5">
+
+        <section class="content-panel h-100">
+
+            <p class="section-kicker">
+                Coach profile
+            </p>
+
+            <h2 class="panel-title mb-2">
+                @Model.Trainer.FullName
+            </h2>
+
+            <p class="text-secondary mb-4">
+                @(
+                    string.IsNullOrWhiteSpace(Model.Trainer.Specialty)
+                        ? "General fitness"
+                        : Model.Trainer.Specialty
+                )
+            </p>
+
+
+            <div class="metric-block mb-4">
+
+                <span class="text-secondary">
+                    Certifications
+                </span>
+
+                <strong class="d-block mt-2">
+
+                    @if (string.IsNullOrWhiteSpace(Model.Trainer.Certificates))
+                    {
+                        <span>Not listed</span>
+                    }
+                    else
+                    {
+                        @Model.Trainer.Certificates
+                    }
+
+                </strong>
+
+            </div>
+
+
+            <div class="d-flex justify-content-between
+                        align-items-center
+                        gap-3">
+
+                <span class="text-secondary">
+                    Classes
+                </span>
+
+                <strong>
+                    @Model.Classes.Count
+                </strong>
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <!-- Classes -->
+
+    <div class="col-lg-7">
+
+        <section class="content-panel h-100">
+
+            <div class="mb-4">
+
+                <p class="section-kicker">
+                    Schedule
+                </p>
+
+                <h2 class="panel-title mb-1">
+                    Classes
+                </h2>
+
+                <p class="text-secondary mb-0">
+                    Sessions currently assigned to this trainer.
+                </p>
+
+            </div>
+
+
+            @if (Model.Classes.Any())
             {
-                <div class="col-sm-6 col-lg-3">
-                    <article class="trainer-card">
-                        <div class="trainer-card-media">
-                            <img src="~/images/trainers/trainer-placeholder.png"
-                                 alt="@trainer.FullName, IRONCORE coach"
-                                 onerror="this.hidden=true" />
-                        </div>
+                <div class="d-flex flex-column gap-3">
 
-                        <div>
-                            <p class="section-kicker">@trainer.Specialty</p>
+                    @foreach (var gymClass in Model.Classes)
+                    {
+                        <div class="metric-block">
 
-                            <h2>@trainer.FullName</h2>
+                            <div class="d-flex justify-content-between
+                                        align-items-start
+                                        gap-3">
 
-                            <p class="trainer-rating">
-                                ★ @trainer.AverageRating.ToString("0.0") / 5
-                                <span class="text-muted">
-                                    (@trainer.ReviewsCount reviews)
+                                <div>
+
+                                    <strong class="d-block">
+                                        @gymClass.Name
+                                    </strong>
+
+                                    <span class="text-secondary">
+                                        @gymClass.DayOfWeek
+                                    </span>
+
+                                </div>
+
+                                <span class="status-pill">
+                                    @gymClass.StartTime.ToString(@"hh\:mm")
                                 </span>
-                            </p>
 
-                            <a class="text-link"
-                               asp-controller="Trainers"
-                               asp-action="Details"
-                               asp-route-id="@trainer.Id">
-                                View profile
-                            </a>
+                            </div>
+
                         </div>
-                    </article>
+                    }
+
                 </div>
             }
-        </div>
-    }
-</section>
+            else
+            {
+                @await Html.PartialAsync(
+                    "_EmptyState",
+                    new Dictionary<string, string>
+                    {
+                        ["Title"] = "No classes assigned",
+                        ["Message"] = "This trainer currently has no scheduled classes."
+                    })
+            }
+
+        </section>
+
+    </div>
+
+
+    <!-- Reviews -->
+
+    <div class="col-12">
+
+        <section class="content-panel">
+
+            <div class="mb-4">
+
+                <p class="section-kicker">
+                    Member feedback
+                </p>
+
+                <h2 class="panel-title mb-1">
+                    Reviews
+                </h2>
+
+                <p class="text-secondary mb-0">
+                    Feedback shared by members about this trainer.
+                </p>
+
+            </div>
+
+
+            @if (Model.Reviews.Any())
+            {
+                <div class="row g-3">
+
+                    @foreach (var review in Model.Reviews)
+                    {
+                        <div class="col-md-6 col-xl-4">
+
+                            <article class="metric-block h-100">
+
+                                <div class="d-flex justify-content-between
+                                            align-items-start
+                                            gap-3 mb-3">
+
+                                    <strong>
+                                        @review.MemberName
+                                    </strong>
+
+                                    <span class="status-pill">
+                                        @review.Rating / 5
+                                    </span>
+
+                                </div>
+
+                                <p class="text-secondary mb-0">
+                                    @review.Comment
+                                </p>
+
+                            </article>
+
+                        </div>
+                    }
+
+                </div>
+            }
+            else
+            {
+                @await Html.PartialAsync(
+                    "_EmptyState",
+                    new Dictionary<string, string>
+                    {
+                        ["Title"] = "No reviews yet",
+                        ["Message"] = "This trainer has not received any member reviews yet."
+                    })
+            }
+
+        </section>
+
+    </div>
+
+</div>

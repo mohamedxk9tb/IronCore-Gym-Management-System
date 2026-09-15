@@ -1,10 +1,190 @@
+@model GymMvc.Models.GymClass
+
 @{
-    ViewData["Title"] = "Edit Class"; ViewData["Dashboard"] = true;
+    ViewData["Title"] = "Edit Class";
+    ViewData["Dashboard"] = true;
+
+    var trainers =
+        ViewBag.Trainers as IEnumerable<GymMvc.Models.Trainer>
+        ?? Enumerable.Empty<GymMvc.Models.Trainer>();
 }
+
 @await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
 {
     ["Title"] = "Edit class",
-    ["Description"] = "Update Engine Room schedule.",
-    ["Eyebrow"] =
-"Classes"
-})@await Html.PartialAsync("_AdminForm", new[] { "Class name", "Coach", "Day and time", "Capacity" })
+    ["Description"] = "Update the class schedule, trainer, and capacity.",
+    ["Eyebrow"] = "Operations / Classes"
+})
+
+<section class="content-panel">
+
+    <form asp-controller="Admin"
+          asp-action="ClassesEdit"
+          asp-route-id="@Model.Id"
+          method="post">
+
+        @Html.AntiForgeryToken()
+
+        <input asp-for="Id"
+               type="hidden" />
+
+        <div asp-validation-summary="ModelOnly"
+             class="alert alert-danger"
+             role="alert"></div>
+
+
+        <div class="row g-4">
+
+            <div class="col-md-6">
+
+                <label asp-for="Name"
+                       class="form-label">
+                </label>
+
+                <input asp-for="Name"
+                       class="form-control" />
+
+                <span asp-validation-for="Name"
+                      class="text-danger">
+                </span>
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <label asp-for="TrainerId"
+                       class="form-label">
+                    Trainer
+                </label>
+
+                <select asp-for="TrainerId"
+                        class="form-select">
+
+                    @foreach (var trainer in trainers)
+                    {
+                        <option value="@trainer.Id">
+                            @trainer.FullName
+                        </option>
+                    }
+
+                </select>
+
+                <span asp-validation-for="TrainerId"
+                      class="text-danger">
+                </span>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <label asp-for="DayOfWeek"
+                       class="form-label">
+                </label>
+
+                <select asp-for="DayOfWeek"
+                        class="form-select">
+
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                    <option value="Saturday">Saturday</option>
+                    <option value="Sunday">Sunday</option>
+
+                </select>
+
+                <span asp-validation-for="DayOfWeek"
+                      class="text-danger">
+                </span>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <label asp-for="StartTime"
+                       class="form-label">
+                </label>
+
+                <input asp-for="StartTime"
+                       class="form-control"
+                       type="time" />
+
+                <span asp-validation-for="StartTime"
+                      class="text-danger">
+                </span>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <label asp-for="DurationMinutes"
+                       class="form-label">
+                </label>
+
+                <input asp-for="DurationMinutes"
+                       class="form-control"
+                       type="number"
+                       min="1"
+                       max="480" />
+
+                <span asp-validation-for="DurationMinutes"
+                      class="text-danger">
+                </span>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <label asp-for="Capacity"
+                       class="form-label">
+                </label>
+
+                <input asp-for="Capacity"
+                       class="form-control"
+                       type="number"
+                       min="1"
+                       max="500" />
+
+                <span asp-validation-for="Capacity"
+                      class="text-danger">
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="d-flex justify-content-end
+                    flex-wrap
+                    gap-2
+                    mt-4">
+
+            <a asp-controller="Admin"
+               asp-action="ClassesDetails"
+               asp-route-id="@Model.Id"
+               class="btn btn-iron-outline">
+                Cancel
+            </a>
+
+            <button type="submit"
+                    class="btn btn-iron">
+                Save changes
+            </button>
+
+        </div>
+
+    </form>
+
+</section>
+
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+}

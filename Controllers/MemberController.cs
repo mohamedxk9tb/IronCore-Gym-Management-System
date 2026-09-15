@@ -47,12 +47,21 @@ public class MemberController : Controller
             return NotFound();
         }
 
-        var currentMonth = DateTime.Now;
+        var now = DateTime.Now;
+        var today = now.Date;
+
+        // =========================
+        // Check-ins
+        // =========================
 
         var monthlyCheckIns = member.CheckIns
             .Count(checkIn =>
-                checkIn.CheckInTime.Year == currentMonth.Year &&
-                checkIn.CheckInTime.Month == currentMonth.Month);
+                checkIn.CheckInTime.Year == now.Year &&
+                checkIn.CheckInTime.Month == now.Month);
+
+        // =========================
+        // Weight
+        // =========================
 
         var latestWeightLog = member.WeightLogs
             .OrderByDescending(weightLog => weightLog.Date)
@@ -79,6 +88,79 @@ public class MemberController : Controller
                 previousWeightLog.Weight;
         }
 
+        // =========================
+        // Active Subscription
+        // =========================
+
+        var activeSubscription = await _context.Subscriptions
+            .Include(subscription => subscription.Plan)
+            .Where(subscription =>
+                subscription.MemberId == member.Id &&
+                subscription.Status == "Active" &&
+                subscription.StartDate <= now &&
+                subscription.EndDate >= now)
+            .OrderByDescending(subscription => subscription.EndDate)
+            .FirstOrDefaultAsync();
+
+        var subscriptionStatus =
+            activeSubscription is not null
+                ? "Active"
+                : "No Active Subscription";
+
+        var daysRemaining = 0;
+
+        if (activeSubscription is not null)
+        {
+            daysRemaining = Math.Max(
+                0,
+                (activeSubscription.EndDate.Date - today).Days);
+        }
+
+        // =========================
+        // Next Booked Class
+        // =========================
+
+        var bookedClasses = await _context.Bookings
+            .Include(booking => booking.GymClass)
+            .Where(booking =>
+                booking.MemberId == member.Id &&
+                booking.Status == "Booked")
+            .ToListAsync();
+
+        var upcomingClasses = bookedClasses
+            .Select(booking => new
+            {
+                Booking = booking,
+                ClassDateTime = GetNextOccurrence(
+                    booking.GymClass.DayOfWeek,
+                    booking.GymClass.StartTime)
+            })
+            .Where(item => item.ClassDateTime != DateTime.MaxValue)
+            .OrderBy(item => item.ClassDateTime)
+            .ToList();
+
+        var nextBookedClass = upcomingClasses.FirstOrDefault();
+
+        int? nextClassAvailableSpots = null;
+
+        if (nextBookedClass is not null)
+        {
+            var gymClassId = nextBookedClass.Booking.GymClassId;
+
+            var bookedCount = await _context.Bookings
+                .CountAsync(booking =>
+                    booking.GymClassId == gymClassId &&
+                    booking.Status == "Booked");
+
+            nextClassAvailableSpots = Math.Max(
+                0,
+                nextBookedClass.Booking.GymClass.Capacity - bookedCount);
+        }
+
+        // =========================
+        // View Model
+        // =========================
+
         var model = new MemberDashboardViewModel
         {
             FullName = member.FullName,
@@ -86,14 +168,32 @@ public class MemberController : Controller
             CurrentWeight = currentWeight,
             PreviousWeight = previousWeight,
             Goal = member.Goal,
+
             MonthlyCheckIns = monthlyCheckIns,
             TotalWeightLogs = member.WeightLogs.Count,
+
             WeightChange = weightChange,
+
             LastCheckIn = member.CheckIns
                 .OrderByDescending(checkIn => checkIn.CheckInTime)
                 .Select(checkIn => (DateTime?)checkIn.CheckInTime)
                 .FirstOrDefault(),
-            LastWeightLog = latestWeightLog?.Date
+
+            LastWeightLog = latestWeightLog?.Date,
+
+            SubscriptionStatus = subscriptionStatus,
+            PlanName = activeSubscription?.Plan?.Name,
+            SubscriptionEndDate = activeSubscription?.EndDate,
+            DaysRemaining = daysRemaining,
+
+            NextClassName =
+                nextBookedClass?.Booking.GymClass.Name,
+
+            NextClassDateTime =
+                nextBookedClass?.ClassDateTime,
+
+            NextClassAvailableSpots =
+                nextClassAvailableSpots
         };
 
         return View(model);
@@ -383,6 +483,27 @@ public class MemberController : Controller
             return NotFound();
         }
 
+        var now = DateTime.Now;
+
+        var activeSubscription = await _context.Subscriptions
+            .Include(subscription => subscription.Plan)
+            .Where(subscription =>
+                subscription.MemberId == member.Id &&
+                subscription.Status == "Active" &&
+                subscription.StartDate <= now &&
+                subscription.EndDate >= now)
+            .OrderByDescending(subscription => subscription.EndDate)
+            .FirstOrDefaultAsync();
+
+        ViewBag.HasActiveSubscription =
+            activeSubscription is not null;
+
+        ViewBag.ActivePlanName =
+            activeSubscription?.Plan?.Name;
+
+        ViewBag.SubscriptionEndDate =
+            activeSubscription?.EndDate;
+
         ViewBag.LastCheckIn = await _context.CheckIns
             .Where(checkIn => checkIn.MemberId == member.Id)
             .OrderByDescending(checkIn => checkIn.CheckInTime)
@@ -412,10 +533,35 @@ public class MemberController : Controller
             return NotFound();
         }
 
+        // =========================
+        // Active Subscription Check
+        // =========================
+
+        var now = DateTime.Now;
+
+        var hasActiveSubscription = await _context.Subscriptions
+            .AnyAsync(subscription =>
+                subscription.MemberId == member.Id &&
+                subscription.Status == "Active" &&
+                subscription.StartDate <= now &&
+                subscription.EndDate >= now);
+
+        if (!hasActiveSubscription)
+        {
+            TempData["ErrorMessage"] =
+                "You need an active subscription to check in.";
+
+            return RedirectToAction(nameof(CheckIn));
+        }
+
+        // =========================
+        // Create Check-in
+        // =========================
+
         var checkIn = new CheckIn
         {
             MemberId = member.Id,
-            CheckInTime = DateTime.Now
+            CheckInTime = now
         };
 
         _context.CheckIns.Add(checkIn);
@@ -426,5 +572,43 @@ public class MemberController : Controller
             "Check-in completed successfully.";
 
         return RedirectToAction(nameof(CheckIn));
+    }
+
+    // =========================
+    // Helpers
+    // =========================
+
+    private static DateTime GetNextOccurrence(
+        string dayOfWeekName,
+        TimeSpan startTime)
+    {
+        if (!Enum.TryParse<DayOfWeek>(
+                dayOfWeekName,
+                true,
+                out var targetDay))
+        {
+            return DateTime.MaxValue;
+        }
+
+        var now = DateTime.Now;
+        var today = now.Date;
+
+        var daysUntilTarget =
+            ((int)targetDay - (int)today.DayOfWeek + 7) % 7;
+
+        var candidateDate =
+            today.AddDays(daysUntilTarget);
+
+        var candidateDateTime =
+            candidateDate.Add(startTime);
+
+        if (daysUntilTarget == 0 &&
+            candidateDateTime <= now)
+        {
+            candidateDateTime =
+                candidateDateTime.AddDays(7);
+        }
+
+        return candidateDateTime;
     }
 }

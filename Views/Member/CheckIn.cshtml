@@ -1,82 +1,287 @@
 @{
-    ViewData["Title"] = "Check In";
+    ViewData["Title"] = "Check-in";
     ViewData["Dashboard"] = true;
+
+    var hasActiveSubscription =
+        ViewBag.HasActiveSubscription is bool value && value;
+
+    var activePlanName =
+        ViewBag.ActivePlanName as string;
+
+    DateTime? subscriptionEndDate =
+        ViewBag.SubscriptionEndDate as DateTime?;
+
+    DateTime? lastCheckIn =
+        ViewBag.LastCheckIn as DateTime?;
 }
 
 @await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
 {
-    ["Title"] = "Check in",
-    ["Description"] = "Start your session with one clear signal.",
+    ["Title"] = "Check-in",
+    ["Description"] = "Confirm your gym access and record today's visit.",
     ["Eyebrow"] = "Member area"
 })
 
-<section class="checkin-state checkin-success">
+<div class="row g-4">
 
-    <span class="state-mark">
-        OK
-    </span>
+    <div class="col-lg-7">
 
-    <p class="section-kicker">
-        Check-in available
-    </p>
+        <section class="content-panel h-100">
 
-    <h2>
-        You are ready to train.
-    </h2>
+            <div class="d-flex flex-column flex-md-row
+                        justify-content-between
+                        align-items-md-start
+                        gap-3 mb-4">
 
-    @if (ViewBag.LastCheckIn is DateTime lastCheckIn)
-    {
-        <p>
-            Last check-in:
-            @lastCheckIn.ToString("dd MMM yyyy, HH:mm")
-        </p>
-    }
-    else
-    {
-        <p>
-            This will be your first recorded check-in.
-        </p>
-    }
+                <div>
 
-    <form asp-controller="Member"
-          asp-action="CheckInNow"
-          method="post">
+                    <p class="section-kicker mb-1">
+                        Facility access
+                    </p>
 
-        @Html.AntiForgeryToken()
+                    <h2 class="panel-title mb-2">
+                        Check in to IRONCORE
+                    </h2>
 
-        <button type="submit"
-                class="btn btn-iron">
+                    <p class="text-secondary mb-0">
+                        Your check-in is recorded against your
+                        member account when your subscription is active.
+                    </p>
 
-            Check in now
+                </div>
 
-        </button>
+                @if (hasActiveSubscription)
+                {
+                    <span class="status-pill">
+                        Active access
+                    </span>
+                }
+                else
+                {
+                    <span class="status-pill">
+                        Access unavailable
+                    </span>
+                }
 
-    </form>
+            </div>
 
-</section>
 
-<section class="checkin-state">
+            @if (hasActiveSubscription)
+            {
+                <div class="row g-3 mb-4">
 
-    <p class="section-kicker">
-        Membership validation
-    </p>
+                    <div class="col-md-6">
 
-    <h2>
-        Subscription check coming next.
-    </h2>
+                        <div class="metric-block h-100">
 
-    <p>
-        Active subscription validation will be connected
-        after the Membership and Subscription models
-        are integrated.
-    </p>
+                            <span class="text-secondary">
+                                Current plan
+                            </span>
 
-    <a class="btn btn-iron-outline"
-       asp-controller="Plans"
-       asp-action="Index">
+                            <strong class="d-block mt-2">
+                                @(string.IsNullOrWhiteSpace(activePlanName)
+                                    ? "Active membership"
+                                    : activePlanName)
+                            </strong>
 
-        View plans
+                        </div>
 
-    </a>
+                    </div>
 
-</section>
+
+                    <div class="col-md-6">
+
+                        <div class="metric-block h-100">
+
+                            <span class="text-secondary">
+                                Membership ends
+                            </span>
+
+                            <strong class="d-block mt-2">
+
+                                @if (subscriptionEndDate.HasValue)
+                                {
+                                    @subscriptionEndDate.Value.ToString("dd MMM yyyy")
+                                }
+                                else
+                                {
+                                    <span>—</span>
+                                }
+
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="checkin-action p-4">
+
+                    <p class="section-kicker mb-2">
+                        Ready when you are
+                    </p>
+
+                    <h3 class="mb-2">
+                        Record your visit.
+                    </h3>
+
+                    <p class="text-secondary mb-4">
+                        Press the button below to record your
+                        current visit at the facility.
+                    </p>
+
+                    <form asp-controller="Member"
+                          asp-action="CheckInNow"
+                          method="post"
+                          id="checkInForm">
+
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit"
+                                class="btn btn-iron btn-lg"
+                                id="checkInButton">
+
+                            <span id="checkInText">
+                                Check in now
+                            </span>
+
+                            <span id="checkInLoading"
+                                  class="d-none">
+
+                                <span class="spinner-border spinner-border-sm me-2"
+                                      aria-hidden="true"></span>
+
+                                Checking in...
+
+                            </span>
+
+                        </button>
+
+                    </form>
+
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-iron-warning"
+                     role="alert">
+
+                    <strong>Active subscription required.</strong>
+
+                    You need an active subscription to check in.
+                    Renew or purchase a membership before visiting
+                    the facility.
+
+                </div>
+
+                <a asp-controller="Plans"
+                   asp-action="Index"
+                   class="btn btn-iron">
+
+                    View membership plans
+
+                </a>
+            }
+
+        </section>
+
+    </div>
+
+
+    <div class="col-lg-5">
+
+        <section class="content-panel h-100">
+
+            <p class="auth-kicker">
+                VISIT HISTORY
+            </p>
+
+            <h3 class="mb-3">
+                Your latest check-in
+            </h3>
+
+            @if (lastCheckIn.HasValue)
+            {
+                <div class="metric-block mb-4">
+
+                    <span class="text-secondary">
+                        Last visit
+                    </span>
+
+                    <strong class="d-block mt-2">
+                        @lastCheckIn.Value.ToString("dd MMM yyyy")
+                    </strong>
+
+                    <span class="text-secondary d-block mt-1">
+                        @lastCheckIn.Value.ToString("hh:mm tt")
+                    </span>
+
+                </div>
+
+                <p class="text-secondary mb-0">
+                    Your latest recorded facility visit appears here.
+                    Every successful check-in is stored in your member
+                    history.
+                </p>
+            }
+            else
+            {
+                <div class="empty-state py-4">
+
+                    <h4>
+                        No visits recorded yet.
+                    </h4>
+
+                    <p class="text-secondary mb-0">
+                        Your first successful check-in will appear here.
+                    </p>
+
+                </div>
+            }
+
+        </section>
+
+    </div>
+
+</div>
+
+
+@section Scripts
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const form =
+                document.getElementById("checkInForm");
+
+            const button =
+                document.getElementById("checkInButton");
+
+            const text =
+                document.getElementById("checkInText");
+
+            const loading =
+                document.getElementById("checkInLoading");
+
+            if (!form || !button) {
+                return;
+            }
+
+            form.addEventListener("submit", function () {
+
+                button.disabled = true;
+
+                if (text) {
+                    text.classList.add("d-none");
+                }
+
+                if (loading) {
+                    loading.classList.remove("d-none");
+                }
+            });
+
+        });
+    </script>
+}

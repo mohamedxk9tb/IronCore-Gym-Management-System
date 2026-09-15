@@ -13,6 +13,33 @@
     var chartValues = Model.WeightHistory
         .Select(item => item.Weight)
         .ToList();
+
+    var firstRecord = Model.WeightHistory
+        .OrderBy(item => item.Date)
+        .FirstOrDefault();
+
+    var latestRecord = Model.WeightHistory
+        .OrderByDescending(item => item.Date)
+        .FirstOrDefault();
+
+    string progressDirection;
+
+    if (!Model.TotalChange.HasValue)
+    {
+        progressDirection = "Not enough records yet";
+    }
+    else if (Model.TotalChange.Value < 0)
+    {
+        progressDirection = "Weight decreased";
+    }
+    else if (Model.TotalChange.Value > 0)
+    {
+        progressDirection = "Weight increased";
+    }
+    else
+    {
+        progressDirection = "Weight maintained";
+    }
 }
 
 <partial name="_PageHeader"
@@ -101,7 +128,6 @@
 
 </div>
 
-
 <div class="row g-4">
 
     <div class="col-lg-8">
@@ -165,7 +191,6 @@
 
     </div>
 
-
     <div class="col-lg-4">
 
         <section class="content-panel h-100">
@@ -186,7 +211,8 @@
             <form asp-controller="Member"
                   asp-action="LogWeight"
                   method="post"
-                  class="mt-4">
+                  class="mt-4"
+                  id="logWeightForm">
 
                 @Html.AntiForgeryToken()
 
@@ -230,9 +256,18 @@
                 </div>
 
                 <button type="submit"
-                        class="btn btn-iron w-100">
+                        class="btn btn-iron w-100"
+                        id="saveWeightButton">
 
-                    Save measurement
+                    <span class="save-weight-text">
+                        Save measurement
+                    </span>
+
+                    <span class="save-weight-loading d-none">
+                        <span class="spinner-border spinner-border-sm me-2"
+                              aria-hidden="true"></span>
+                        Saving...
+                    </span>
 
                 </button>
 
@@ -242,31 +277,100 @@
 
     </div>
 
-
     <div class="col-12">
 
         <section class="content-panel">
 
-            <p class="section-kicker">
-                Training data
-            </p>
+            <div class="row g-4">
 
-            <h2 class="panel-title">
-                Progress tracking
-            </h2>
+                <div class="col-md-4">
 
-            <p class="text-secondary mb-0">
-                Additional measurements and coaching metrics can
-                be added when their corresponding models are
-                integrated into the final project.
-            </p>
+                    <p class="section-kicker">
+                        Tracking overview
+                    </p>
+
+                    <h2 class="panel-title">
+                        Your records
+                    </h2>
+
+                    <p class="text-secondary mb-0">
+                        Your progress is calculated from the
+                        weight measurements you have recorded.
+                    </p>
+
+                </div>
+
+                <div class="col-md-8">
+
+                    <div class="row g-3">
+
+                        <div class="col-sm-4">
+
+                            <div class="metric-block">
+
+                                <span class="text-secondary">
+                                    First record
+                                </span>
+
+                                <strong class="d-block mt-1">
+
+                                    @(firstRecord is not null
+                                        ? firstRecord.Date.ToString("dd MMM yyyy")
+                                        : "—")
+
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-sm-4">
+
+                            <div class="metric-block">
+
+                                <span class="text-secondary">
+                                    Latest record
+                                </span>
+
+                                <strong class="d-block mt-1">
+
+                                    @(latestRecord is not null
+                                        ? latestRecord.Date.ToString("dd MMM yyyy")
+                                        : "—")
+
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-sm-4">
+
+                            <div class="metric-block">
+
+                                <span class="text-secondary">
+                                    Current trend
+                                </span>
+
+                                <strong class="d-block mt-1">
+                                    @progressDirection
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
 
         </section>
 
     </div>
 
 </div>
-
 
 @section Scripts
 {
@@ -319,6 +423,37 @@
                                 beginAtZero: false
                             }
                         }
+                    }
+                });
+            }
+
+            const logWeightForm =
+                document.getElementById("logWeightForm");
+
+            const saveWeightButton =
+                document.getElementById("saveWeightButton");
+
+            if (logWeightForm && saveWeightButton) {
+                logWeightForm.addEventListener("submit", function () {
+
+                    if (!logWeightForm.checkValidity()) {
+                        return;
+                    }
+
+                    saveWeightButton.disabled = true;
+
+                    const text =
+                        saveWeightButton.querySelector(".save-weight-text");
+
+                    const loading =
+                        saveWeightButton.querySelector(".save-weight-loading");
+
+                    if (text) {
+                        text.classList.add("d-none");
+                    }
+
+                    if (loading) {
+                        loading.classList.remove("d-none");
                     }
                 });
             }

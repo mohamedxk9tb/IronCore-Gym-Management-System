@@ -1,9 +1,200 @@
+@model GymMvc.Models.GymClass
+
 @{
-    ViewData["Title"] = "Delete Class"; ViewData["Dashboard"] = true;
+    ViewData["Title"] = "Delete Class";
+    ViewData["Dashboard"] = true;
+
+    var bookedCount =
+        Model.Bookings?.Count(b => b.Status == "Booked") ?? 0;
 }
-<section class="confirm-panel">
-    <p class="section-kicker">Destructive action</p>
-    <h1>Delete Engine Room?</h1>
-    <p>This display-only confirmation is ready for the future persistence layer.</p><a class="btn btn-iron-outline"
-                                                                                       asp-action="Classes">Cancel</a><button class="btn btn-danger">Confirm delete</button>
+
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = "Delete class",
+    ["Description"] = "Review the class before permanently deleting it.",
+    ["Eyebrow"] = "Operations / Classes"
+})
+
+<section class="content-panel">
+
+    <p class="section-kicker">
+        Destructive action
+    </p>
+
+    <h2 class="panel-title mb-3">
+        Delete @Model.Name?
+    </h2>
+
+
+    <div class="alert alert-iron-warning mb-4"
+         role="alert">
+
+        <strong>This action cannot be undone.</strong>
+
+        Make sure there are no related records that prevent
+        this class from being removed.
+
+    </div>
+
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-3">
+
+            <div class="metric-block h-100">
+
+                <span class="text-secondary">
+                    Class
+                </span>
+
+                <strong class="d-block mt-2">
+                    @Model.Name
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="metric-block h-100">
+
+                <span class="text-secondary">
+                    Trainer
+                </span>
+
+                <strong class="d-block mt-2">
+                    @(Model.Trainer?.FullName ?? "Unassigned")
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="metric-block h-100">
+
+                <span class="text-secondary">
+                    Schedule
+                </span>
+
+                <strong class="d-block mt-2">
+                    @Model.DayOfWeek
+                    @Model.StartTime.ToString(@"hh\:mm")
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="metric-block h-100">
+
+                <span class="text-secondary">
+                    Active bookings
+                </span>
+
+                <strong class="d-block mt-2">
+                    @bookedCount
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <form asp-controller="Admin"
+          asp-action="ClassesDeleteConfirmed"
+          method="post"
+          id="deleteClassForm">
+
+        @Html.AntiForgeryToken()
+
+        <input asp-for="Id"
+               type="hidden" />
+
+
+        <div class="d-flex justify-content-end
+                    flex-wrap
+                    gap-2">
+
+            <a asp-controller="Admin"
+               asp-action="Classes"
+               class="btn btn-iron-outline">
+                Cancel
+            </a>
+
+            <button type="submit"
+                    class="btn btn-danger"
+                    id="deleteClassButton">
+
+                <span id="deleteClassText">
+                    Delete class
+                </span>
+
+                <span id="deleteClassLoading"
+                      class="d-none">
+
+                    <span class="spinner-border spinner-border-sm me-2"
+                          aria-hidden="true"></span>
+
+                    Deleting...
+
+                </span>
+
+            </button>
+
+        </div>
+
+    </form>
+
 </section>
+
+
+@section Scripts
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const form =
+                document.getElementById("deleteClassForm");
+
+            const button =
+                document.getElementById("deleteClassButton");
+
+            const text =
+                document.getElementById("deleteClassText");
+
+            const loading =
+                document.getElementById("deleteClassLoading");
+
+            if (!form || !button) {
+                return;
+            }
+
+            form.addEventListener("submit", function (event) {
+
+                if (!window.confirm(
+                    "Are you sure you want to permanently delete this class?"
+                )) {
+                    event.preventDefault();
+                    return;
+                }
+
+                button.disabled = true;
+
+                text?.classList.add("d-none");
+                loading?.classList.remove("d-none");
+
+            });
+
+        });
+    </script>
+}

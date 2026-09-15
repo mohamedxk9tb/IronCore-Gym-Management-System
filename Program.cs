@@ -1,22 +1,20 @@
 using GymMvc.Data;
 using GymMvc.Models;
+using GymMvc.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+// MVC
 builder.Services.AddControllersWithViews();
 
-// Entity Framework Core + SQL Server
-
+// EF Core
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// ASP.NET Core Identity
-
+// Identity
 builder.Services
     .AddDefaultIdentity<ApplicationUser>(options =>
     {
@@ -31,19 +29,42 @@ builder.Services
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+// Current User Service
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+// Session
+builder.Services.AddDistributedMemoryCache();
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+// AI
+builder.Services.AddHttpClient<IAiChatService, AiChatService>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+
+// Antiforgery
+builder.Services.AddAntiforgery(options =>
+{
+    options.HeaderName = "RequestVerificationToken";
+});
+
 var app = builder.Build();
 
-// Seed Identity roles and admin account.
-
+// Seed Identity
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-
     await IdentitySeeder.SeedAsync(services);
 }
 
-// Configure the HTTP request pipeline.
-
+// Error handling
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -52,9 +73,13 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseStaticFiles();
+
 app.UseRouting();
 
 app.UseStatusCodePagesWithReExecute("/Home/NotFoundPage");
+
+app.UseSession();
 
 app.UseAuthentication();
 

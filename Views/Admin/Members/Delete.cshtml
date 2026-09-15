@@ -8,90 +8,105 @@
 @await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
 {
     ["Title"] = "Delete member",
-    ["Description"] = "Review this action before permanently removing the record.",
-    ["Eyebrow"] = "Admin / Members"
+    ["Description"] = "Review the member record before permanently deleting it.",
+    ["Eyebrow"] = "Operations / Members"
 })
 
-<section class="content-panel">
+<div class="row g-4">
 
-    <div class="row justify-content-center">
+    <div class="col-lg-8">
 
-        <div class="col-lg-7">
+        <section class="content-panel">
 
-            <div class="text-center">
+            <p class="section-kicker">
+                Permanent action
+            </p>
 
-                <div class="state-mark mb-4">
-                    !
-                </div>
+            <h2 class="panel-title mb-3">
+                Delete member
+            </h2>
 
-                <p class="auth-kicker">
-                    Permanent action
-                </p>
+            <div class="alert alert-iron-warning mb-4"
+                 role="alert">
 
-                <h2 class="mb-3">
-                    Delete @Model.FullName?
-                </h2>
+                <strong>Are you sure?</strong>
 
-                <p class="text-secondary mb-4">
-                    This will permanently remove the member
-                    profile and its related weight logs and
-                    check-in records.
-                </p>
+                You are about to permanently delete
+                <strong>@Model.FullName</strong>.
+                This action cannot be undone.
 
             </div>
 
-            <div class="content-panel mb-4">
 
-                <div class="d-flex justify-content-between
-                            gap-3 py-2 border-bottom">
+            <div class="row g-3 mb-4">
 
-                    <span class="text-secondary">
-                        Name
-                    </span>
+                <div class="col-md-4">
 
-                    <strong>
-                        @Model.FullName
-                    </strong>
+                    <div class="metric-block h-100">
 
-                </div>
+                        <span class="text-secondary">
+                            Member ID
+                        </span>
 
-                <div class="d-flex justify-content-between
-                            gap-3 py-2 border-bottom">
+                        <strong class="d-block mt-2">
+                            #@Model.Id
+                        </strong>
 
-                    <span class="text-secondary">
-                        Email
-                    </span>
-
-                    <strong>
-                        @Model.Email
-                    </strong>
+                    </div>
 
                 </div>
 
-                <div class="d-flex justify-content-between
-                            gap-3 py-2">
 
-                    <span class="text-secondary">
-                        Member ID
-                    </span>
+                <div class="col-md-4">
 
-                    <strong>
-                        #@Model.Id
-                    </strong>
+                    <div class="metric-block h-100">
+
+                        <span class="text-secondary">
+                            Name
+                        </span>
+
+                        <strong class="d-block mt-2">
+                            @Model.FullName
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <div class="metric-block h-100">
+
+                        <span class="text-secondary">
+                            Email
+                        </span>
+
+                        <strong class="d-block mt-2 text-break">
+                            @Model.Email
+                        </strong>
+
+                    </div>
 
                 </div>
 
             </div>
+
 
             <form asp-controller="Admin"
                   asp-action="MembersDeleteConfirmed"
-                  asp-route-id="@Model.Id"
-                  method="post">
+                  method="post"
+                  id="deleteMemberForm">
 
                 @Html.AntiForgeryToken()
 
-                <div class="d-flex justify-content-center
-                            flex-wrap gap-2">
+                <input asp-for="Id"
+                       type="hidden" />
+
+
+                <div class="d-flex justify-content-end
+                            flex-wrap
+                            gap-2">
 
                     <a asp-controller="Admin"
                        asp-action="MembersDetails"
@@ -101,16 +116,104 @@
                     </a>
 
                     <button type="submit"
-                            class="btn btn-danger">
-                        Yes, delete member
+                            class="btn btn-danger"
+                            id="deleteMemberButton">
+
+                        <span id="deleteMemberText">
+                            Delete member
+                        </span>
+
+                        <span id="deleteMemberLoading"
+                              class="d-none">
+
+                            <span class="spinner-border spinner-border-sm me-2"
+                                  aria-hidden="true"></span>
+
+                            Deleting...
+
+                        </span>
+
                     </button>
 
                 </div>
 
             </form>
 
-        </div>
+        </section>
 
     </div>
 
-</section>
+
+    <div class="col-lg-4">
+
+        <section class="content-panel h-100">
+
+            <p class="auth-kicker">
+                MEMBER RECORD
+            </p>
+
+            <h3 class="mb-3">
+                Review before removal.
+            </h3>
+
+            <p class="text-secondary mb-0">
+                Deleting a member may be affected by related
+                subscriptions, bookings, check-ins, or other
+                database relationships.
+            </p>
+
+        </section>
+
+    </div>
+
+</div>
+
+
+@section Scripts
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const form =
+                document.getElementById("deleteMemberForm");
+
+            const button =
+                document.getElementById("deleteMemberButton");
+
+            const text =
+                document.getElementById("deleteMemberText");
+
+            const loading =
+                document.getElementById("deleteMemberLoading");
+
+            if (!form || !button) {
+                return;
+            }
+
+            form.addEventListener("submit", function (event) {
+
+                const confirmed =
+                    window.confirm(
+                        "Are you sure you want to permanently delete this member?"
+                    );
+
+                if (!confirmed) {
+                    event.preventDefault();
+                    return;
+                }
+
+                button.disabled = true;
+
+                if (text) {
+                    text.classList.add("d-none");
+                }
+
+                if (loading) {
+                    loading.classList.remove("d-none");
+                }
+
+            });
+
+        });
+    </script>
+}

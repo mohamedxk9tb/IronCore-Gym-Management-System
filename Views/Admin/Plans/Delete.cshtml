@@ -1,9 +1,178 @@
+@model GymMvc.Models.Plan
+
 @{
-    ViewData["Title"] = "Delete Plan"; ViewData["Dashboard"] = true;
+    ViewData["Title"] = "Delete Plan";
+    ViewData["Dashboard"] = true;
 }
-<section class="confirm-panel">
-    <p class="section-kicker">Destructive action</p>
-    <h1>Delete Performance?</h1>
-    <p>This display-only confirmation is ready for the future persistence layer.</p><a class="btn btn-iron-outline"
-                                                                                       asp-action="Plans">Cancel</a><button class="btn btn-danger">Confirm delete</button>
+
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = "Delete plan",
+    ["Description"] = "Review the plan before permanently deleting it.",
+    ["Eyebrow"] = "Operations / Plans"
+})
+
+<section class="content-panel">
+
+    <p class="section-kicker">
+        Destructive action
+    </p>
+
+    <h2 class="panel-title mb-3">
+        Delete @Model.Name?
+    </h2>
+
+
+    <div class="alert alert-iron-warning mb-4"
+         role="alert">
+
+        <strong>This action cannot be undone.</strong>
+
+        Deleting a plan that has related subscriptions
+        may be rejected by the database.
+
+    </div>
+
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-4">
+
+            <div class="metric-block h-100">
+
+                <span class="text-secondary">
+                    Plan
+                </span>
+
+                <strong class="d-block mt-2">
+                    @Model.Name
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="metric-block h-100">
+
+                <span class="text-secondary">
+                    Price
+                </span>
+
+                <strong class="d-block mt-2">
+                    @Model.Price.ToString("C")
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="metric-block h-100">
+
+                <span class="text-secondary">
+                    Duration
+                </span>
+
+                <strong class="d-block mt-2">
+                    @Model.DurationMonths months
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <form asp-controller="Admin"
+          asp-action="PlansDeleteConfirmed"
+          method="post"
+          id="deletePlanForm">
+
+        @Html.AntiForgeryToken()
+
+        <input asp-for="Id"
+               type="hidden" />
+
+
+        <div class="d-flex justify-content-end
+                    flex-wrap
+                    gap-2">
+
+            <a asp-controller="Admin"
+               asp-action="Plans"
+               class="btn btn-iron-outline">
+                Cancel
+            </a>
+
+            <button type="submit"
+                    class="btn btn-danger"
+                    id="deletePlanButton">
+
+                <span id="deletePlanText">
+                    Delete plan
+                </span>
+
+                <span id="deletePlanLoading"
+                      class="d-none">
+
+                    <span class="spinner-border spinner-border-sm me-2"
+                          aria-hidden="true"></span>
+
+                    Deleting...
+
+                </span>
+
+            </button>
+
+        </div>
+
+    </form>
+
 </section>
+
+
+@section Scripts
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const form =
+                document.getElementById("deletePlanForm");
+
+            const button =
+                document.getElementById("deletePlanButton");
+
+            const text =
+                document.getElementById("deletePlanText");
+
+            const loading =
+                document.getElementById("deletePlanLoading");
+
+            if (!form || !button) {
+                return;
+            }
+
+            form.addEventListener("submit", function (event) {
+
+                if (!window.confirm(
+                    "Are you sure you want to permanently delete this plan?"
+                )) {
+                    event.preventDefault();
+                    return;
+                }
+
+                button.disabled = true;
+
+                text?.classList.add("d-none");
+                loading?.classList.remove("d-none");
+            });
+
+        });
+    </script>
+}

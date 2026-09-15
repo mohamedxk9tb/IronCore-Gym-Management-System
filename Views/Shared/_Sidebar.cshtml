@@ -1,23 +1,197 @@
-@{
-    var controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
-    var action = ViewContext.RouteData.Values["action"]?.ToString() ?? "Dashboard";
-    bool IsActive(string targetAction) => action == targetAction;
+﻿@{
+    var controller =
+        ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+
+    var action =
+        ViewContext.RouteData.Values["action"]?.ToString() ?? "Dashboard";
+
+    bool IsActive(string targetAction)
+        => action == targetAction;
 }
-<aside class="dashboard-sidebar" id="dashboardSidebar" aria-label="Dashboard navigation">
-    <a class="sidebar-brand" asp-controller="Home" asp-action="Index"><img src="~/images/brand/ironcore-logo.svg" alt="IRONCORE Gym and Fitness" /></a><div class="sidebar-rule"></div>
-    <div class="sidebar-label">@(controller == "Admin" ? "Operations" : controller == "Trainer" ? "Coach workspace" : "Member area")</div>
-    <nav class="sidebar-nav"><a class="@(IsActive("Dashboard") ? "active" : "")" asp-controller="@controller" asp-action="Dashboard"><span>01</span> Dashboard</a>
+
+<aside class="dashboard-sidebar"
+       id="dashboardSidebar"
+       aria-label="Dashboard navigation">
+
+    <a class="sidebar-brand"
+       asp-controller="Home"
+       asp-action="Index">
+
+        <img src="~/images/brand/ironcore-logo.svg"
+             alt="IRONCORE Gym and Fitness" />
+
+    </a>
+
+
+    <div class="sidebar-rule"></div>
+
+
+    <div class="sidebar-label">
+
+        @(controller == "Admin"
+            ? "Operations"
+            : controller == "TrainerDashboard"
+                ? "Coach workspace"
+                : "Member area")
+
+    </div>
+
+
+    <nav class="sidebar-nav">
+
         @if (controller == "Admin")
         {
-            <a class="@(IsActive("Plans") ? "active" : "")" asp-controller="Admin" asp-action="Plans"><span>02</span> Plans</a><a class="@(IsActive("Classes") ? "active" : "")" asp-controller="Admin" asp-action="Classes"><span>03</span> Classes</a><a class="@(IsActive("Trainers") ? "active" : "")" asp-controller="Admin" asp-action="Trainers"><span>04</span> Trainers</a><a class="@(IsActive("Members") ? "active" : "")" asp-controller="Admin" asp-action="Members"><span>05</span> Members</a><a class="@(IsActive("Subscriptions") ? "active" : "")" asp-controller="Admin" asp-action="Subscriptions"><span>06</span> Subscriptions</a><a class="@(IsActive("Payments") ? "active" : "")" asp-controller="Admin" asp-action="Payments"><span>07</span> Payments</a><a class="@(IsActive("Reports") ? "active" : "")" asp-controller="Admin" asp-action="Reports"><span>08</span> Reports</a>
+            <a class="@(IsActive("Dashboard") ? "active" : "")"
+               asp-controller="Admin"
+               asp-action="Dashboard">
+
+                <span>01</span>
+                Dashboard
+
+            </a>
+
+
+            <a class="@(IsActive("Plans") ? "active" : "")"
+               asp-controller="Admin"
+               asp-action="Plans">
+
+                <span>02</span>
+                Plans
+
+            </a>
+
+
+            <a class="@(IsActive("Classes") ? "active" : "")"
+               asp-controller="Admin"
+               asp-action="Classes">
+
+                <span>03</span>
+                Classes
+
+            </a>
+
+
+            <a class="@(IsActive("Trainers") ? "active" : "")"
+               asp-controller="Admin"
+               asp-action="Trainers">
+
+                <span>04</span>
+                Trainers
+
+            </a>
+
+
+            <a class="@(IsActive("Members") ? "active" : "")"
+               asp-controller="Admin"
+               asp-action="Members">
+
+                <span>05</span>
+                Members
+
+            </a>
+
+
+            <a class="@(IsActive("Subscriptions") ? "active" : "")"
+               asp-controller="Admin"
+               asp-action="Subscriptions">
+
+                <span>06</span>
+                Subscriptions
+
+            </a>
+
+
+            <a class="@(IsActive("Payments") ? "active" : "")"
+               asp-controller="Admin"
+               asp-action="Payments">
+
+                <span>07</span>
+                Payments
+
+            </a>
+
+
+            <a class="@(IsActive("Reports") ? "active" : "")"
+               asp-controller="Admin"
+               asp-action="Reports">
+
+                <span>08</span>
+                Reports
+
+            </a>
         }
-        else if (controller == "Trainer")
+        else if (controller == "TrainerDashboard")
         {
-            <a class="@(IsActive("ClassRoster") ? "active" : "")" asp-controller="Trainer" asp-action="ClassRoster"><span>02</span> Classes / Roster</a><a class="@(IsActive("Attendance") ? "active" : "")" asp-controller="Trainer" asp-action="Attendance"><span>03</span> Attendance</a>
+            <a class="@(IsActive("Dashboard") ? "active" : "")"
+               asp-controller="TrainerDashboard"
+               asp-action="Dashboard">
+
+                <span>01</span>
+                Dashboard
+
+            </a>
         }
         else
         {
-            <a class="@(IsActive("Profile") ? "active" : "")" asp-controller="Member" asp-action="Profile"><span>02</span> Profile</a><a class="@(IsActive("Classes") ? "active" : "")" asp-controller="Member" asp-action="Classes"><span>03</span> Classes</a><a class="@(IsActive("Bookings") ? "active" : "")" asp-controller="Member" asp-action="Bookings"><span>04</span> My bookings</a><a class="@(IsActive("FitnessPlan") ? "active" : "")" asp-controller="Member" asp-action="FitnessPlan"><span>05</span> Fitness plan</a><a class="@(IsActive("Progress") ? "active" : "")" asp-controller="Member" asp-action="Progress"><span>06</span> Progress</a><a class="@(IsActive("CheckIn") ? "active" : "")" asp-controller="Member" asp-action="CheckIn"><span>07</span> Check-in</a><a class="@(IsActive("Assistant") ? "active" : "")" asp-controller="Member" asp-action="Assistant"><span>08</span> AI coach</a>
+            <a class="@(IsActive("Dashboard") ? "active" : "")"
+               asp-controller="Member"
+               asp-action="Dashboard">
+
+                <span>01</span>
+                Dashboard
+
+            </a>
+
+
+            <a class="@(IsActive("Profile") ? "active" : "")"
+               asp-controller="Member"
+               asp-action="Profile">
+
+                <span>02</span>
+                Profile
+
+            </a>
+
+
+            <a class="@(IsActive("Progress") ? "active" : "")"
+               asp-controller="Member"
+               asp-action="Progress">
+
+                <span>03</span>
+                Progress
+
+            </a>
+
+
+            <a class="@(IsActive("CheckIn") ? "active" : "")"
+               asp-controller="Member"
+               asp-action="CheckIn">
+
+                <span>04</span>
+                Check-in
+
+            </a>
+
+
+            <a class="@(IsActive("ChangePassword") ? "active" : "")"
+               asp-controller="Member"
+               asp-action="ChangePassword">
+
+                <span>05</span>
+                Change password
+
+            </a>
         }
-    </nav><div class="sidebar-bottom"><span class="status-dot"></span> Facility systems operational</div>
+
+    </nav>
+
+
+    <div class="sidebar-bottom">
+
+        <span class="status-dot"></span>
+
+        Facility systems operational
+
+    </div>
+
 </aside>

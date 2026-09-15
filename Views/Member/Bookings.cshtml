@@ -1,19 +1,263 @@
+@model GymMvc.ViewModels.BookingListViewModel
+
 @{
-    ViewData["Title"] = "My Bookings"; ViewData["Dashboard"] = true;
+    ViewData["Title"] = "My Bookings";
+    ViewData["Dashboard"] = true;
 }
-<partial name="_PageHeader"
-         model='new Dictionary<string, string> { ["Title"] = "My bookings", ["Description"] = "Upcoming sessions and your training history.", ["Eyebrow"] = "Member area" }' />
-<div class="content-panel mb-4">
-    <h2 class="panel-title">Upcoming</h2>
-    <div class="booking-row">
+
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = "My bookings",
+    ["Description"] = "Review your upcoming classes and manage your reservations.",
+    ["Eyebrow"] = "Member area"
+})
+
+<section class="content-panel">
+
+    <div class="d-flex flex-column flex-lg-row
+                justify-content-between
+                align-items-lg-end
+                gap-3 mb-4">
+
         <div>
-            <p class="section-kicker">Today - 18:00</p>
-            <h3>Engine Room</h3><span>Conditioning Floor - Sarah Nabil</span>
-        </div><span class="status-pill">Confirmed</span><button class="btn btn-iron-outline btn-sm">Cancel</button>
+            <p class="section-kicker mb-1">
+                Reservations
+            </p>
+
+            <h2 class="panel-title mb-1">
+                Your class bookings
+            </h2>
+
+            <p class="text-secondary mb-0">
+                Keep track of the sessions you have reserved.
+            </p>
+        </div>
+
+        <a asp-controller="Classes"
+           asp-action="Index"
+           class="btn btn-iron">
+            Browse classes
+        </a>
+
     </div>
-</div>
-<div class="content-panel">
-    <h2 class="panel-title">Past sessions</h2>
-    <partial name="_EmptyState"
-             model='new Dictionary<string, string> { ["Title"] = "No history yet", ["Description"] = "Completed sessions will appear here after your first visit." }' />
-</div>
+
+
+    @if (Model.Bookings.Any())
+    {
+        <div class="table-responsive">
+
+            <table class="table table-dark table-hover align-middle mb-0">
+
+                <thead>
+                    <tr>
+
+                        <th scope="col">
+                            Class
+                        </th>
+
+                        <th scope="col">
+                            Trainer
+                        </th>
+
+                        <th scope="col">
+                            Schedule
+                        </th>
+
+                        <th scope="col">
+                            Status
+                        </th>
+
+                        <th scope="col"
+                            class="text-end">
+                            Action
+                        </th>
+
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var booking in Model.Bookings)
+                    {
+                        <tr>
+
+                            <td>
+
+                                <div class="fw-semibold">
+                                    @booking.ClassName
+                                </div>
+
+                                <small class="text-secondary">
+                                    Booked
+                                    @booking.BookedAt.ToString("dd MMM yyyy")
+                                </small>
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="text-secondary">
+                                    @booking.TrainerName
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <div>
+                                    @booking.ClassDateTime.ToString("ddd, dd MMM yyyy")
+                                </div>
+
+                                <small class="text-secondary">
+                                    @booking.ClassDateTime.ToString("hh:mm tt")
+                                </small>
+
+                            </td>
+
+
+                            <td>
+
+                                @if (booking.Status == "Cancelled")
+                                {
+                                    <span class="status-pill">
+                                        Cancelled
+                                    </span>
+                                }
+                                else if (booking.Status == "Attended")
+                                {
+                                    <span class="status-pill">
+                                        Attended
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="status-pill">
+                                        Booked
+                                    </span>
+                                }
+
+                            </td>
+
+
+                            <td class="text-end">
+
+                                @if (booking.CanCancel)
+                                {
+                                    <form asp-controller="Booking"
+                                          asp-action="Cancel"
+                                          asp-route-id="@booking.Id"
+                                          method="post"
+                                          class="d-inline">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-outline-danger"
+                                                data-cancel-booking>
+
+                                            <span data-cancel-text>
+                                                Cancel
+                                            </span>
+
+                                            <span class="d-none"
+                                                  data-cancel-loading>
+
+                                                <span class="spinner-border spinner-border-sm me-1"
+                                                      aria-hidden="true"></span>
+
+                                                Cancelling...
+
+                                            </span>
+
+                                        </button>
+
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="text-secondary small">
+                                        —
+                                    </span>
+                                }
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+    }
+    else
+    {
+        @await Html.PartialAsync(
+            "_EmptyState",
+            new Dictionary<string, string>
+            {
+                ["Title"] = "No bookings yet",
+                ["Message"] = "You have not booked any classes yet.",
+                ["ActionText"] = "Browse classes",
+                ["ActionController"] = "Classes",
+                ["Action"] = "Index"
+            })
+    }
+
+</section>
+
+
+@section Scripts
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const forms =
+                document.querySelectorAll("form");
+
+            forms.forEach(function (form) {
+
+                const button =
+                    form.querySelector("[data-cancel-booking]");
+
+                if (!button) {
+                    return;
+                }
+
+                form.addEventListener("submit", function (event) {
+
+                    const confirmed =
+                        window.confirm(
+                            "Are you sure you want to cancel this booking?"
+                        );
+
+                    if (!confirmed) {
+                        event.preventDefault();
+                        return;
+                    }
+
+                    const text =
+                        button.querySelector("[data-cancel-text]");
+
+                    const loading =
+                        button.querySelector("[data-cancel-loading]");
+
+                    button.disabled = true;
+
+                    if (text) {
+                        text.classList.add("d-none");
+                    }
+
+                    if (loading) {
+                        loading.classList.remove("d-none");
+                    }
+                });
+
+            });
+
+        });
+    </script>
+}

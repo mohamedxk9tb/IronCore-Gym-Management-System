@@ -1,61 +1,286 @@
+@model GymMvc.ViewModels.TrainerDashboardViewModel
+
 @{
-    ViewData["Title"] = "Trainer dashboard"; ViewData["Section"] = "Trainer"; ViewData["Dashboard"] = true;
+    ViewData["Title"] = "Trainer Dashboard";
+    ViewData["Dashboard"] = true;
 }
-<header class="page-header">
-    <div>
-        <p class="section-kicker">Coach workspace</p>
-        <h1>Today on the coaching floor.</h1>
-        <p>Keep sessions moving and members seen.</p>
-    </div><a class="btn btn-iron" asp-controller="Trainer" asp-action="ClassRoster">View class roster</a>
-</header>
+
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = $"Welcome, {Model.TrainerName}",
+    ["Description"] = "Today's classes, rosters, and attendance in one place.",
+    ["Eyebrow"] = "Coach workspace"
+})
+
 <div class="row g-3 mb-4">
-    <div class="col-md-3">
-        <article class="stat-card"><span>Today classes</span><strong>4</strong>
-            <p>First class at 07:00</p>
-        </article>
+
+    <div class="col-sm-6 col-xl-4">
+
+        @await Html.PartialAsync(
+            "_StatCard",
+            new Dictionary<string, string>
+            {
+                ["Title"] = "Today's classes",
+                ["Value"] = Model.Classes.Count.ToString(),
+                ["Icon"] = "01"
+            })
+
     </div>
-    <div class="col-md-3">
-        <article class="stat-card"><span>Booked members</span><strong>58</strong>
-            <p>Across your sessions</p>
-        </article>
+
+    <div class="col-sm-6 col-xl-4">
+
+        @await Html.PartialAsync(
+            "_StatCard",
+            new Dictionary<string, string>
+            {
+                ["Title"] = "Booked members",
+                ["Value"] = Model.Classes
+                    .Sum(c => c.Members.Count)
+                    .ToString(),
+                ["Icon"] = "02"
+            })
+
     </div>
-    <div class="col-md-3">
-        <article class="stat-card"><span>Attendance</span><strong>91%</strong>
-            <p>This week</p>
-        </article>
+
+    <div class="col-sm-6 col-xl-4">
+
+        @await Html.PartialAsync(
+            "_StatCard",
+            new Dictionary<string, string>
+            {
+                ["Title"] = "Attendance marked",
+                ["Value"] = Model.Classes
+                    .SelectMany(c => c.Members)
+                    .Count(m => m.IsPresent)
+                    .ToString(),
+                ["Icon"] = "03"
+            })
+
     </div>
-    <div class="col-md-3">
-        <article class="stat-card"><span>Plans due</span><strong>3</strong>
-            <p>Review this week</p>
-        </article>
-    </div>
+
 </div>
+
+
 <section class="content-panel">
-    <h2 class="panel-title">Class roster</h2>
-    <div class="table-responsive">
-        <table class="table table-iron">
-            <thead>
-                <tr>
-                    <th>Time</th>
-                    <th>Class</th>
-                    <th>Booked</th>
-                    <th>Floor</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>17:00</td>
-                    <td>HYROX Performance Circuit</td>
-                    <td>24 / 24</td>
-                    <td>Studio Alpha</td>
-                </tr>
-                <tr>
-                    <td>18:30</td>
-                    <td>Olympic Barbell</td>
-                    <td>12 / 16</td>
-                    <td>Platform Deck</td>
-                </tr>
-            </tbody>
-        </table>
+
+    <div class="d-flex flex-column flex-lg-row
+                justify-content-between
+                align-items-lg-end
+                gap-3 mb-4">
+
+        <div>
+
+            <p class="section-kicker mb-1">
+                Today's schedule
+            </p>
+
+            <h2 class="panel-title mb-1">
+                Classes & attendance
+            </h2>
+
+            <p class="text-secondary mb-0">
+                Review your booked members and mark attendance.
+            </p>
+
+        </div>
+
+        <span class="status-pill">
+            @DateTime.Now.ToString("dddd, dd MMM yyyy")
+        </span>
+
     </div>
+
+
+    @if (Model.Classes.Any())
+    {
+        <div class="row g-4">
+
+            @foreach (var gymClass in Model.Classes)
+            {
+                <div class="col-12">
+
+                    <article class="content-panel">
+
+                        <div class="d-flex flex-column flex-md-row
+                                    justify-content-between
+                                    align-items-md-start
+                                    gap-3 mb-4">
+
+                            <div>
+
+                                <p class="section-kicker mb-1">
+                                    @gymClass.Time
+                                </p>
+
+                                <h3 class="h3 mb-0">
+                                    @gymClass.ClassName
+                                </h3>
+
+                            </div>
+
+                            <span class="status-pill">
+                                @gymClass.Members.Count member@(gymClass.Members.Count == 1 ? "" : "s")
+                            </span>
+
+                        </div>
+
+
+                        @if (gymClass.Members.Any())
+                        {
+                            <div class="table-responsive">
+
+                                <table class="table table-dark
+                                              table-hover
+                                              align-middle
+                                              mb-0">
+
+                                    <thead>
+
+                                        <tr>
+
+                                            <th>
+                                                Member
+                                            </th>
+
+                                            <th>
+                                                Attendance
+                                            </th>
+
+                                            <th class="text-end">
+                                                Action
+                                            </th>
+
+                                        </tr>
+
+                                    </thead>
+
+                                    <tbody>
+
+                                        @foreach (var member in gymClass.Members)
+                                        {
+                                            <tr>
+
+                                                <td>
+
+                                                    <div class="fw-semibold">
+                                                        @member.MemberName
+                                                    </div>
+
+                                                    <small class="text-secondary">
+                                                        Member #@member.MemberId
+                                                    </small>
+
+                                                </td>
+
+
+                                                <td>
+
+                                                    @if (member.IsPresent)
+                                                    {
+                                                        <span class="status-pill">
+                                                            Present
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-secondary">
+                                                            Not marked
+                                                        </span>
+                                                    }
+
+                                                </td>
+
+
+                                                <td class="text-end">
+
+                                                    <form asp-controller="TrainerDashboard"
+                                                          asp-action="MarkAttendance"
+                                                          method="post"
+                                                          class="d-inline-flex
+                                                                 flex-wrap
+                                                                 justify-content-end
+                                                                 gap-2">
+
+                                                        @Html.AntiForgeryToken()
+
+                                                        <input type="hidden"
+                                                               name="bookingId"
+                                                               value="@member.BookingId" />
+
+                                                        <input type="hidden"
+                                                               name="isPresent"
+                                                               value="true" />
+
+                                                        <button type="submit"
+                                                                class="btn btn-sm btn-iron"
+                                                                @(member.IsPresent ? "disabled" : null)>
+                                                            Present
+                                                        </button>
+
+                                                    </form>
+
+
+                                                    <form asp-controller="TrainerDashboard"
+                                                          asp-action="MarkAttendance"
+                                                          method="post"
+                                                          class="d-inline-flex">
+
+                                                        @Html.AntiForgeryToken()
+
+                                                        <input type="hidden"
+                                                               name="bookingId"
+                                                               value="@member.BookingId" />
+
+                                                        <input type="hidden"
+                                                               name="isPresent"
+                                                               value="false" />
+
+                                                        <button type="submit"
+                                                                class="btn btn-sm btn-iron-outline"
+                                                                @(!member.IsPresent ? "disabled" : null)>
+                                                            Not present
+                                                        </button>
+
+                                                    </form>
+
+                                                </td>
+
+                                            </tr>
+                                        }
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+                        }
+                        else
+                        {
+                            @await Html.PartialAsync(
+                                "_EmptyState",
+                                new Dictionary<string, string>
+                                {
+                                    ["Title"] = "No booked members",
+                                    ["Message"] = "There are no members currently booked for this class."
+                                })
+                        }
+
+                    </article>
+
+                </div>
+            }
+
+        </div>
+    }
+    else
+    {
+        @await Html.PartialAsync(
+            "_EmptyState",
+            new Dictionary<string, string>
+            {
+                ["Title"] = "No classes today",
+                ["Message"] = "You have no scheduled classes for today."
+            })
+    }
+
 </section>

@@ -1,8 +1,12 @@
-@if (TempData["Success"] is string success)
+﻿@* Reads the TempData key actually set by the controllers ("SuccessMessage"). *@
+@if (TempData["SuccessMessage"] is string successMessage)
 {
-    <div class="toast-container position-fixed top-0 end-0 p-3">    <div class="toast toast-iron show">
-        <div class="toast-body"><strong>Updated</strong> @success <button type="button"
-                                                                              class="btn-close btn-close-white float-end" data-bs-dismiss="toast"></button></div>
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div class="toast toast-iron show" role="status" aria-live="polite" aria-atomic="true" data-iron-toast>
+            <div class="toast-body">
+                <strong>Updated</strong> @successMessage
+                <button type="button" class="btn-close btn-close-white float-end" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
         </div>
     </div>
 }

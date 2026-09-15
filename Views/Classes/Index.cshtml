@@ -1,42 +1,351 @@
+@model GymMvc.ViewModels.ClassListViewModel
+
 @{
-    ViewData["Title"] = "Class Schedule";
+    ViewData["Title"] = "Classes";
+    ViewData["Dashboard"] = false;
 }
-<section class="page-surface container-xxl">
-    <header class="public-page-header">
-        <p class="section-kicker">This week</p>
-        <h1>Class schedule.</h1>
-        <p>Book the work that moves you forward. Capacity is shown live for every session.</p>
-    </header>
-    <div class="schedule-toolbar"><strong>Monday 14 October</strong><span>Week 42 / 2026</span></div>
-    <div class="row g-4">
-        <div class="col-md-6 col-xl-4">
-            <article class="class-card"><img src="~/images/classes/class-strength.png" alt="Strength class" />
-                <div>
-                    <p class="section-kicker">06:30 · Studio Alpha</p>
-                    <h2>Strength Foundations</h2>
-                    <p>Coach Omar Hassan · 8 seats remaining</p><a class="btn btn-iron" asp-controller="Account"
-                                                                  asp-action="Login">Book class</a>
-                </div>
-            </article>
+
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = "Classes",
+    ["Description"] = "Explore the weekly schedule and find your next session.",
+    ["Eyebrow"] = "IRONCORE"
+})
+
+<section class="content-panel">
+
+    <div class="d-flex flex-column flex-lg-row
+                justify-content-between
+                align-items-lg-end
+                gap-3 mb-4">
+
+        <div>
+            <p class="section-kicker mb-1">
+                Weekly schedule
+            </p>
+
+            <h2 class="panel-title mb-1">
+                Find your session.
+            </h2>
+
+            <p class="text-secondary mb-0">
+                Search classes, filter by day, and check availability.
+            </p>
         </div>
-        <div class="col-md-6 col-xl-4">
-            <article class="class-card"><img src="~/images/classes/class-conditioning.png" alt="Conditioning class" />
-                <div>
-                    <p class="section-kicker">18:00 · Conditioning Floor</p>
-                    <h2>Engine Room</h2>
-                    <p>Coach Sarah Nabil · 4 seats remaining</p><a class="btn btn-iron" asp-controller="Account"
-                                                                  asp-action="Login">Book class</a>
-                </div>
-            </article>
+
+    </div>
+
+
+    <form asp-controller="Classes"
+          asp-action="Index"
+          method="get"
+          class="row g-3 mb-5">
+
+        <div class="col-lg-5">
+
+            <label for="search"
+                   class="form-label">
+                Search
+            </label>
+
+            <input id="search"
+                   name="search"
+                   value="@Model.CurrentSearch"
+                   class="form-control"
+                   type="search"
+                   placeholder="Search classes..." />
+
         </div>
-        <div class="col-md-6 col-xl-4">
-            <article class="class-card class-card-full"><img src="~/images/classes/class-yoga.png"
-                                                                 alt="Mobility class" />
-                <div>
-                    <p class="section-kicker">19:30 · Recovery Studio</p>
-                    <h2>Mobility Reset</h2>
-                    <p>Coach Adam Kareem · Full</p><button class="btn btn-secondary" disabled>Class full</button>
-                </div>
-            </article>
+
+
+        <div class="col-md-4 col-lg-3">
+
+            <label for="day"
+                   class="form-label">
+                Day
+            </label>
+
+            <select id="day"
+                    name="day"
+                    class="form-select">
+
+                <option value="">
+                    All days
+                </option>
+
+                @foreach (var day in new[]
+                {
+                    "Saturday",
+                    "Sunday",
+                    "Monday",
+                    "Tuesday",
+                    "Wednesday",
+                    "Thursday",
+                    "Friday"
+                })
+                {
+                    <option value="@day"
+                            selected="@(Model.CurrentDay == day)">
+                        @day
+                    </option>
+                }
+
+            </select>
+
         </div>
-    </div></section>
+
+
+        <div class="col-md-4 col-lg-2">
+
+            <label for="sort"
+                   class="form-label">
+                Sort
+            </label>
+
+            <select id="sort"
+                    name="sort"
+                    class="form-select">
+
+                <option value=""
+                        selected="@string.IsNullOrEmpty(Model.CurrentSort)">
+                    Schedule
+                </option>
+
+                <option value="name"
+                        selected="@(Model.CurrentSort == "name")">
+                    Name A–Z
+                </option>
+
+                <option value="name_desc"
+                        selected="@(Model.CurrentSort == "name_desc")">
+                    Name Z–A
+                </option>
+
+                <option value="time_desc"
+                        selected="@(Model.CurrentSort == "time_desc")">
+                    Latest time
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="col-md-4 col-lg-2 d-flex align-items-end">
+
+            <button type="submit"
+                    class="btn btn-iron w-100">
+                Apply
+            </button>
+
+        </div>
+
+    </form>
+
+
+    @if (Model.Classes.Any())
+    {
+        <div class="row g-4">
+
+            @foreach (var item in Model.Classes)
+            {
+                var gymClass = item.GymClass;
+
+                <div class="col-md-6 col-xl-4">
+
+                    <article class="content-panel h-100 d-flex flex-column">
+
+                        <div class="d-flex justify-content-between
+                                    align-items-start
+                                    gap-3 mb-3">
+
+                            <div>
+
+                                <p class="section-kicker mb-1">
+                                    @gymClass.DayOfWeek
+                                </p>
+
+                                <h3 class="h4 mb-1">
+                                    @gymClass.Name
+                                </h3>
+
+                            </div>
+
+                            @if (item.IsFull)
+                            {
+                                <span class="status-pill">
+                                    Full
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="status-pill">
+                                    Available
+                                </span>
+                            }
+
+                        </div>
+
+
+                        <div class="mb-4">
+
+                            <div class="d-flex justify-content-between
+                                        gap-3 mb-2">
+
+                                <span class="text-secondary">
+                                    Trainer
+                                </span>
+
+                                <strong>
+                                    @item.TrainerName
+                                </strong>
+
+                            </div>
+
+
+                            <div class="d-flex justify-content-between
+                                        gap-3 mb-2">
+
+                                <span class="text-secondary">
+                                    Start
+                                </span>
+
+                                <strong>
+                                    @gymClass.StartTime.ToString(@"hh\:mm")
+                                </strong>
+
+                            </div>
+
+
+                            <div class="d-flex justify-content-between
+                                        gap-3 mb-2">
+
+                                <span class="text-secondary">
+                                    Duration
+                                </span>
+
+                                <strong>
+                                    @gymClass.DurationMinutes min
+                                </strong>
+
+                            </div>
+
+
+                            <div class="d-flex justify-content-between
+                                        gap-3">
+
+                                <span class="text-secondary">
+                                    Availability
+                                </span>
+
+                                <strong>
+                                    @item.AvailableSlots /
+                                    @gymClass.Capacity
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="mt-auto">
+
+                            <a asp-controller="Classes"
+                               asp-action="Details"
+                               asp-route-id="@gymClass.Id"
+                               class="btn btn-iron-outline w-100">
+                                View class
+                            </a>
+
+                        </div>
+
+                    </article>
+
+                </div>
+            }
+
+        </div>
+
+
+        @if (Model.TotalPages > 1)
+        {
+            <nav class="mt-5"
+                 aria-label="Classes pagination">
+
+                <ul class="pagination justify-content-center mb-0">
+
+                    <li class="page-item
+                        @(Model.CurrentPage <= 1 ? "disabled" : "")">
+
+                        <a class="page-link"
+                           asp-controller="Classes"
+                           asp-action="Index"
+                           asp-route-search="@Model.CurrentSearch"
+                           asp-route-day="@Model.CurrentDay"
+                           asp-route-sort="@Model.CurrentSort"
+                           asp-route-page="@(Model.CurrentPage - 1)">
+
+                            Previous
+
+                        </a>
+
+                    </li>
+
+
+                    @for (var page = 1;
+                          page <= Model.TotalPages;
+                          page++)
+                    {
+                        <li class="page-item
+                            @(page == Model.CurrentPage ? "active" : "")">
+
+                            <a class="page-link"
+                               asp-controller="Classes"
+                               asp-action="Index"
+                               asp-route-search="@Model.CurrentSearch"
+                               asp-route-day="@Model.CurrentDay"
+                               asp-route-sort="@Model.CurrentSort"
+                               asp-route-page="@page">
+
+                                @page
+
+                            </a>
+
+                        </li>
+                    }
+
+
+                    <li class="page-item
+                        @(Model.CurrentPage >= Model.TotalPages ? "disabled" : "")">
+
+                        <a class="page-link"
+                           asp-controller="Classes"
+                           asp-action="Index"
+                           asp-route-search="@Model.CurrentSearch"
+                           asp-route-day="@Model.CurrentDay"
+                           asp-route-sort="@Model.CurrentSort"
+                           asp-route-page="@(Model.CurrentPage + 1)">
+
+                            Next
+
+                        </a>
+
+                    </li>
+
+                </ul>
+
+            </nav>
+        }
+    }
+    else
+    {
+        @await Html.PartialAsync(
+            "_EmptyState",
+            new Dictionary<string, string>
+            {
+                ["Title"] = "No classes found",
+                ["Message"] = "Try changing your search or day filter."
+            })
+    }
+
+</section>
