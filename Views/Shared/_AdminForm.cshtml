@@ -1,2 +1,12 @@
 @model string[]
-<section class="content-panel admin-form"><form data-save-form><div class="row g-3">@foreach (var field in Model) { <div class="col-md-6"><label class="form-label" for="@field.Replace(" ", "-")">@field</label><input class="form-control" id="@field.Replace(" ", "-")" placeholder="@field" /></div> }</div><div class="form-actions"><button type="submit" class="btn btn-iron" data-save-button>Save changes</button><a class="btn btn-iron-outline" href="javascript:history.back()">Cancel</a></div></form></section>
+<section class="content-panel admin-form">    <form data-save-form>
+    <div class="row g-3">@foreach (var field in Model) {
+        <div class="col-md-6"><label class="form-label"
+                                         for="@field.Replace(" ", "-")">@field</label><input class="form-control"
+                                                                id="@field.Replace(" ", "-")" placeholder="@field" /></div>
+        }
+    </div>
+    <div class="form-actions"><button type="submit" class="btn btn-iron" data-save-button>Save changes</button><a
+        class="btn btn-iron-outline" href="javascript:history.back()">Cancel</a></div>
+    </form>
+</section>

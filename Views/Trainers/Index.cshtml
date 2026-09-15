@@ -1,33 +1,97 @@
-@model IEnumerable<GymMvc.Models.Trainer>
+@model IEnumerable<GymMvc.ViewModels.TrainerListItemViewModel>
 
 @{
     ViewData["Title"] = "Trainers";
+    ViewData["Dashboard"] = false;
 }
 
-<h1>Trainers</h1>
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = "Trainers",
+    ["Description"] = "Meet the coaches behind the IRONCORE floor.",
+    ["Eyebrow"] = "Our team"
+})
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+<section class="content-panel">
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.FullName</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    <div class="d-flex justify-content-between
+                align-items-end
+                gap-3 mb-4">
+
+        <div>
+            <p class="section-kicker mb-1">
+                Coaching team
+            </p>
+
+            <h2 class="panel-title mb-1">
+                Train with people who know the work.
+            </h2>
+
+            <p class="text-secondary mb-0">
+                Explore specialties and find the right coach for your goals.
+            </p>
+        </div>
+
+        <span class="status-pill">
+            @Model.Count() trainer@(Model.Count() == 1 ? "" : "s")
+        </span>
+
+    </div>
+
+
+    @if (Model.Any())
+    {
+        <div class="row g-4">
+
+            @foreach (var trainer in Model)
+            {
+                <div class="col-md-6 col-xl-4">
+
+                    <article class="content-panel h-100 d-flex flex-column">
+
+                        <p class="section-kicker mb-2">
+                            Coach
+                        </p>
+
+                        <h3 class="h3 mb-2">
+                            @trainer.FullName
+                        </h3>
+
+                        <p class="text-secondary mb-4">
+                            @(
+                                string.IsNullOrWhiteSpace(trainer.Specialty)
+                                    ? "General fitness"
+                                    : trainer.Specialty
+                            )
+                        </p>
+
+                        <div class="mt-auto">
+
+                            <a asp-controller="Trainers"
+                               asp-action="Details"
+                               asp-route-id="@trainer.Id"
+                               class="btn btn-iron-outline w-100">
+                                View profile
+                            </a>
+
+                        </div>
+
+                    </article>
+
+                </div>
+            }
+
+        </div>
+    }
+    else
+    {
+        @await Html.PartialAsync(
+            "_EmptyState",
+            new Dictionary<string, string>
+            {
+                ["Title"] = "No trainers available",
+                ["Message"] = "Trainer profiles are not available right now."
+            })
+    }
+
+</section>

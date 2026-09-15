@@ -1,11 +1,462 @@
+@model GymMvc.ViewModels.MemberProgressViewModel
+
+@using System.Text.Json
+
 @{
     ViewData["Title"] = "My Progress";
     ViewData["Dashboard"] = true;
+
+    var chartLabels = Model.WeightHistory
+        .Select(item => item.Date.ToString("dd MMM"))
+        .ToList();
+
+    var chartValues = Model.WeightHistory
+        .Select(item => item.Weight)
+        .ToList();
+
+    var firstRecord = Model.WeightHistory
+        .OrderBy(item => item.Date)
+        .FirstOrDefault();
+
+    var latestRecord = Model.WeightHistory
+        .OrderByDescending(item => item.Date)
+        .FirstOrDefault();
+
+    string progressDirection;
+
+    if (!Model.TotalChange.HasValue)
+    {
+        progressDirection = "Not enough records yet";
+    }
+    else if (Model.TotalChange.Value < 0)
+    {
+        progressDirection = "Weight decreased";
+    }
+    else if (Model.TotalChange.Value > 0)
+    {
+        progressDirection = "Weight increased";
+    }
+    else
+    {
+        progressDirection = "Weight maintained";
+    }
 }
-<partial name="_PageHeader" model='new Dictionary<string, string> { ["Title"] = "My progress", ["Description"] = "Static demo measurements for your next coaching review.", ["Eyebrow"] = "Member area" }' />
-<div class="row g-3 mb-4"><div class="col-sm-6 col-xl-3"><article class="stat-card"><span>Current weight</span><strong>78.4</strong><p>kg today</p></article></div><div class="col-sm-6 col-xl-3"><article class="stat-card"><span>Starting weight</span><strong>82.0</strong><p>kg / 04 June</p></article></div><div class="col-sm-6 col-xl-3"><article class="stat-card"><span>Target weight</span><strong>76.0</strong><p>kg / current block</p></article></div><div class="col-sm-6 col-xl-3"><article class="stat-card"><span>Goal progress</span><strong>60%</strong><p>3.6 kg completed</p></article></div></div>
-<div class="row g-4"><div class="col-lg-8"><section class="content-panel h-100"><div class="d-flex justify-content-between align-items-start gap-3"><div><p class="section-kicker">Weight history</p><h2 class="panel-title">Measured progress</h2></div><span class="status-pill">-3.6 kg overall</span></div><div class="progress-chart"><canvas id="weightProgressChart" aria-label="Weight progress from 82 kilograms in June to 78.4 kilograms in October" role="img"></canvas></div></section></div><div class="col-lg-4"><section class="content-panel h-100"><p class="section-kicker">Current direction</p><h2 class="panel-title">On course.</h2><p class="text-secondary">Your current weekly average supports a sustainable cut while preserving strength.</p><div class="metric-list"><div><span>Waist</span><strong>84 cm</strong></div><div><span>Strength index</span><strong>+18%</strong></div><div><span>Next review</span><strong>04 Oct</strong></div></div></section></div></div>
-@section Scripts {
-    <script src="~/lib/chart.js/chart.umd.min.js"></script>
-    <script src="~/js/progress-chart.js" asp-append-version="true"></script>
+
+<partial name="_PageHeader"
+         model='new Dictionary<string, string>
+         {
+             ["Title"] = "My progress",
+             ["Description"] = "Track your weight history and training progress.",
+             ["Eyebrow"] = "Member area"
+         }' />
+
+<div class="row g-3 mb-4">
+
+    <div class="col-sm-6 col-xl-3">
+
+        <article class="stat-card">
+
+            <span>Current weight</span>
+
+            <strong>
+                @Model.CurrentWeight.ToString("0.0")
+            </strong>
+
+            <p>kg today</p>
+
+        </article>
+
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+
+        <article class="stat-card">
+
+            <span>Starting weight</span>
+
+            <strong>
+                @Model.StartingWeight.ToString("0.0")
+            </strong>
+
+            <p>
+                @(
+                    Model.StartingDate.HasValue
+                        ? Model.StartingDate.Value.ToString("dd MMM yyyy")
+                        : "Current profile weight"
+                )
+            </p>
+
+        </article>
+
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+
+        <article class="stat-card">
+
+            <span>Weight records</span>
+
+            <strong>
+                @Model.TotalRecords
+            </strong>
+
+            <p>Recorded measurements</p>
+
+        </article>
+
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+
+        <article class="stat-card">
+
+            <span>Overall change</span>
+
+            <strong>
+                @(
+                    Model.TotalChange.HasValue
+                        ? $"{(Model.TotalChange.Value > 0 ? "+" : "")}{Model.TotalChange.Value:0.0}"
+                        : "—"
+                )
+            </strong>
+
+            <p>kg since first record</p>
+
+        </article>
+
+    </div>
+
+</div>
+
+<div class="row g-4">
+
+    <div class="col-lg-8">
+
+        <section class="content-panel h-100">
+
+            <div class="d-flex justify-content-between align-items-start gap-3">
+
+                <div>
+
+                    <p class="section-kicker">
+                        Weight history
+                    </p>
+
+                    <h2 class="panel-title">
+                        Measured progress
+                    </h2>
+
+                </div>
+
+                @if (Model.TotalChange.HasValue)
+                {
+                    <span class="status-pill">
+
+                        @(Model.TotalChange.Value > 0 ? "+" : "")
+                        @Model.TotalChange.Value.ToString("0.0") kg
+
+                    </span>
+                }
+
+            </div>
+
+            @if (Model.WeightHistory.Any())
+            {
+                <div class="progress-chart">
+
+                    <canvas id="weightProgressChart"
+                            aria-label="Weight progress history"
+                            role="img">
+                    </canvas>
+
+                </div>
+            }
+            else
+            {
+                <div class="empty-state py-5">
+
+                    <h3>
+                        No weight records yet.
+                    </h3>
+
+                    <p class="text-secondary mb-0">
+                        Add your first weight measurement to start
+                        tracking your progress.
+                    </p>
+
+                </div>
+            }
+
+        </section>
+
+    </div>
+
+    <div class="col-lg-4">
+
+        <section class="content-panel h-100">
+
+            <p class="section-kicker">
+                Log progress
+            </p>
+
+            <h2 class="panel-title">
+                Add a measurement
+            </h2>
+
+            <p class="text-secondary">
+                Record your current weight to keep your progress
+                history up to date.
+            </p>
+
+            <form asp-controller="Member"
+                  asp-action="LogWeight"
+                  method="post"
+                  class="mt-4"
+                  id="logWeightForm">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="alert alert-danger"
+                     role="alert"></div>
+
+                <div class="mb-3">
+
+                    <label asp-for="NewWeight"
+                           class="form-label">
+                    </label>
+
+                    <input asp-for="NewWeight"
+                           class="form-control"
+                           type="number"
+                           step="0.1"
+                           min="0.1"
+                           max="500" />
+
+                    <span asp-validation-for="NewWeight"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+                <div class="mb-4">
+
+                    <label asp-for="NewWeightDate"
+                           class="form-label">
+                    </label>
+
+                    <input asp-for="NewWeightDate"
+                           class="form-control"
+                           type="date" />
+
+                    <span asp-validation-for="NewWeightDate"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+                <button type="submit"
+                        class="btn btn-iron w-100"
+                        id="saveWeightButton">
+
+                    <span class="save-weight-text">
+                        Save measurement
+                    </span>
+
+                    <span class="save-weight-loading d-none">
+                        <span class="spinner-border spinner-border-sm me-2"
+                              aria-hidden="true"></span>
+                        Saving...
+                    </span>
+
+                </button>
+
+            </form>
+
+        </section>
+
+    </div>
+
+    <div class="col-12">
+
+        <section class="content-panel">
+
+            <div class="row g-4">
+
+                <div class="col-md-4">
+
+                    <p class="section-kicker">
+                        Tracking overview
+                    </p>
+
+                    <h2 class="panel-title">
+                        Your records
+                    </h2>
+
+                    <p class="text-secondary mb-0">
+                        Your progress is calculated from the
+                        weight measurements you have recorded.
+                    </p>
+
+                </div>
+
+                <div class="col-md-8">
+
+                    <div class="row g-3">
+
+                        <div class="col-sm-4">
+
+                            <div class="metric-block">
+
+                                <span class="text-secondary">
+                                    First record
+                                </span>
+
+                                <strong class="d-block mt-1">
+
+                                    @(firstRecord is not null
+                                        ? firstRecord.Date.ToString("dd MMM yyyy")
+                                        : "—")
+
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-sm-4">
+
+                            <div class="metric-block">
+
+                                <span class="text-secondary">
+                                    Latest record
+                                </span>
+
+                                <strong class="d-block mt-1">
+
+                                    @(latestRecord is not null
+                                        ? latestRecord.Date.ToString("dd MMM yyyy")
+                                        : "—")
+
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-sm-4">
+
+                            <div class="metric-block">
+
+                                <span class="text-secondary">
+                                    Current trend
+                                </span>
+
+                                <strong class="d-block mt-1">
+                                    @progressDirection
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+
+    @if (Model.WeightHistory.Any())
+    {
+        <script src="~/lib/chart.js/chart.umd.min.js"></script>
+
+        <script>
+            const weightLabels =
+                @Html.Raw(JsonSerializer.Serialize(chartLabels));
+
+            const weightValues =
+                @Html.Raw(JsonSerializer.Serialize(chartValues));
+
+            const weightChart =
+                document.getElementById("weightProgressChart");
+
+            if (weightChart) {
+                new Chart(weightChart, {
+                    type: "line",
+
+                    data: {
+                        labels: weightLabels,
+
+                        datasets: [
+                            {
+                                label: "Weight (kg)",
+                                data: weightValues,
+                                tension: 0.3,
+                                fill: false
+                            }
+                        ]
+                    },
+
+                    options: {
+                        responsive: true,
+
+                        maintainAspectRatio: false,
+
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+
+                        scales: {
+                            y: {
+                                beginAtZero: false
+                            }
+                        }
+                    }
+                });
+            }
+
+            const logWeightForm =
+                document.getElementById("logWeightForm");
+
+            const saveWeightButton =
+                document.getElementById("saveWeightButton");
+
+            if (logWeightForm && saveWeightButton) {
+                logWeightForm.addEventListener("submit", function () {
+
+                    if (!logWeightForm.checkValidity()) {
+                        return;
+                    }
+
+                    saveWeightButton.disabled = true;
+
+                    const text =
+                        saveWeightButton.querySelector(".save-weight-text");
+
+                    const loading =
+                        saveWeightButton.querySelector(".save-weight-loading");
+
+                    if (text) {
+                        text.classList.add("d-none");
+                    }
+
+                    if (loading) {
+                        loading.classList.remove("d-none");
+                    }
+                });
+            }
+        </script>
+    }
 }

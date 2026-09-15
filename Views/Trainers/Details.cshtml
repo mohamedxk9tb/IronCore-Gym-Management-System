@@ -1,22 +1,228 @@
-@model GymMvc.Models.Trainer
+@model GymMvc.ViewModels.TrainerProfileViewModel
 
 @{
-    ViewData["Title"] = "Trainer Profile";
+    ViewData["Title"] = "Trainer Details";
+    ViewData["Dashboard"] = false;
 }
 
-<div class="container py-4">
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = Model.Trainer.FullName,
+    ["Description"] = "Trainer profile, specialty, classes, and member feedback.",
+    ["Eyebrow"] = "Our team / Trainer"
+})
 
-    <h1>@Model.FullName</h1>
+<div class="row g-4">
 
-    <hr />
+    <!-- Trainer Profile -->
 
-    <p>
-        <strong>Specialty:</strong>
-        @Model.Specialty
-    </p>
+    <div class="col-lg-5">
 
-    <a asp-action="Index" class="btn btn-secondary">
-        Back to Trainers
-    </a>
+        <section class="content-panel h-100">
+
+            <p class="section-kicker">
+                Coach profile
+            </p>
+
+            <h2 class="panel-title mb-2">
+                @Model.Trainer.FullName
+            </h2>
+
+            <p class="text-secondary mb-4">
+                @(
+                    string.IsNullOrWhiteSpace(Model.Trainer.Specialty)
+                        ? "General fitness"
+                        : Model.Trainer.Specialty
+                )
+            </p>
+
+
+            <div class="metric-block mb-4">
+
+                <span class="text-secondary">
+                    Certifications
+                </span>
+
+                <strong class="d-block mt-2">
+
+                    @if (string.IsNullOrWhiteSpace(Model.Trainer.Certificates))
+                    {
+                        <span>Not listed</span>
+                    }
+                    else
+                    {
+                        @Model.Trainer.Certificates
+                    }
+
+                </strong>
+
+            </div>
+
+
+            <div class="d-flex justify-content-between
+                        align-items-center
+                        gap-3">
+
+                <span class="text-secondary">
+                    Classes
+                </span>
+
+                <strong>
+                    @Model.Classes.Count
+                </strong>
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <!-- Classes -->
+
+    <div class="col-lg-7">
+
+        <section class="content-panel h-100">
+
+            <div class="mb-4">
+
+                <p class="section-kicker">
+                    Schedule
+                </p>
+
+                <h2 class="panel-title mb-1">
+                    Classes
+                </h2>
+
+                <p class="text-secondary mb-0">
+                    Sessions currently assigned to this trainer.
+                </p>
+
+            </div>
+
+
+            @if (Model.Classes.Any())
+            {
+                <div class="d-flex flex-column gap-3">
+
+                    @foreach (var gymClass in Model.Classes)
+                    {
+                        <div class="metric-block">
+
+                            <div class="d-flex justify-content-between
+                                        align-items-start
+                                        gap-3">
+
+                                <div>
+
+                                    <strong class="d-block">
+                                        @gymClass.Name
+                                    </strong>
+
+                                    <span class="text-secondary">
+                                        @gymClass.DayOfWeek
+                                    </span>
+
+                                </div>
+
+                                <span class="status-pill">
+                                    @gymClass.StartTime.ToString(@"hh\:mm")
+                                </span>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+            }
+            else
+            {
+                @await Html.PartialAsync(
+                    "_EmptyState",
+                    new Dictionary<string, string>
+                    {
+                        ["Title"] = "No classes assigned",
+                        ["Message"] = "This trainer currently has no scheduled classes."
+                    })
+            }
+
+        </section>
+
+    </div>
+
+
+    <!-- Reviews -->
+
+    <div class="col-12">
+
+        <section class="content-panel">
+
+            <div class="mb-4">
+
+                <p class="section-kicker">
+                    Member feedback
+                </p>
+
+                <h2 class="panel-title mb-1">
+                    Reviews
+                </h2>
+
+                <p class="text-secondary mb-0">
+                    Feedback shared by members about this trainer.
+                </p>
+
+            </div>
+
+
+            @if (Model.Reviews.Any())
+            {
+                <div class="row g-3">
+
+                    @foreach (var review in Model.Reviews)
+                    {
+                        <div class="col-md-6 col-xl-4">
+
+                            <article class="metric-block h-100">
+
+                                <div class="d-flex justify-content-between
+                                            align-items-start
+                                            gap-3 mb-3">
+
+                                    <strong>
+                                        @review.MemberName
+                                    </strong>
+
+                                    <span class="status-pill">
+                                        @review.Rating / 5
+                                    </span>
+
+                                </div>
+
+                                <p class="text-secondary mb-0">
+                                    @review.Comment
+                                </p>
+
+                            </article>
+
+                        </div>
+                    }
+
+                </div>
+            }
+            else
+            {
+                @await Html.PartialAsync(
+                    "_EmptyState",
+                    new Dictionary<string, string>
+                    {
+                        ["Title"] = "No reviews yet",
+                        ["Message"] = "This trainer has not received any member reviews yet."
+                    })
+            }
+
+        </section>
+
+    </div>
 
 </div>

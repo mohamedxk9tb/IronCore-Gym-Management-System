@@ -1,8 +1,93 @@
+@model GymMvc.Models.Plan
+
 @{
-    ViewData["Title"] = "Plan Details"; ViewData["Dashboard"] = true;
+    ViewData["Title"] = "Plan Details";
+    ViewData["Dashboard"] = true;
 }
-@await Html.PartialAsync("_PageHeader", new Dictionary<string, string> { ["Title"] = "Performance", ["Description"] = "Quarterly membership plan.", ["Eyebrow"] = "Plan details" })<section class="content-panel detail-grid">
-<div><span>Price</span><strong>$219 / quarter</strong></div>
-<div><span>Status</span><strong>Active</strong></div>
-<div><span>Members</span><strong>318</strong></div>
+
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = Model.Name,
+    ["Description"] = "Membership plan details and pricing.",
+    ["Eyebrow"] = "Operations / Plans"
+})
+
+<section class="content-panel">
+
+    <div class="row g-4">
+
+        <div class="col-md-4">
+
+            <div class="metric-block h-100">
+
+                <span class="text-secondary">
+                    Price
+                </span>
+
+                <strong class="d-block mt-2">
+                    @Model.Price.ToString("C")
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="metric-block h-100">
+
+                <span class="text-secondary">
+                    Duration
+                </span>
+
+                <strong class="d-block mt-2">
+                    @Model.DurationMonths
+                    month@(Model.DurationMonths == 1 ? "" : "s")
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="metric-block h-100">
+
+                <span class="text-secondary">
+                    Plan ID
+                </span>
+
+                <strong class="d-block mt-2">
+                    #@Model.Id
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="d-flex justify-content-end
+                flex-wrap
+                gap-2
+                mt-4">
+
+        <a asp-controller="Admin"
+           asp-action="Plans"
+           class="btn btn-iron-outline">
+            Back
+        </a>
+
+        <a asp-controller="Admin"
+           asp-action="PlansEdit"
+           asp-route-id="@Model.Id"
+           class="btn btn-iron">
+            Edit plan
+        </a>
+
+    </div>
+
 </section>

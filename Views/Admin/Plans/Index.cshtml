@@ -1,44 +1,178 @@
+@model IEnumerable<GymMvc.Models.Plan>
+
 @{
-    ViewData["Title"] = "Plans"; ViewData["Dashboard"] = true;
+    ViewData["Title"] = "Plans";
+    ViewData["Dashboard"] = true;
+
+    var search = ViewBag.Search as string ?? "";
 }
-@await Html.PartialAsync("_PageHeader", new Dictionary<string,string> { ["Title"] = "Plans" ,    ["Description"] = "Membership products and pricing." , ["Eyebrow"] = "Manage plans" , ["Action"] = "Create plan" })
+
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = "Plans",
+    ["Description"] = "Manage membership plans, pricing, and availability.",
+    ["Eyebrow"] = "Operations / Plans"
+})
+
 <section class="content-panel">
-    <div class="admin-toolbar"><input class="form-control" placeholder="Search plans"
-                                          aria-label="Search plans" /><select class="form-select" aria-label="Filter plans">
-        <option>All statuses</option>
-        <option>Active</option>
-        <option>Archived</option>
-    </select></div>
-    <div class="table-responsive">
-        <table class="table table-iron">
-            <thead>
-                <tr>
-                    <th>Plan</th>
-                    <th>Billing</th>
-                    <th>Price</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Performance</td>
-                    <td>Quarterly</td>
-                    <td>$219</td>
-                    <td>Active</td>
-                    <td><a asp-action="PlansEdit" asp-route-id="1">Edit</a> - <a asp-action="PlansDetails"
-                                                                                     asp-route-id="1">View</a></td>
-                    </tr>
+
+    <div class="d-flex flex-column flex-lg-row
+                justify-content-between
+                align-items-lg-end
+                gap-3 mb-4">
+
+        <div>
+            <p class="section-kicker mb-1">
+                Membership plans
+            </p>
+
+            <h2 class="panel-title mb-1">
+                Plan catalogue
+            </h2>
+
+            <p class="text-secondary mb-0">
+                Manage the memberships offered by IRONCORE.
+            </p>
+        </div>
+
+        <a asp-controller="Admin"
+           asp-action="PlansCreate"
+           class="btn btn-iron">
+            Create plan
+        </a>
+
+    </div>
+
+
+    <form asp-controller="Admin"
+          asp-action="Plans"
+          method="get"
+          class="row g-3 mb-4">
+
+        <div class="col-md-9">
+
+            <label for="planSearch"
+                   class="form-label">
+                Search plans
+            </label>
+
+            <input id="planSearch"
+                   name="search"
+                   value="@search"
+                   type="search"
+                   class="form-control"
+                   placeholder="Search by plan name..." />
+
+        </div>
+
+        <div class="col-md-3 d-flex align-items-end">
+
+            <button type="submit"
+                    class="btn btn-iron-outline w-100">
+                Search
+            </button>
+
+        </div>
+
+    </form>
+
+
+    @if (Model.Any())
+    {
+        <div class="table-responsive">
+
+            <table class="table table-dark table-hover align-middle mb-0">
+
+                <thead>
                     <tr>
-                        <td>Foundation</td>
-                        <td>Monthly</td>
-                        <td>$49</td>
-                        <td>Active</td>
-                        <td><a asp-action="PlansEdit" asp-route-id="2">Edit</a> - <a asp-action="PlansDetails"
-                                                                                         asp-route-id="2">View</a></td>
+                        <th>Plan</th>
+                        <th>Duration</th>
+                        <th>Price</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var plan in Model)
+                    {
+                        <tr>
+
+                            <td>
+                                <div class="fw-semibold">
+                                    @plan.Name
+                                </div>
+
+                                <small class="text-secondary">
+                                    Plan #@plan.Id
+                                </small>
+                            </td>
+
+                            <td>
+                                @plan.DurationMonths
+                                month@(plan.DurationMonths == 1 ? "" : "s")
+                            </td>
+
+                            <td>
+                                <strong>
+                                    @plan.Price.ToString("C")
+                                </strong>
+                            </td>
+
+                            <td class="text-end">
+
+                                <div class="d-inline-flex
+                                            flex-wrap
+                                            gap-2">
+
+                                    <a asp-controller="Admin"
+                                       asp-action="PlansDetails"
+                                       asp-route-id="@plan.Id"
+                                       class="btn btn-sm btn-iron-outline">
+                                        Details
+                                    </a>
+
+                                    <a asp-controller="Admin"
+                                       asp-action="PlansEdit"
+                                       asp-route-id="@plan.Id"
+                                       class="btn btn-sm btn-iron-outline">
+                                        Edit
+                                    </a>
+
+                                    <a asp-controller="Admin"
+                                       asp-action="PlansDelete"
+                                       asp-route-id="@plan.Id"
+                                       class="btn btn-sm btn-outline-danger">
+                                        Delete
+                                    </a>
+
+                                </div>
+
+                            </td>
+
                         </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="pagination-iron">1 - 2 - 3 - Next</div>
-        </section>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+    }
+    else
+    {
+        @await Html.PartialAsync(
+            "_EmptyState",
+            new Dictionary<string, string>
+            {
+                ["Title"] = "No plans found",
+                ["Message"] = string.IsNullOrWhiteSpace(search)
+                    ? "There are no membership plans yet."
+                    : "No plans match your search.",
+                ["ActionText"] = "Create plan",
+                ["ActionController"] = "Admin",
+                ["Action"] = "PlansCreate"
+            })
+    }
+
+</section>

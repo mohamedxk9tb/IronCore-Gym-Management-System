@@ -1,9 +1,176 @@
+@model GymMvc.Models.Trainer
+
 @{
-    ViewData["Title"] = "Trainer Details"; ViewData["Dashboard"] = true;
+    ViewData["Title"] = "Trainer Details";
+    ViewData["Dashboard"] = true;
 }
-@await Html.PartialAsync("_PageHeader", new Dictionary<string, string> {
-["Title"] = "Omar Hassan", ["Description"] = "Strength & Olympic lifting - 4.9 rating",
-["Eyebrow"] = "Trainer details" })<section class="content-panel detail-grid">
-<div><span>Certificates</span><strong>UKSCA - BWL L2</strong></div>
-<div><span>Classes</span><strong>2 active classes</strong></div>
-</section>
+
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = "Trainer details",
+    ["Description"] = "Review the trainer's profile and core information.",
+    ["Eyebrow"] = "Operations / Trainers"
+})
+
+<div class="row g-4">
+
+    <div class="col-lg-8">
+
+        <section class="content-panel">
+
+            <div class="d-flex flex-column flex-md-row
+                        justify-content-between
+                        align-items-md-start
+                        gap-3 mb-4">
+
+                <div>
+
+                    <p class="section-kicker">
+                        Trainer profile
+                    </p>
+
+                    <h2 class="panel-title mb-2">
+                        @Model.FullName
+                    </h2>
+
+                    <p class="text-secondary mb-0">
+                        @(
+                            string.IsNullOrWhiteSpace(Model.Specialty)
+                                ? "Trainer"
+                                : Model.Specialty
+                        )
+                    </p>
+
+                </div>
+
+                <span class="status-pill">
+                    Trainer #@Model.Id
+                </span>
+
+            </div>
+
+
+            <div class="row g-4">
+
+                <div class="col-md-6">
+
+                    <div class="metric-block">
+
+                        <span class="text-secondary">
+                            Full name
+                        </span>
+
+                        <strong class="d-block mt-1">
+                            @Model.FullName
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <div class="metric-block">
+
+                        <span class="text-secondary">
+                            Specialty
+                        </span>
+
+                        <strong class="d-block mt-1">
+                            @(
+                                string.IsNullOrWhiteSpace(Model.Specialty)
+                                    ? "—"
+                                    : Model.Specialty
+                            )
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-12">
+
+                    <div class="metric-block">
+
+                        <span class="text-secondary">
+                            Certifications
+                        </span>
+
+                        <strong class="d-block mt-1">
+
+                            @if (string.IsNullOrWhiteSpace(Model.Certificates))
+                            {
+                                <span>—</span>
+                            }
+                            else
+                            {
+                                @Model.Certificates
+                            }
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="d-flex justify-content-end
+                        flex-wrap
+                        gap-2
+                        mt-4">
+
+                <a asp-controller="AdminTrainers"
+                   asp-action="Index"
+                   class="btn btn-iron-outline">
+                    Back to trainers
+                </a>
+
+                <a asp-controller="AdminTrainers"
+                   asp-action="Edit"
+                   asp-route-id="@Model.Id"
+                   class="btn btn-iron">
+                    Edit trainer
+                </a>
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <div class="col-lg-4">
+
+        <section class="content-panel h-100">
+
+            <p class="auth-kicker">
+                TRAINER RECORD
+            </p>
+
+            <h3 class="mb-3">
+                @Model.FullName
+            </h3>
+
+            <p class="text-secondary mb-4">
+                This page contains the trainer's core
+                administrative profile. Classes, workout plans,
+                attendance, and reviews are managed through
+                their dedicated systems.
+            </p>
+
+            <a asp-controller="AdminTrainers"
+               asp-action="Delete"
+               asp-route-id="@Model.Id"
+               class="btn btn-outline-danger w-100">
+                Delete trainer
+            </a>
+
+        </section>
+
+    </div>
+
+</div>

@@ -1,41 +1,285 @@
+@model IEnumerable<GymMvc.Models.GymClass>
+
 @{
-    ViewData["Title"] = "Classes"; ViewData["Dashboard"] = true;
+    ViewData["Title"] = "Classes";
+    ViewData["Dashboard"] = true;
+
+    var search = ViewBag.Search as string ?? "";
+    var day = ViewBag.Day as string ?? "";
+    var currentPage = ViewBag.CurrentPage is int p ? p : 1;
+    var totalPages = ViewBag.TotalPages is int tp ? tp : 0;
 }
+
 @await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
 {
     ["Title"] = "Classes",
-    ["Description"] =
-"Schedules, capacity, and coaches.",
-    ["Eyebrow"] = "Manage classes"
+    ["Description"] = "Manage the gym schedule, trainers, capacity, and class timing.",
+    ["Eyebrow"] = "Operations / Classes"
 })
+
 <section class="content-panel">
-    <div class="admin-toolbar"><input class="form-control" placeholder="Search classes"
-                                          aria-label="Search classes" /><select class="form-select">
-        <option>All days</option>
-        <option>Monday</option>
-        <option>Tuesday</option>
-    </select></div>
-    <div class="table-responsive">
-        <table class="table table-iron">
-            <thead>
-                <tr>
-                    <th>Class</th>
-                    <th>Coach</th>
-                    <th>Schedule</th>
-                    <th>Capacity</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Engine Room</td>
-                    <td>Sarah Nabil</td>
-                    <td>Mon / Wed - 18:00</td>
-                    <td>16</td>
-                    <td><a asp-action="ClassesEdit" asp-route-id="1">Edit</a> - <a asp-action="ClassesDetails"
-                                                                                       asp-route-id="1">View</a></td>
-                    </tr>
-                </tbody>
-            </table>
+
+    <div class="d-flex flex-column flex-lg-row
+                justify-content-between
+                align-items-lg-end
+                gap-3 mb-4">
+
+        <div>
+            <p class="section-kicker mb-1">Class management</p>
+
+            <h2 class="panel-title mb-1">
+                Training schedule
+            </h2>
+
+            <p class="text-secondary mb-0">
+                Keep the weekly floor schedule accurate.
+            </p>
         </div>
-    </section>
+
+        <a asp-controller="Admin"
+           asp-action="ClassesCreate"
+           class="btn btn-iron">
+            Add class
+        </a>
+
+    </div>
+
+
+    <form asp-controller="Admin"
+          asp-action="Classes"
+          method="get"
+          class="row g-3 mb-4">
+
+        <div class="col-lg-7">
+
+            <label for="classSearch"
+                   class="form-label">
+                Search
+            </label>
+
+            <input id="classSearch"
+                   name="search"
+                   value="@search"
+                   class="form-control"
+                   type="search"
+                   placeholder="Search class name or trainer..." />
+
+        </div>
+
+
+        <div class="col-lg-3">
+
+            <label for="classDay"
+                   class="form-label">
+                Day
+            </label>
+
+            <select id="classDay"
+                    name="day"
+                    class="form-select">
+
+                <option value="">All days</option>
+                <option value="Monday" selected="@(day == "Monday")">Monday</option>
+                <option value="Tuesday" selected="@(day == "Tuesday")">Tuesday</option>
+                <option value="Wednesday" selected="@(day == "Wednesday")">Wednesday</option>
+                <option value="Thursday" selected="@(day == "Thursday")">Thursday</option>
+                <option value="Friday" selected="@(day == "Friday")">Friday</option>
+                <option value="Saturday" selected="@(day == "Saturday")">Saturday</option>
+                <option value="Sunday" selected="@(day == "Sunday")">Sunday</option>
+
+            </select>
+
+        </div>
+
+
+        <div class="col-lg-2 d-flex align-items-end">
+
+            <button type="submit"
+                    class="btn btn-iron-outline w-100">
+                Filter
+            </button>
+
+        </div>
+
+    </form>
+
+
+    @if (Model.Any())
+    {
+        <div class="table-responsive">
+
+            <table class="table table-dark table-hover align-middle mb-0">
+
+                <thead>
+                    <tr>
+                        <th>Class</th>
+                        <th>Trainer</th>
+                        <th>Schedule</th>
+                        <th>Duration</th>
+                        <th>Capacity</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var gymClass in Model)
+                    {
+                        var bookedCount =
+                            gymClass.Bookings?
+                                .Count(b => b.Status == "Booked") ?? 0;
+
+                        <tr>
+
+                            <td>
+                                <div class="fw-semibold">
+                                    @gymClass.Name
+                                </div>
+
+                                <small class="text-secondary">
+                                    Class #@gymClass.Id
+                                </small>
+                            </td>
+
+
+                            <td>
+                                @(gymClass.Trainer?.FullName ?? "Unassigned")
+                            </td>
+
+
+                            <td>
+                                <div>
+                                    @gymClass.DayOfWeek
+                                </div>
+
+                                <small class="text-secondary">
+                                    @gymClass.StartTime.ToString(@"hh\:mm")
+                                </small>
+                            </td>
+
+
+                            <td>
+                                @gymClass.DurationMinutes min
+                            </td>
+
+
+                            <td>
+                                <span class="status-pill">
+                                    @bookedCount / @gymClass.Capacity
+                                </span>
+                            </td>
+
+
+                            <td class="text-end">
+
+                                <div class="d-inline-flex
+                                            flex-wrap
+                                            justify-content-end
+                                            gap-2">
+
+                                    <a asp-controller="Admin"
+                                       asp-action="ClassesDetails"
+                                       asp-route-id="@gymClass.Id"
+                                       class="btn btn-sm btn-iron-outline">
+                                        Details
+                                    </a>
+
+                                    <a asp-controller="Admin"
+                                       asp-action="ClassesEdit"
+                                       asp-route-id="@gymClass.Id"
+                                       class="btn btn-sm btn-iron-outline">
+                                        Edit
+                                    </a>
+
+                                    <a asp-controller="Admin"
+                                       asp-action="ClassesDelete"
+                                       asp-route-id="@gymClass.Id"
+                                       class="btn btn-sm btn-outline-danger">
+                                        Delete
+                                    </a>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        @if (totalPages > 1)
+        {
+            <nav class="mt-4"
+                 aria-label="Classes pagination">
+
+                <ul class="pagination justify-content-center mb-0">
+
+                    <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+
+                        <a class="page-link"
+                           asp-controller="Admin"
+                           asp-action="Classes"
+                           asp-route-search="@search"
+                           asp-route-day="@day"
+                           asp-route-page="@(currentPage - 1)">
+                            Previous
+                        </a>
+
+                    </li>
+
+
+                    @for (var i = 1; i <= totalPages; i++)
+                    {
+                        <li class="page-item @(i == currentPage ? "active" : "")">
+
+                            <a class="page-link"
+                               asp-controller="Admin"
+                               asp-action="Classes"
+                               asp-route-search="@search"
+                               asp-route-day="@day"
+                               asp-route-page="@i">
+                                @i
+                            </a>
+
+                        </li>
+                    }
+
+
+                    <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+
+                        <a class="page-link"
+                           asp-controller="Admin"
+                           asp-action="Classes"
+                           asp-route-search="@search"
+                           asp-route-day="@day"
+                           asp-route-page="@(currentPage + 1)">
+                            Next
+                        </a>
+
+                    </li>
+
+                </ul>
+
+            </nav>
+        }
+    }
+    else
+    {
+        @await Html.PartialAsync(
+            "_EmptyState",
+            new Dictionary<string, string>
+            {
+                ["Title"] = "No classes found",
+                ["Message"] = "There are no classes matching the current filters.",
+                ["ActionText"] = "Add class",
+                ["ActionController"] = "Admin",
+                ["Action"] = "ClassesCreate"
+            })
+    }
+
+</section>

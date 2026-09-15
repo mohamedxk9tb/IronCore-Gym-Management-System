@@ -1,15 +1,308 @@
+@model GymMvc.Models.Member
+
 @{
-    ViewData["Title"] = "Member Details"; ViewData["Dashboard"] = true;
+    ViewData["Title"] = "Member Details";
+    ViewData["Dashboard"] = true;
 }
+
 @await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
 {
-    ["Title"] = "Alex Morgan",
-    ["Description"] =
-"Performance member - active through 04 Nov 2026",
-    ["Eyebrow"] = "Member details"
-})<section
-class="content-panel detail-grid">
-<div><span>Attendance</span><strong>84% this month</strong></div>
-<div><span>Bookings</span><strong>18 total</strong></div>
-<div><span>Last check-in</span><strong>Today - 06:18</strong></div>
-</section>
+    ["Title"] = "Member details",
+    ["Description"] = "Review the member's profile, fitness information, and recent activity.",
+    ["Eyebrow"] = "Operations / Members"
+})
+
+<div class="row g-4">
+
+    <div class="col-lg-5">
+
+        <section class="content-panel h-100">
+
+            <p class="section-kicker">
+                Member profile
+            </p>
+
+            <h2 class="panel-title mb-2">
+                @Model.FullName
+            </h2>
+
+            <p class="text-secondary mb-4">
+                @Model.Email
+            </p>
+
+
+            <div class="row g-3">
+
+                <div class="col-6">
+
+                    <div class="metric-block h-100">
+
+                        <span class="text-secondary">
+                            Height
+                        </span>
+
+                        <strong class="d-block mt-2">
+                            @Model.Height:0.0 cm
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-6">
+
+                    <div class="metric-block h-100">
+
+                        <span class="text-secondary">
+                            Weight
+                        </span>
+
+                        <strong class="d-block mt-2">
+                            @Model.Weight:0.0 kg
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-12">
+
+                    <div class="metric-block">
+
+                        <span class="text-secondary">
+                            Fitness level
+                        </span>
+
+                        <strong class="d-block mt-2">
+                            @(
+                                string.IsNullOrWhiteSpace(Model.FitnessLevel)
+                                    ? "Not set"
+                                    : Model.FitnessLevel
+                            )
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-12">
+
+                    <div class="metric-block">
+
+                        <span class="text-secondary">
+                            Goal
+                        </span>
+
+                        <strong class="d-block mt-2">
+                            @(
+                                string.IsNullOrWhiteSpace(Model.Goal)
+                                    ? "Not set"
+                                    : Model.Goal
+                            )
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="d-flex justify-content-end
+                        flex-wrap
+                        gap-2
+                        mt-4">
+
+                <a asp-controller="Admin"
+                   asp-action="Members"
+                   class="btn btn-iron-outline">
+                    Back
+                </a>
+
+                <a asp-controller="Admin"
+                   asp-action="MembersEdit"
+                   asp-route-id="@Model.Id"
+                   class="btn btn-iron">
+                    Edit member
+                </a>
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <div class="col-lg-7">
+
+        <section class="content-panel mb-4">
+
+            <div class="d-flex justify-content-between
+                        align-items-center
+                        gap-3 mb-4">
+
+                <div>
+
+                    <p class="section-kicker">
+                        Weight history
+                    </p>
+
+                    <h2 class="panel-title mb-0">
+                        Progress records
+                    </h2>
+
+                </div>
+
+                <span class="status-pill">
+                    @Model.WeightLogs.Count record@(Model.WeightLogs.Count == 1 ? "" : "s")
+                </span>
+
+            </div>
+
+
+            @if (Model.WeightLogs.Any())
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-dark table-hover align-middle mb-0">
+
+                        <thead>
+                            <tr>
+
+                                <th>
+                                    Date
+                                </th>
+
+                                <th class="text-end">
+                                    Weight
+                                </th>
+
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var log in Model.WeightLogs
+                                .OrderByDescending(x => x.Date))
+                            {
+                                <tr>
+
+                                    <td>
+                                        @log.Date.ToString("dd MMM yyyy")
+                                    </td>
+
+                                    <td class="text-end fw-semibold">
+                                        @log.Weight:0.0 kg
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                @await Html.PartialAsync(
+                    "_EmptyState",
+                    new Dictionary<string, string>
+                    {
+                        ["Title"] = "No weight records",
+                        ["Message"] = "This member has no recorded weight history yet."
+                    })
+            }
+
+        </section>
+
+
+        <section class="content-panel">
+
+            <div class="d-flex justify-content-between
+                        align-items-center
+                        gap-3 mb-4">
+
+                <div>
+
+                    <p class="section-kicker">
+                        Facility activity
+                    </p>
+
+                    <h2 class="panel-title mb-0">
+                        Check-in history
+                    </h2>
+
+                </div>
+
+                <span class="status-pill">
+                    @Model.CheckIns.Count visit@(Model.CheckIns.Count == 1 ? "" : "s")
+                </span>
+
+            </div>
+
+
+            @if (Model.CheckIns.Any())
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-dark table-hover align-middle mb-0">
+
+                        <thead>
+                            <tr>
+
+                                <th>
+                                    Date
+                                </th>
+
+                                <th>
+                                    Time
+                                </th>
+
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var checkIn in Model.CheckIns
+                                .OrderByDescending(x => x.CheckInTime))
+                            {
+                                <tr>
+
+                                    <td>
+                                        @checkIn.CheckInTime.ToString("dd MMM yyyy")
+                                    </td>
+
+                                    <td>
+                                        @checkIn.CheckInTime.ToString("hh:mm tt")
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                @await Html.PartialAsync(
+                    "_EmptyState",
+                    new Dictionary<string, string>
+                    {
+                        ["Title"] = "No check-ins",
+                        ["Message"] = "This member has no recorded facility visits yet."
+                    })
+            }
+
+        </section>
+
+    </div>
+
+</div>

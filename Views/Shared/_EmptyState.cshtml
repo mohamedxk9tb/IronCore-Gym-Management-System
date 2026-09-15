@@ -2,4 +2,10 @@
 @{
     var action = Model.TryGetValue("Action", out var actionValue) ? actionValue : null;
 }
-<section class="empty-state"><div class="empty-state-mark">+</div><h2>@Model["Title"]</h2><p>@Model["Description"]</p>@if (!string.IsNullOrWhiteSpace(action)){<button class="btn btn-iron" type="button">@action</button>}</section>
+<section class="empty-state">    <div class="empty-state-mark">+</div>
+    <h2>@Model["Title"]</h2>
+    <p>@Model["Description"]</p>@if (!string.IsNullOrWhiteSpace(action)){
+    <button class="btn btn-iron"
+            type="button">@action</button>
+}
+</section>

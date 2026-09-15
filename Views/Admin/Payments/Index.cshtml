@@ -1,43 +1,232 @@
+@model GymMvc.ViewModels.PaymentListViewModel
+
 @{
-    ViewData["Title"] = "Payments"; ViewData["Dashboard"] = true;
+    ViewData["Title"] = "Payments";
+    ViewData["Dashboard"] = true;
+
+    var payments = Model?.Payments
+        ?? new List<GymMvc.ViewModels.PaymentRowViewModel>();
+
+    var now = DateTime.Now;
+
+    var monthlyPayments = payments
+        .Where(x =>
+            x.Payment.PaymentDate.Year == now.Year &&
+            x.Payment.PaymentDate.Month == now.Month)
+        .ToList();
+
+    var monthlyIncome = monthlyPayments.Sum(x => x.Payment.Amount);
+
+    var totalIncome = payments.Sum(x => x.Payment.Amount);
 }
+
 @await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
 {
     ["Title"] = "Payments",
-    ["Description"] =
-"Collected revenue and receipt records.",
-    ["Eyebrow"] = "Operations"
-})<section class="content-panel">
-<div class="table-responsive">
-    <table class="table table-iron">
-        <thead>
-            <tr>
-                <th>Member</th>
-                <th>Amount</th>
-                <th>Date</th>
-                <th>Method</th>
-                <th>Status</th>
-                <th>Receipt</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Alex Morgan</td>
-                <td>$79.00</td>
-                <td>04 Oct 2026</td>
-                <td>Card ---- 4488</td>
-                <td><span class="status-pill">Paid</span></td>
-                <td><a class="text-link" asp-controller="Admin" asp-action="Payments">View receipt</a></td>
-            </tr>
-            <tr>
-                <td>Samira Khan</td>
-                <td>$1,299.00</td>
-                <td>22 Sep 2026</td>
-                <td>Transfer</td>
-                <td><span class="status-pill">Paid</span></td>
-                <td><a class="text-link" asp-controller="Admin" asp-action="Payments">View receipt</a></td>
-            </tr>
-        </tbody>
-    </table>
+    ["Description"] = "Review recorded membership payments and current revenue.",
+    ["Eyebrow"] = "Operations / Payments"
+})
+
+
+<div class="row g-3 mb-4">
+
+    <div class="col-sm-4">
+
+        @await Html.PartialAsync(
+            "_StatCard",
+            new Dictionary<string, string>
+            {
+                ["Title"] = "This month",
+                ["Value"] = monthlyIncome.ToString("C"),
+                ["Icon"] = "01"
+            })
+
+    </div>
+
+
+    <div class="col-sm-4">
+
+        @await Html.PartialAsync(
+            "_StatCard",
+            new Dictionary<string, string>
+            {
+                ["Title"] = "Recorded payments",
+                ["Value"] = payments.Count.ToString(),
+                ["Icon"] = "02"
+            })
+
+    </div>
+
+
+    <div class="col-sm-4">
+
+        @await Html.PartialAsync(
+            "_StatCard",
+            new Dictionary<string, string>
+            {
+                ["Title"] = "Total recorded",
+                ["Value"] = totalIncome.ToString("C"),
+                ["Icon"] = "03"
+            })
+
+    </div>
+
 </div>
+
+
+<section class="content-panel">
+
+    <div class="d-flex flex-column flex-lg-row
+                justify-content-between
+                align-items-lg-end
+                gap-3 mb-4">
+
+        <div>
+
+            <p class="section-kicker mb-1">
+                Revenue records
+            </p>
+
+            <h2 class="panel-title mb-1">
+                Payment ledger
+            </h2>
+
+            <p class="text-secondary mb-0">
+                Recorded payments linked to member subscriptions.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    @if (payments.Any())
+    {
+        <div class="table-responsive">
+
+            <table class="table table-dark table-hover align-middle mb-0">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Member
+                        </th>
+
+                        <th>
+                            Plan
+                        </th>
+
+                        <th>
+                            Payment
+                        </th>
+
+                        <th>
+                            Date
+                        </th>
+
+                        <th>
+                            Subscription
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    @foreach (var row in payments
+                        .OrderByDescending(x => x.Payment.PaymentDate))
+                    {
+                        var payment = row.Payment;
+
+                        <tr>
+
+                            <td>
+
+                                <div class="fw-semibold">
+                                    @(payment.Subscription?.Member?.FullName
+                                        ?? "Unknown member")
+                                </div>
+
+                                @if (payment.Subscription != null)
+                                {
+                                    <small class="text-secondary">
+                                        Member #@payment.Subscription.MemberId
+                                    </small>
+                                }
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="fw-semibold">
+                                    @row.PlanName
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <strong>
+                                    @payment.Amount.ToString("C")
+                                </strong>
+
+                            </td>
+
+
+                            <td>
+
+                                <div>
+                                    @payment.PaymentDate.ToString("dd MMM yyyy")
+                                </div>
+
+                                <small class="text-secondary">
+                                    @payment.PaymentDate.ToString("hh:mm tt")
+                                </small>
+
+                            </td>
+
+
+                            <td>
+
+                                @if (payment.Subscription != null)
+                                {
+                                    <span class="text-secondary">
+                                        #@payment.Subscription.Id
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-secondary">
+                                        —
+                                    </span>
+                                }
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+    }
+    else
+    {
+        @await Html.PartialAsync(
+            "_EmptyState",
+            new Dictionary<string, string>
+            {
+                ["Title"] = "No payments recorded",
+                ["Message"] = "There are no payment records to display yet."
+            })
+    }
+
 </section>

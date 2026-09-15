@@ -1,15 +1,185 @@
+@model GymMvc.Models.GymClass
+
 @{
-    ViewData["Title"] = "Class Details"; ViewData["Dashboard"] = true;
+    ViewData["Title"] = "Class Details";
+    ViewData["Dashboard"] = true;
+
+    var bookedCount =
+        Model.Bookings?.Count(b => b.Status == "Booked") ?? 0;
+
+    var availableSlots =
+        Math.Max(Model.Capacity - bookedCount, 0);
 }
+
 @await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
 {
-    ["Title"] = "Engine Room",
-    ["Description"] =
-"Monday / Wednesday - 18:00 - Conditioning Floor",
-    ["Eyebrow"] = "Class details"
-})<section
-class="content-panel detail-grid">
-<div><span>Coach</span><strong>Sarah Nabil</strong></div>
-<div><span>Capacity</span><strong>16 athletes</strong></div>
-<div><span>Bookings</span><strong>12 confirmed</strong></div>
-</section>
+    ["Title"] = Model.Name,
+    ["Description"] = "Review class schedule, trainer, and capacity.",
+    ["Eyebrow"] = "Operations / Classes"
+})
+
+<div class="row g-4">
+
+    <div class="col-lg-8">
+
+        <section class="content-panel">
+
+            <p class="section-kicker">
+                Class #@Model.Id
+            </p>
+
+            <h2 class="panel-title mb-4">
+                @Model.Name
+            </h2>
+
+
+            <div class="row g-3">
+
+                <div class="col-md-6">
+
+                    <div class="metric-block h-100">
+
+                        <span class="text-secondary">
+                            Trainer
+                        </span>
+
+                        <strong class="d-block mt-2">
+                            @(Model.Trainer?.FullName ?? "Unassigned")
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <div class="metric-block h-100">
+
+                        <span class="text-secondary">
+                            Schedule
+                        </span>
+
+                        <strong class="d-block mt-2">
+                            @Model.DayOfWeek
+                            —
+                            @Model.StartTime.ToString(@"hh\:mm")
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <div class="metric-block h-100">
+
+                        <span class="text-secondary">
+                            Duration
+                        </span>
+
+                        <strong class="d-block mt-2">
+                            @Model.DurationMinutes min
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <div class="metric-block h-100">
+
+                        <span class="text-secondary">
+                            Capacity
+                        </span>
+
+                        <strong class="d-block mt-2">
+                            @Model.Capacity
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <div class="metric-block h-100">
+
+                        <span class="text-secondary">
+                            Places left
+                        </span>
+
+                        <strong class="d-block mt-2">
+                            @availableSlots
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="d-flex justify-content-end
+                        flex-wrap
+                        gap-2
+                        mt-4">
+
+                <a asp-controller="Admin"
+                   asp-action="Classes"
+                   class="btn btn-iron-outline">
+                    Back
+                </a>
+
+                <a asp-controller="Admin"
+                   asp-action="ClassesEdit"
+                   asp-route-id="@Model.Id"
+                   class="btn btn-iron">
+                    Edit class
+                </a>
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <div class="col-lg-4">
+
+        <section class="content-panel h-100">
+
+            <p class="section-kicker">
+                Roster
+            </p>
+
+            <h3 class="mb-3">
+                Current bookings
+            </h3>
+
+            <div class="nutrition-stat">
+
+                <strong>
+                    @bookedCount
+                </strong>
+
+                <span>
+                    active booking@(bookedCount == 1 ? "" : "s")
+                </span>
+
+            </div>
+
+            <p class="text-secondary mb-0">
+                Cancelled and attended bookings are not
+                counted as active future seats.
+            </p>
+
+        </section>
+
+    </div>
+
+</div>

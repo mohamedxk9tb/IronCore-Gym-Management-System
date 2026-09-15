@@ -1,3 +1,449 @@
-@{ ViewData["Title"] = "Class Schedule"; ViewData["Dashboard"] = true; }
-<partial name="_PageHeader" model='new Dictionary<string, string> { ["Title"] = "Class schedule", ["Description"] = "Find the session that fits your week.", ["Eyebrow"] = "Member area" }' />
-<section class="content-panel"><div class="admin-toolbar flex-wrap"><div class="d-flex flex-wrap gap-2"><select class="form-select" aria-label="Filter by day"><option>Monday 14 October</option><option>Tuesday 15 October</option></select><select class="form-select" aria-label="Filter by class type"><option>All class types</option><option>Strength</option><option>Conditioning</option></select><select class="form-select" aria-label="Filter by trainer"><option>All trainers</option><option>Omar Hassan</option><option>Sarah Nabil</option></select></div><span class="text-secondary small">8 sessions · 42 seats available</span></div><div class="table-responsive"><table class="table table-iron align-middle"><thead><tr><th>Class</th><th>Trainer</th><th>Date &amp; time</th><th>Duration</th><th>Capacity</th><th>Available</th><th></th></tr></thead><tbody><tr><td><strong>Strength Foundations</strong><br /><small class="text-secondary">Studio Alpha</small></td><td>Omar Hassan</td><td>14 Oct · 06:30</td><td>60 min</td><td>16</td><td>8 spots</td><td><button class="btn btn-iron btn-sm" type="button">Book</button></td></tr><tr><td><strong>Engine Room</strong><br /><small class="text-secondary">Conditioning Floor</small></td><td>Sarah Nabil</td><td>14 Oct · 18:00</td><td>60 min</td><td>24</td><td>4 spots</td><td><button class="btn btn-iron btn-sm" type="button">Book</button></td></tr><tr><td><strong>Mobility Reset</strong><br /><small class="text-secondary">Recovery Studio</small></td><td>Adam Kareem</td><td>14 Oct · 19:30</td><td>45 min</td><td>12</td><td>Full</td><td><button class="btn btn-secondary btn-sm" type="button" disabled>Full</button></td></tr></tbody></table></div></section>
+@model GymMvc.ViewModels.ClassListViewModel
+
+@{
+    ViewData["Title"] = "Class Schedule";
+    ViewData["Dashboard"] = true;
+}
+
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = "Class schedule",
+    ["Description"] = "Find a class, check availability, and reserve your place.",
+    ["Eyebrow"] = "Member area"
+})
+
+<section class="content-panel">
+
+    <div class="d-flex flex-column flex-lg-row
+                justify-content-between
+                align-items-lg-end
+                gap-3 mb-4">
+
+        <div>
+            <p class="section-kicker mb-1">
+                Weekly programme
+            </p>
+
+            <h2 class="panel-title mb-1">
+                Find your next session
+            </h2>
+
+            <p class="text-secondary mb-0">
+                Browse classes by name or day and see remaining places.
+            </p>
+        </div>
+
+        <span class="status-pill">
+            @Model.Classes.Count class@(Model.Classes.Count == 1 ? "" : "es")
+        </span>
+
+    </div>
+
+    <form asp-controller="Classes"
+          asp-action="Index"
+          method="get"
+          class="row g-3 mb-4">
+
+        <div class="col-lg-5">
+
+            <label for="search"
+                   class="form-label">
+                Search classes
+            </label>
+
+            <input type="search"
+                   id="search"
+                   name="search"
+                   value="@Model.CurrentSearch"
+                   class="form-control"
+                   placeholder="Search by class name..." />
+
+        </div>
+
+        <div class="col-md-4 col-lg-3">
+
+            <label for="day"
+                   class="form-label">
+                Day
+            </label>
+
+            <select id="day"
+                    name="day"
+                    class="form-select">
+
+                <option value="">
+                    All days
+                </option>
+
+                <option value="Saturday"
+                        selected="@(Model.CurrentDay == "Saturday")">
+                    Saturday
+                </option>
+
+                <option value="Sunday"
+                        selected="@(Model.CurrentDay == "Sunday")">
+                    Sunday
+                </option>
+
+                <option value="Monday"
+                        selected="@(Model.CurrentDay == "Monday")">
+                    Monday
+                </option>
+
+                <option value="Tuesday"
+                        selected="@(Model.CurrentDay == "Tuesday")">
+                    Tuesday
+                </option>
+
+                <option value="Wednesday"
+                        selected="@(Model.CurrentDay == "Wednesday")">
+                    Wednesday
+                </option>
+
+                <option value="Thursday"
+                        selected="@(Model.CurrentDay == "Thursday")">
+                    Thursday
+                </option>
+
+                <option value="Friday"
+                        selected="@(Model.CurrentDay == "Friday")">
+                    Friday
+                </option>
+
+            </select>
+
+        </div>
+
+        <div class="col-md-4 col-lg-2">
+
+            <label for="sort"
+                   class="form-label">
+                Sort
+            </label>
+
+            <select id="sort"
+                    name="sort"
+                    class="form-select">
+
+                <option value="">
+                    Schedule
+                </option>
+
+                <option value="name"
+                        selected="@(Model.CurrentSort == "name")">
+                    Name Aâ€“Z
+                </option>
+
+                <option value="name_desc"
+                        selected="@(Model.CurrentSort == "name_desc")">
+                    Name Zâ€“A
+                </option>
+
+                <option value="time_desc"
+                        selected="@(Model.CurrentSort == "time_desc")">
+                    Latest time
+                </option>
+
+            </select>
+
+        </div>
+
+        <div class="col-md-4 col-lg-2 d-flex align-items-end">
+
+            <button type="submit"
+                    class="btn btn-iron w-100">
+                Apply
+            </button>
+
+        </div>
+
+    </form>
+
+    @if (Model.Classes.Any())
+    {
+        <div class="row g-4">
+
+            @foreach (var item in Model.Classes)
+            {
+                var gymClass = item.GymClass;
+
+                <div class="col-md-6 col-xl-4">
+
+                    <article class="content-panel h-100 d-flex flex-column">
+
+                        <div class="d-flex justify-content-between
+                                    align-items-start
+                                    gap-3 mb-3">
+
+                            <div>
+
+                                <p class="section-kicker mb-1">
+                                    @gymClass.DayOfWeek
+                                </p>
+
+                                <h3 class="h4 mb-1">
+                                    @gymClass.Name
+                                </h3>
+
+                            </div>
+
+                            @if (item.IsFull)
+                            {
+                                <span class="status-pill">
+                                    Full
+                                </span>
+                            }
+                            else if (item.IsBookedByCurrentMember)
+                            {
+                                <span class="status-pill">
+                                    Booked
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="status-pill">
+                                    Available
+                                </span>
+                            }
+
+                        </div>
+
+                        <div class="mb-4">
+
+                            <div class="d-flex justify-content-between
+                                        gap-3 mb-2">
+
+                                <span class="text-secondary">
+                                    Trainer
+                                </span>
+
+                                <strong>
+                                    @item.TrainerName
+                                </strong>
+
+                            </div>
+
+                            <div class="d-flex justify-content-between
+                                        gap-3 mb-2">
+
+                                <span class="text-secondary">
+                                    Start
+                                </span>
+
+                                <strong>
+                                    @gymClass.StartTime.ToString(@"hh\:mm")
+                                </strong>
+
+                            </div>
+
+                            <div class="d-flex justify-content-between
+                                        gap-3 mb-2">
+
+                                <span class="text-secondary">
+                                    Duration
+                                </span>
+
+                                <strong>
+                                    @gymClass.DurationMinutes min
+                                </strong>
+
+                            </div>
+
+                            <div class="d-flex justify-content-between
+                                        gap-3">
+
+                                <span class="text-secondary">
+                                    Places left
+                                </span>
+
+                                <strong>
+                                    @item.AvailableSlots / @gymClass.Capacity
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                        <div class="mt-auto">
+
+                            @if (item.IsBookedByCurrentMember)
+                            {
+                                <div class="alert alert-iron-success mb-0"
+                                     role="status">
+
+                                    <strong>You're booked.</strong>
+
+                                    Your place in this class is confirmed.
+
+                                </div>
+                            }
+                            else if (item.IsFull)
+                            {
+                                <button type="button"
+                                        class="btn btn-outline-secondary w-100"
+                                        disabled>
+                                    Class full
+                                </button>
+                            }
+                            else
+                            {
+                                <form asp-controller="Booking"
+                                      asp-action="Create"
+                                      method="post">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <input type="hidden"
+                                           name="gymClassId"
+                                           value="@gymClass.Id" />
+
+                                    <button type="submit"
+                                            class="btn btn-iron w-100"
+                                            data-booking-submit>
+
+                                        <span data-booking-text>
+                                            Book this class
+                                        </span>
+
+                                        <span class="d-none"
+                                              data-booking-loading>
+
+                                            <span class="spinner-border spinner-border-sm me-2"
+                                                  aria-hidden="true"></span>
+
+                                            Booking...
+
+                                        </span>
+
+                                    </button>
+
+                                </form>
+                            }
+
+                        </div>
+
+                    </article>
+
+                </div>
+            }
+
+        </div>
+
+        @if (Model.TotalPages > 1)
+        {
+            <nav class="mt-5"
+                 aria-label="Class schedule pagination">
+
+                <ul class="pagination justify-content-center mb-0">
+
+                    <li class="page-item @(Model.CurrentPage <= 1 ? "disabled" : "")">
+
+                        <a class="page-link"
+                           asp-controller="Classes"
+                           asp-action="Index"
+                           asp-route-search="@Model.CurrentSearch"
+                           asp-route-day="@Model.CurrentDay"
+                           asp-route-sort="@Model.CurrentSort"
+                           asp-route-page="@(Model.CurrentPage - 1)">
+
+                            Previous
+
+                        </a>
+
+                    </li>
+
+                    @for (var pageNumber = 1;
+                          pageNumber <= Model.TotalPages;
+                          pageNumber++)
+                    {
+                        <li class="page-item @(pageNumber == Model.CurrentPage ? "active" : "")">
+
+                            <a class="page-link"
+                               asp-controller="Classes"
+                               asp-action="Index"
+                               asp-route-search="@Model.CurrentSearch"
+                               asp-route-day="@Model.CurrentDay"
+                               asp-route-sort="@Model.CurrentSort"
+                               asp-route-page="@pageNumber">
+
+                                @pageNumber
+
+                            </a>
+
+                        </li>
+                    }
+
+                    <li class="page-item @(Model.CurrentPage >= Model.TotalPages ? "disabled" : "")">
+
+                        <a class="page-link"
+                           asp-controller="Classes"
+                           asp-action="Index"
+                           asp-route-search="@Model.CurrentSearch"
+                           asp-route-day="@Model.CurrentDay"
+                           asp-route-sort="@Model.CurrentSort"
+                           asp-route-page="@(Model.CurrentPage + 1)">
+
+                            Next
+
+                        </a>
+
+                    </li>
+
+                </ul>
+
+            </nav>
+        }
+    }
+    else
+    {
+        @await Html.PartialAsync(
+            "_EmptyState",
+            new Dictionary<string, string>
+            {
+                ["Title"] = "No classes found",
+                ["Message"] = "Try another search term or choose a different day."
+            })
+    }
+
+</section>
+
+@section Scripts
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const bookingForms =
+                document.querySelectorAll("form");
+
+            bookingForms.forEach(function (form) {
+
+                const button =
+                    form.querySelector("[data-booking-submit]");
+
+                if (!button) {
+                    return;
+                }
+
+                form.addEventListener("submit", function () {
+
+                    const text =
+                        button.querySelector("[data-booking-text]");
+
+                    const loading =
+                        button.querySelector("[data-booking-loading]");
+
+                    button.disabled = true;
+
+                    if (text) {
+                        text.classList.add("d-none");
+                    }
+
+                    if (loading) {
+                        loading.classList.remove("d-none");
+                    }
+                });
+            });
+
+        });
+    </script>
+}

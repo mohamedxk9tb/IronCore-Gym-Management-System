@@ -1,3 +1,293 @@
-@{ ViewData["Title"] = "Members"; ViewData["Dashboard"] = true; }
-<partial name="_PageHeader" model='new Dictionary<string, string> { ["Title"] = "Members", ["Description"] = "Static member records and subscription health.", ["Eyebrow"] = "Manage members" }' />
-<section class="content-panel"><div class="admin-toolbar flex-wrap"><div class="d-flex flex-wrap gap-2"><input class="form-control" placeholder="Search members" aria-label="Search members" /><select class="form-select" aria-label="Filter membership"><option>All memberships</option><option>Performance</option><option>Coached</option></select><select class="form-select" aria-label="Filter status"><option>All statuses</option><option>Active</option><option>Expiring</option></select></div><button class="btn btn-iron btn-sm" type="button">Sort: newest</button></div><div class="table-responsive"><table class="table table-iron align-middle"><thead><tr><th>Member</th><th>Email</th><th>Membership</th><th>Status</th><th>Join date</th><th>Subscription</th><th>Actions</th></tr></thead><tbody><tr><td><strong>Alex Morgan</strong></td><td>alex@example.com</td><td>Performance</td><td><span class="status-pill">Active</span></td><td>04 Jun 2026</td><td>Renews 04 Nov</td><td><a class="text-link" asp-action="MembersDetails" asp-route-id="1">Details</a> <a class="text-link" asp-action="MembersEdit" asp-route-id="1">Edit</a> <a class="text-link" asp-action="MembersDelete" asp-route-id="1">Delete</a></td></tr><tr><td><strong>Samira Khan</strong></td><td>samira@example.com</td><td>Coached</td><td><span class="status-pill">Active</span></td><td>22 Sep 2026</td><td>Renews 22 Sep 2027</td><td><a class="text-link" asp-action="MembersDetails" asp-route-id="2">Details</a> <a class="text-link" asp-action="MembersEdit" asp-route-id="2">Edit</a> <a class="text-link" asp-action="MembersDelete" asp-route-id="2">Delete</a></td></tr></tbody></table></div><div class="pagination-iron">Showing 1–2 of 842 · Previous · <strong>1</strong> · 2 · 3 · Next</div></section>
+@model IEnumerable<GymMvc.Models.Member>
+
+@{
+    ViewData["Title"] = "Members";
+    ViewData["Dashboard"] = true;
+
+    var search = ViewBag.Search as string ?? string.Empty;
+    var currentPage = ViewBag.CurrentPage is int page ? page : 1;
+    var totalPages = ViewBag.TotalPages is int pages ? pages : 0;
+    var totalMembers = ViewBag.TotalMembers is int total ? total : 0;
+}
+
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = "Members",
+    ["Description"] = "Manage member profiles, fitness information, and records.",
+    ["Eyebrow"] = "Operations / Members"
+})
+
+<section class="content-panel">
+
+    <div class="d-flex flex-column flex-lg-row
+                justify-content-between
+                align-items-lg-end
+                gap-3 mb-4">
+
+        <div>
+            <p class="section-kicker mb-1">
+                Member management
+            </p>
+
+            <h2 class="panel-title mb-1">
+                Members
+            </h2>
+
+            <p class="text-secondary mb-0">
+                @totalMembers member@(totalMembers == 1 ? "" : "s")
+                registered in the system.
+            </p>
+        </div>
+
+        <a asp-controller="Admin"
+           asp-action="MembersCreate"
+           class="btn btn-iron">
+            Add member
+        </a>
+
+    </div>
+
+
+    <form asp-controller="Admin"
+          asp-action="Members"
+          method="get"
+          class="row g-3 mb-4">
+
+        <div class="col-md-9">
+
+            <label for="memberSearch"
+                   class="form-label">
+                Search members
+            </label>
+
+            <input id="memberSearch"
+                   name="search"
+                   value="@search"
+                   type="search"
+                   class="form-control"
+                   placeholder="Search by name or email..." />
+
+        </div>
+
+        <div class="col-md-3 d-flex align-items-end">
+
+            <button type="submit"
+                    class="btn btn-iron-outline w-100">
+                Search
+            </button>
+
+        </div>
+
+    </form>
+
+
+    @if (Model.Any())
+    {
+        <div class="table-responsive">
+
+            <table class="table table-dark table-hover align-middle mb-0">
+
+                <thead>
+                    <tr>
+
+                        <th scope="col">
+                            Member
+                        </th>
+
+                        <th scope="col">
+                            Email
+                        </th>
+
+                        <th scope="col">
+                            Fitness level
+                        </th>
+
+                        <th scope="col">
+                            Goal
+                        </th>
+
+                        <th scope="col"
+                            class="text-end">
+                            Actions
+                        </th>
+
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var member in Model)
+                    {
+                        <tr>
+
+                            <td>
+
+                                <div class="fw-semibold">
+                                    @member.FullName
+                                </div>
+
+                                <small class="text-secondary">
+                                    Member #@member.Id
+                                </small>
+
+                            </td>
+
+
+                            <td>
+                                <span class="text-secondary">
+                                    @member.Email
+                                </span>
+                            </td>
+
+
+                            <td>
+
+                                @if (string.IsNullOrWhiteSpace(member.FitnessLevel))
+                                {
+                                    <span class="text-secondary">
+                                        Not set
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="status-pill">
+                                        @member.FitnessLevel
+                                    </span>
+                                }
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="text-secondary">
+                                    @(
+                                        string.IsNullOrWhiteSpace(member.Goal)
+                                            ? "Not set"
+                                            : member.Goal
+                                    )
+                                </span>
+
+                            </td>
+
+
+                            <td class="text-end">
+
+                                <div class="d-inline-flex
+                                            flex-wrap
+                                            justify-content-end
+                                            gap-2">
+
+                                    <a asp-controller="Admin"
+                                       asp-action="MembersDetails"
+                                       asp-route-id="@member.Id"
+                                       class="btn btn-sm btn-iron-outline">
+                                        View
+                                    </a>
+
+                                    <a asp-controller="Admin"
+                                       asp-action="MembersEdit"
+                                       asp-route-id="@member.Id"
+                                       class="btn btn-sm btn-iron-outline">
+                                        Edit
+                                    </a>
+
+                                    <a asp-controller="Admin"
+                                       asp-action="MembersDelete"
+                                       asp-route-id="@member.Id"
+                                       class="btn btn-sm btn-outline-danger">
+                                        Delete
+                                    </a>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        @if (totalPages > 1)
+        {
+            <nav class="mt-4"
+                 aria-label="Members pagination">
+
+                <ul class="pagination justify-content-center mb-0">
+
+                    <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+
+                        <a class="page-link"
+                           asp-controller="Admin"
+                           asp-action="Members"
+                           asp-route-search="@search"
+                           asp-route-page="@(currentPage - 1)">
+
+                            Previous
+
+                        </a>
+
+                    </li>
+
+
+                    @for (var pageNumber = 1;
+                          pageNumber <= totalPages;
+                          pageNumber++)
+                    {
+                        <li class="page-item @(pageNumber == currentPage ? "active" : "")">
+
+                            <a class="page-link"
+                               asp-controller="Admin"
+                               asp-action="Members"
+                               asp-route-search="@search"
+                               asp-route-page="@pageNumber">
+
+                                @pageNumber
+
+                            </a>
+
+                        </li>
+                    }
+
+
+                    <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+
+                        <a class="page-link"
+                           asp-controller="Admin"
+                           asp-action="Members"
+                           asp-route-search="@search"
+                           asp-route-page="@(currentPage + 1)">
+
+                            Next
+
+                        </a>
+
+                    </li>
+
+                </ul>
+
+            </nav>
+        }
+    }
+    else
+    {
+        @await Html.PartialAsync(
+            "_EmptyState",
+            new Dictionary<string, string>
+            {
+                ["Title"] = "No members found",
+                ["Message"] = string.IsNullOrWhiteSpace(search)
+                    ? "There are no members in the system yet."
+                    : "No members match your search.",
+                ["ActionText"] = "Add member",
+                ["ActionController"] = "Admin",
+                ["Action"] = "MembersCreate"
+            })
+    }
+
+</section>

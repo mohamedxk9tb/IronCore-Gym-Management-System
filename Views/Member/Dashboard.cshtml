@@ -1,21 +1,433 @@
+@model GymMvc.ViewModels.MemberDashboardViewModel
+
 @{
-    ViewData["Title"] = "Member dashboard";
-    ViewData["Section"] = "Member";
+    ViewData["Title"] = "Member Dashboard";
     ViewData["Dashboard"] = true;
+
+    var weightChangeText =
+        Model.WeightChange.HasValue
+            ? $"{(Model.WeightChange.Value > 0 ? "+" : "")}{Model.WeightChange.Value:0.0} kg"
+            : "No previous log";
+
+    var subscriptionActive =
+        string.Equals(
+            Model.SubscriptionStatus,
+            "Active",
+            StringComparison.OrdinalIgnoreCase);
+
+    var hasNextClass =
+        !string.IsNullOrWhiteSpace(Model.NextClassName) &&
+        Model.NextClassDateTime.HasValue;
 }
-<header class="page-header">
-    <div><p class="section-kicker">Member area / Performance plan</p><h1>Good morning, Marcus.</h1><p>Your current training week is on track. Membership active through 26 September.</p></div>
-    <a class="btn btn-iron" asp-controller="Member" asp-action="CheckIn">Check in</a>
-</header>
+
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = $"Welcome back, {Model.FullName}",
+    ["Description"] = "A quick view of your training progress and gym activity.",
+    ["Eyebrow"] = "Member dashboard"
+})
+
+
+<!-- Overview -->
+
 <div class="row g-3 mb-4">
-    <div class="col-sm-6 col-xl-3"><article class="stat-card"><span>Days remaining</span><strong>18</strong><p>Renews 26 September</p></article></div>
-    <div class="col-sm-6 col-xl-3"><article class="stat-card"><span>Membership</span><strong>Active</strong><p>Performance plan</p></article></div>
-    <div class="col-sm-6 col-xl-3"><article class="stat-card"><span>Monthly attendance</span><strong>12</strong><p>86% of your goal</p></article></div>
-    <div class="col-sm-6 col-xl-3"><article class="stat-card"><span>Next class</span><strong>18:00</strong><p>Engine Room / Today</p></article></div>
+
+    <div class="col-sm-6 col-xl-3">
+
+        @await Html.PartialAsync(
+            "_StatCard",
+            new Dictionary<string, string>
+            {
+                ["Title"] = "Current weight",
+                ["Value"] = $"{Model.CurrentWeight:0.0} kg",
+                ["Icon"] = "01"
+            })
+
+    </div>
+
+
+    <div class="col-sm-6 col-xl-3">
+
+        @await Html.PartialAsync(
+            "_StatCard",
+            new Dictionary<string, string>
+            {
+                ["Title"] = "Monthly check-ins",
+                ["Value"] = Model.MonthlyCheckIns.ToString("N0"),
+                ["Icon"] = "02"
+            })
+
+    </div>
+
+
+    <div class="col-sm-6 col-xl-3">
+
+        @await Html.PartialAsync(
+            "_StatCard",
+            new Dictionary<string, string>
+            {
+                ["Title"] = "Weight logs",
+                ["Value"] = Model.TotalWeightLogs.ToString("N0"),
+                ["Icon"] = "03"
+            })
+
+    </div>
+
+
+    <div class="col-sm-6 col-xl-3">
+
+        @await Html.PartialAsync(
+            "_StatCard",
+            new Dictionary<string, string>
+            {
+                ["Title"] = "Weight change",
+                ["Value"] = weightChangeText,
+                ["Icon"] = "04"
+            })
+
+    </div>
+
 </div>
+
+
 <div class="row g-4">
-    <div class="col-lg-7"><section class="content-panel h-100"><p class="section-kicker">Up next / Today</p><h2 class="panel-title">Engine Room</h2><p class="text-secondary">18:00–19:00 · Conditioning Floor · Coach Sarah Nabil</p><div class="d-flex flex-wrap gap-2 mt-4"><a class="btn btn-iron" asp-controller="Member" asp-action="Bookings">View booking</a><a class="btn btn-iron-outline" asp-controller="Member" asp-action="Classes">Browse schedule</a></div></section></div>
-    <div class="col-lg-5"><section class="content-panel h-100"><h2 class="panel-title">Quick actions</h2><div class="quick-actions"><a asp-controller="Member" asp-action="FitnessPlan">Review fitness plan</a><a asp-controller="Member" asp-action="Progress">Log progress snapshot</a><a asp-controller="Member" asp-action="Profile">Update profile</a></div></section></div>
-    <div class="col-lg-7"><section class="content-panel h-100"><h2 class="panel-title">Recent activity</h2><div class="timeline"><p><strong>Yesterday</strong> — Checked in for Olympic Barbell.</p><p><strong>12 Sep</strong> — Completed your weekly mobility target.</p><p><strong>10 Sep</strong> — Weight check recorded: 78.4 kg.</p></div></section></div>
-    <div class="col-lg-5"><section class="content-panel h-100"><p class="section-kicker">Progress snapshot</p><h2 class="panel-title">78.4 kg</h2><p class="text-secondary">1.2 kg closer to your 76 kg target this month.</p><div class="progress progress-iron" role="progressbar" aria-label="Weight goal progress" aria-valuenow="68" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width:68%"></div></div></section></div>
+
+    <!-- Progress -->
+
+    <div class="col-lg-7">
+
+        <section class="content-panel h-100">
+
+            <div class="d-flex justify-content-between
+                        align-items-start
+                        gap-3 mb-4">
+
+                <div>
+
+                    <p class="section-kicker mb-1">
+                        Progress
+                    </p>
+
+                    <h2 class="panel-title mb-1">
+                        Keep the momentum.
+                    </h2>
+
+                    <p class="text-secondary mb-0">
+                        Your latest measurements and training activity.
+                    </p>
+
+                </div>
+
+                <span class="status-pill">
+                    @Model.TotalWeightLogs logs
+                </span>
+
+            </div>
+
+
+            <div class="row g-3">
+
+                <div class="col-md-6">
+
+                    <div class="metric-block h-100">
+
+                        <span class="text-secondary">
+                            Height
+                        </span>
+
+                        <strong class="d-block mt-2">
+                            @Model.Height:0.0 cm
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <div class="metric-block h-100">
+
+                        <span class="text-secondary">
+                            Goal
+                        </span>
+
+                        <strong class="d-block mt-2">
+                            @(string.IsNullOrWhiteSpace(Model.Goal)
+                                ? "Not set"
+                                : Model.Goal)
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <div class="metric-block h-100">
+
+                        <span class="text-secondary">
+                            Last weight log
+                        </span>
+
+                        <strong class="d-block mt-2">
+
+                            @if (Model.LastWeightLog.HasValue)
+                            {
+                                @Model.LastWeightLog.Value.ToString("dd MMM yyyy")
+                            }
+                            else
+                            {
+                                <span>No logs yet</span>
+                            }
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <div class="metric-block h-100">
+
+                        <span class="text-secondary">
+                            Last check-in
+                        </span>
+
+                        <strong class="d-block mt-2">
+
+                            @if (Model.LastCheckIn.HasValue)
+                            {
+                                @Model.LastCheckIn.Value.ToString("dd MMM yyyy")
+                            }
+                            else
+                            {
+                                <span>No visits yet</span>
+                            }
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="mt-4">
+
+                <a asp-controller="Member"
+                   asp-action="Progress"
+                   class="btn btn-iron-outline">
+                    View progress
+                </a>
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <!-- Membership -->
+
+    <div class="col-lg-5">
+
+        <section class="content-panel h-100">
+
+            <p class="section-kicker">
+                Membership
+            </p>
+
+            <h2 class="panel-title mb-3">
+                Your access
+            </h2>
+
+
+            @if (subscriptionActive)
+            {
+                <div class="metric-block mb-4">
+
+                    <span class="text-secondary">
+                        Current plan
+                    </span>
+
+                    <strong class="d-block mt-2">
+                        @(Model.PlanName ?? "Active membership")
+                    </strong>
+
+                    @if (Model.SubscriptionEndDate.HasValue)
+                    {
+                        <span class="text-secondary d-block mt-1">
+                            Ends
+                            @Model.SubscriptionEndDate.Value.ToString("dd MMM yyyy")
+                        </span>
+                    }
+
+                </div>
+
+
+                <div class="d-flex justify-content-between
+                            align-items-center
+                            gap-3">
+
+                    <span class="text-secondary">
+                        Days remaining
+                    </span>
+
+                    <strong>
+                        @Model.DaysRemaining
+                    </strong>
+
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-iron-warning"
+                     role="status">
+
+                    <strong>
+                        @Model.SubscriptionStatus
+                    </strong>
+
+                    <p class="mb-0 mt-2">
+                        An active membership is required for
+                        facility access and check-in.
+                    </p>
+
+                </div>
+
+                <a asp-controller="Plans"
+                   asp-action="Index"
+                   class="btn btn-iron">
+                    View plans
+                </a>
+            }
+
+        </section>
+
+    </div>
+
+
+    <!-- Next class -->
+
+    <div class="col-lg-7">
+
+        <section class="content-panel h-100">
+
+            <p class="section-kicker">
+                Next session
+            </p>
+
+            <h2 class="panel-title mb-3">
+                Your next class
+            </h2>
+
+
+            @if (hasNextClass)
+            {
+                <div class="metric-block">
+
+                    <span class="text-secondary">
+                        Class
+                    </span>
+
+                    <strong class="d-block mt-2">
+                        @Model.NextClassName
+                    </strong>
+
+                    <span class="text-secondary d-block mt-2">
+                        @Model.NextClassDateTime.Value.ToString(
+                            "ddd, dd MMM yyyy Â· hh:mm tt")
+                    </span>
+
+                    @if (Model.NextClassAvailableSpots.HasValue)
+                    {
+                        <span class="text-secondary d-block mt-1">
+                            @Model.NextClassAvailableSpots
+                            places available
+                        </span>
+                    }
+
+                </div>
+
+                <div class="mt-4">
+
+                    <a asp-controller="Member"
+                       asp-action="Bookings"
+                       class="btn btn-iron-outline">
+                        View my bookings
+                    </a>
+
+                </div>
+            }
+            else
+            {
+                <div class="empty-state py-4">
+
+                    <h3>
+                        No upcoming class.
+                    </h3>
+
+                    <p class="text-secondary mb-4">
+                        Browse the schedule and reserve your next session.
+                    </p>
+
+                    <a asp-controller="Classes"
+                       asp-action="Index"
+                       class="btn btn-iron">
+                        Browse classes
+                    </a>
+
+                </div>
+            }
+
+        </section>
+
+    </div>
+
+
+    <!-- Quick actions -->
+
+    <div class="col-lg-5">
+
+        <section class="content-panel h-100">
+
+            <p class="section-kicker">
+                Quick actions
+            </p>
+
+            <h2 class="panel-title mb-4">
+                Stay on track.
+            </h2>
+
+            <div class="d-grid gap-2">
+
+                <a asp-controller="Member"
+                   asp-action="CheckIn"
+                   class="btn btn-iron">
+                    Check in
+                </a>
+
+                <a asp-controller="Classes"
+                   asp-action="Index"
+                   class="btn btn-iron-outline">
+                    Browse classes
+                </a>
+
+                <a asp-controller="Member"
+                   asp-action="Profile"
+                   class="btn btn-iron-outline">
+                    Update profile
+                </a>
+
+            </div>
+
+        </section>
+
+    </div>
+
 </div>

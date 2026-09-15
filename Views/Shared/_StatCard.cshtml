@@ -3,4 +3,10 @@
     var description = Model.TryGetValue("Description", out var descriptionValue) ? descriptionValue : null;
     var accent = Model.TryGetValue("Icon", out var accentValue) ? accentValue : null;
 }
-<article class="stat-card"><div class="stat-card-top"><span>@Model["Title"]</span>@if (!string.IsNullOrWhiteSpace(accent)){<b>@accent</b>}</div><strong>@Model["Value"]</strong>@if (!string.IsNullOrWhiteSpace(description)){<p>@description</p>}</article>
+<article class="stat-card">    <div class="stat-card-top"><span>@Model["Title"]</span>@if (!string.IsNullOrWhiteSpace(accent)){
+    <b>@accent</b>
+}
+</div><strong>@Model["Value"]</strong>@if (!string.IsNullOrWhiteSpace(description)){
+<p>@description</p>
+    }
+</article>

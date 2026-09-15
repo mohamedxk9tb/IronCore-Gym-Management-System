@@ -1,17 +1,450 @@
+@model GymMvc.ViewModels.ReportsViewModel
+
+@using System.Text.Json
+
 @{
-    ViewData["Title"] = "Reports"; ViewData["Dashboard"] = true;
+    ViewData["Title"] = "Reports";
+    ViewData["Dashboard"] = true;
+
+    var chartLabels = Model.Months;
+    var incomeData = Model.IncomeData;
+    var membersData = Model.MembersData;
 }
-@await Html.PartialAsync("_PageHeader", new Dictionary<string, string> { ["Title"] = "Reports", ["Description"] = "A measured view of the business and the floor.", ["Eyebrow"] = "Operations" })<div class="row g-3 mb-4">    <div class="col-md-3">@await Html.PartialAsync("_StatCard", new Dictionary<string, string> { ["Title"] = "Active members", ["Value"] = "842", ["Icon"] = "01" })</div>
-<div class="col-md-3">@await Html.PartialAsync("_StatCard", new Dictionary<string, string> { ["Title"] = "Monthly income", ["Value"] = "$42.8k", ["Icon"] = "02" })</div>
-<div class="col-md-3">@await Html.PartialAsync("_StatCard", new Dictionary<string, string>
-    {
-        ["Title"] = "Expiring",
-        ["Value"] = "27",
-        ["Icon"] = "03"
-    })</div>
-    <div class="col-md-3">@await Html.PartialAsync("_StatCard", new Dictionary<string, string> { ["Title"] = "Popular class", ["Value"] = "HYROX", ["Icon"] = "04" })</div>
+
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = "Reports",
+    ["Description"] = "A measured view of the business and the floor.",
+    ["Eyebrow"] = "Operations"
+})
+
+
+<!-- Summary -->
+
+<div class="row g-3 mb-4">
+
+    <div class="col-sm-6 col-xl-3">
+
+        @await Html.PartialAsync(
+            "_StatCard",
+            new Dictionary<string, string>
+            {
+                ["Title"] = "Active members",
+                ["Value"] = Model.ActiveMembers.ToString("N0"),
+                ["Icon"] = "01"
+            })
+
+    </div>
+
+
+    <div class="col-sm-6 col-xl-3">
+
+        @await Html.PartialAsync(
+            "_StatCard",
+            new Dictionary<string, string>
+            {
+                ["Title"] = "Monthly income",
+                ["Value"] = Model.MonthlyIncome.ToString("C0"),
+                ["Icon"] = "02"
+            })
+
+    </div>
+
+
+    <div class="col-sm-6 col-xl-3">
+
+        @await Html.PartialAsync(
+            "_StatCard",
+            new Dictionary<string, string>
+            {
+                ["Title"] = "Expiring this week",
+                ["Value"] = Model.ExpiringMembershipsThisWeek.Count.ToString("N0"),
+                ["Icon"] = "03"
+            })
+
+    </div>
+
+
+    <div class="col-sm-6 col-xl-3">
+
+        @await Html.PartialAsync(
+            "_StatCard",
+            new Dictionary<string, string>
+            {
+                ["Title"] = "Popular class",
+                ["Value"] = Model.MostPopularClasses.FirstOrDefault()?.ClassName ?? "—",
+                ["Icon"] = "04"
+            })
+
+    </div>
+
 </div>
-<section class="content-panel">
-    <h2 class="panel-title">Performance report</h2>
-    <div class="chart-placeholder"></div>
+
+
+<!-- Performance Chart -->
+
+<section class="content-panel mb-4">
+
+    <div class="d-flex flex-column flex-md-row
+                justify-content-between
+                align-items-md-start
+                gap-3 mb-4">
+
+        <div>
+
+            <p class="section-kicker">
+                Performance
+            </p>
+
+            <h2 class="panel-title mb-1">
+                Business performance
+            </h2>
+
+            <p class="text-secondary mb-0">
+                Income and active-member activity across the
+                latest reporting period.
+            </p>
+
+        </div>
+
+        <span class="status-pill">
+            Last 6 months
+        </span>
+
+    </div>
+
+
+    @if (Model.Months.Any())
+    {
+        <div class="progress-chart"
+             style="height: 360px;">
+
+            <canvas id="reportsChart"
+                    aria-label="Income and active members over the last six months"
+                    role="img">
+            </canvas>
+
+        </div>
+    }
+    else
+    {
+        @await Html.PartialAsync(
+            "_EmptyState",
+            new Dictionary<string, string>
+            {
+                ["Title"] = "No report data yet",
+                ["Message"] = "There is not enough reporting data to display the performance chart."
+            })
+    }
+
 </section>
+
+
+<div class="row g-4">
+
+
+    <!-- Expiring Memberships -->
+
+    <div class="col-lg-7">
+
+        <section class="content-panel h-100">
+
+            <div class="d-flex justify-content-between
+                        align-items-start
+                        gap-3 mb-4">
+
+                <div>
+
+                    <p class="section-kicker">
+                        Memberships
+                    </p>
+
+                    <h2 class="panel-title mb-1">
+                        Expiring this week
+                    </h2>
+
+                    <p class="text-secondary mb-0">
+                        Active memberships ending within the next
+                        seven days.
+                    </p>
+
+                </div>
+
+                <span class="status-pill">
+                    @Model.ExpiringMembershipsThisWeek.Count
+                </span>
+
+            </div>
+
+
+            @if (Model.ExpiringMembershipsThisWeek.Any())
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-dark table-hover
+                                  align-middle mb-0">
+
+                        <thead>
+
+                            <tr>
+
+                                <th scope="col">
+                                    Member
+                                </th>
+
+                                <th scope="col">
+                                    Plan
+                                </th>
+
+                                <th scope="col">
+                                    Ends
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var membership
+                                in Model.ExpiringMembershipsThisWeek)
+                            {
+                                <tr>
+
+                                    <td>
+                                        <span class="fw-semibold">
+                                            @membership.MemberName
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="text-secondary">
+                                            @membership.PlanName
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span>
+                                            @membership.EndDate.ToString("dd MMM yyyy")
+                                        </span>
+
+                                        <small class="d-block text-secondary">
+                                            @membership.EndDate.ToString("HH:mm")
+                                        </small>
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                @await Html.PartialAsync(
+                    "_EmptyState",
+                    new Dictionary<string, string>
+                    {
+                        ["Title"] = "No memberships expiring",
+                        ["Message"] = "There are no active memberships ending within the next seven days."
+                    })
+            }
+
+        </section>
+
+    </div>
+
+
+    <!-- Popular Classes -->
+
+    <div class="col-lg-5">
+
+        <section class="content-panel h-100">
+
+            <div class="mb-4">
+
+                <p class="section-kicker">
+                    Classes
+                </p>
+
+                <h2 class="panel-title mb-1">
+                    Most popular
+                </h2>
+
+                <p class="text-secondary mb-0">
+                    Classes ranked by non-cancelled bookings.
+                </p>
+
+            </div>
+
+
+            @if (Model.MostPopularClasses.Any())
+            {
+                <div class="d-flex flex-column gap-3">
+
+                    @foreach (var gymClass
+                        in Model.MostPopularClasses)
+                    {
+                        <div class="d-flex justify-content-between
+                                    align-items-center
+                                    gap-3
+                                    p-3
+                                    border
+                                    rounded">
+
+                            <div>
+
+                                <span class="fw-semibold d-block">
+                                    @gymClass.ClassName
+                                </span>
+
+                                <small class="text-secondary">
+                                    @gymClass.BookingsCount
+                                    @(gymClass.BookingsCount == 1
+                                        ? "booking"
+                                        : "bookings")
+                                </small>
+
+                            </div>
+
+                            <span class="status-pill">
+                                @gymClass.BookingsCount
+                            </span>
+
+                        </div>
+                    }
+
+                </div>
+            }
+            else
+            {
+                @await Html.PartialAsync(
+                    "_EmptyState",
+                    new Dictionary<string, string>
+                    {
+                        ["Title"] = "No class data",
+                        ["Message"] = "There are no booking records available for the popularity report."
+                    })
+            }
+
+        </section>
+
+    </div>
+
+</div>
+
+
+@section Scripts
+{
+    <script src="~/lib/chart.js/chart.umd.min.js"></script>
+
+    <script>
+
+        const reportLabels =
+            @Html.Raw(JsonSerializer.Serialize(chartLabels));
+
+        const reportIncome =
+            @Html.Raw(JsonSerializer.Serialize(incomeData));
+
+        const reportMembers =
+            @Html.Raw(JsonSerializer.Serialize(membersData));
+
+        const reportsCanvas =
+            document.getElementById("reportsChart");
+
+        if (reportsCanvas && reportLabels.length > 0) {
+
+            new Chart(reportsCanvas, {
+
+                type: "line",
+
+                data: {
+
+                    labels: reportLabels,
+
+                    datasets: [
+
+                        {
+                            label: "Income",
+                            data: reportIncome,
+                            yAxisID: "income",
+                            tension: 0.3,
+                            fill: false
+                        },
+
+                        {
+                            label: "Active members",
+                            data: reportMembers,
+                            yAxisID: "members",
+                            tension: 0.3,
+                            fill: false
+                        }
+
+                    ]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    interaction: {
+                        mode: "index",
+                        intersect: false
+                    },
+
+                    plugins: {
+
+                        legend: {
+                            display: true
+                        }
+
+                    },
+
+                    scales: {
+
+                        income: {
+
+                            type: "linear",
+
+                            position: "left",
+
+                            beginAtZero: true,
+
+                            ticks: {
+                                callback: function (value) {
+                                    return value.toLocaleString();
+                                }
+                            }
+
+                        },
+
+                        members: {
+
+                            type: "linear",
+
+                            position: "right",
+
+                            beginAtZero: true,
+
+                            grid: {
+                                drawOnChartArea: false
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            });
+
+        }
+
+    </script>
+}

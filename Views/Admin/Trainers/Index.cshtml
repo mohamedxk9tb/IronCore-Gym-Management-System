@@ -1,37 +1,157 @@
+@model IEnumerable<GymMvc.ViewModels.TrainerListItemViewModel>
+
 @{
-    ViewData["Title"] = "Trainers"; ViewData["Dashboard"] = true;
+    ViewData["Title"] = "Trainers";
+    ViewData["Dashboard"] = true;
 }
-@await Html.PartialAsync("_PageHeader", new Dictionary<string,string> { ["Title"] = "Trainers" ,
-         ["Description"] = "Coach profiles and specialties." , ["Eyebrow"] = "Manage trainers" })
+
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = "Trainers",
+    ["Description"] = "Manage trainer profiles, specialties, and certifications.",
+    ["Eyebrow"] = "Operations"
+})
+
 <section class="content-panel">
-    <div class="admin-toolbar"><input class="form-control" placeholder="Search trainers"
-                                          aria-label="Search trainers" /><button class="btn btn-iron">Create trainer</button></div>
+
+    <div class="d-flex flex-column flex-lg-row
+                justify-content-between
+                align-items-lg-center
+                gap-3 mb-4">
+
+        <div>
+            <p class="section-kicker mb-1">
+                Team management
+            </p>
+
+            <h2 class="panel-title mb-1">
+                Trainers
+            </h2>
+
+            <p class="text-secondary mb-0">
+                Manage the coaches available across the facility.
+            </p>
+        </div>
+
+        <a asp-controller="AdminTrainers"
+           asp-action="Create"
+           class="btn btn-iron">
+            Add trainer
+        </a>
+
+    </div>
+
+
+    @if (Model.Any())
+    {
         <div class="table-responsive">
-            <table class="table table-iron">
+
+            <table class="table table-dark table-hover align-middle mb-0">
+
                 <thead>
                     <tr>
-                        <th>Trainer</th>
-                        <th>Specialty</th>
-                        <th>Rating</th>
-                        <th>Actions</th>
+
+                        <th scope="col">
+                            Trainer
+                        </th>
+
+                        <th scope="col">
+                            Specialty
+                        </th>
+
+                        <th scope="col">
+                            Certificates
+                        </th>
+
+                        <th scope="col"
+                            class="text-end">
+                            Actions
+                        </th>
+
                     </tr>
                 </thead>
+
                 <tbody>
-                    <tr>
-                        <td>Omar Hassan</td>
-                        <td>Strength</td>
-                        <td>4.9</td>
-                        <td><a asp-action="TrainersEdit" asp-route-id="1">Edit</a> - <a asp-action="TrainersDetails"
-                                                                                            asp-route-id="1">View</a></td>
-                        </tr>
+
+                    @foreach (var trainer in Model)
+                    {
                         <tr>
-                            <td>Sarah Nabil</td>
-                            <td>Conditioning</td>
-                            <td>4.8</td>
-                            <td><a asp-action="TrainersEdit" asp-route-id="2">Edit</a> - <a asp-action="TrainersDetails"
-                                                                                                asp-route-id="2">View</a></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
+
+                            <td>
+                                <div class="fw-semibold">
+                                    @trainer.FullName
+                                </div>
+                            </td>
+
+                            <td>
+                                <span class="text-secondary">
+                                    @trainer.Specialty
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="text-secondary">
+                                    @(
+                                        string.IsNullOrWhiteSpace(trainer.Certificates)
+                                            ? "—"
+                                            : trainer.Certificates
+                                    )
+                                </span>
+                            </td>
+
+                            <td class="text-end">
+
+                                <div class="d-inline-flex
+                                            flex-wrap
+                                            justify-content-end
+                                            gap-2">
+
+                                    <a asp-controller="AdminTrainers"
+                                       asp-action="Details"
+                                       asp-route-id="@trainer.Id"
+                                       class="btn btn-sm btn-iron-outline">
+                                        View
+                                    </a>
+
+                                    <a asp-controller="AdminTrainers"
+                                       asp-action="Edit"
+                                       asp-route-id="@trainer.Id"
+                                       class="btn btn-sm btn-iron-outline">
+                                        Edit
+                                    </a>
+
+                                    <a asp-controller="AdminTrainers"
+                                       asp-action="Delete"
+                                       asp-route-id="@trainer.Id"
+                                       class="btn btn-sm btn-iron-outline">
+                                        Delete
+                                    </a>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+    }
+    else
+    {
+        @await Html.PartialAsync(
+            "_EmptyState",
+            new Dictionary<string, string>
+            {
+                ["Title"] = "No trainers found",
+                ["Message"] = "There are no trainers in the system yet.",
+                ["ActionText"] = "Add trainer",
+                ["ActionController"] = "AdminTrainers",
+                ["Action"] = "Create"
+            })
+    }
+
+</section>

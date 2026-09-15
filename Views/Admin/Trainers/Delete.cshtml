@@ -1,9 +1,215 @@
+@model GymMvc.Models.Trainer
+
 @{
-    ViewData["Title"] = "Delete Trainer"; ViewData["Dashboard"] = true;
+    ViewData["Title"] = "Delete Trainer";
+    ViewData["Dashboard"] = true;
 }
-<section class="confirm-panel">
-    <p class="section-kicker">Destructive action</p>
-    <h1>Delete Omar Hassan?</h1>
-    <p>This display-only confirmation is ready for the future persistence layer.</p><a class="btn btn-iron-outline"
-                                                                                       asp-action="Trainers">Cancel</a><button class="btn btn-danger">Confirm delete</button>
-</section>
+
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = "Delete trainer",
+    ["Description"] = "Review the trainer record before permanently deleting it.",
+    ["Eyebrow"] = "Operations / Trainers"
+})
+
+<div class="row g-4">
+
+    <div class="col-lg-8">
+
+        <section class="content-panel">
+
+            <div class="mb-4">
+
+                <p class="section-kicker">
+                    Permanent action
+                </p>
+
+                <h2 class="panel-title">
+                    Delete trainer
+                </h2>
+
+                <p class="text-secondary mb-0">
+                    This action will permanently remove the trainer
+                    record from the system.
+                </p>
+
+            </div>
+
+            <div class="alert alert-iron-warning"
+                 role="alert">
+
+                <strong>Are you sure?</strong>
+
+                You are about to delete
+                <strong>@Model.FullName</strong>.
+                This action cannot be undone.
+
+            </div>
+
+            <div class="row g-3 mb-4">
+
+                <div class="col-md-4">
+
+                    <div class="metric-block">
+
+                        <span class="text-secondary">
+                            Trainer ID
+                        </span>
+
+                        <strong class="d-block mt-1">
+                            #@Model.Id
+                        </strong>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="metric-block">
+
+                        <span class="text-secondary">
+                            Name
+                        </span>
+
+                        <strong class="d-block mt-1">
+                            @Model.FullName
+                        </strong>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="metric-block">
+
+                        <span class="text-secondary">
+                            Specialty
+                        </span>
+
+                        <strong class="d-block mt-1">
+                            @(
+                                string.IsNullOrWhiteSpace(Model.Specialty)
+                                    ? "—"
+                                    : Model.Specialty
+                            )
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <form asp-controller="AdminTrainers"
+                  asp-action="Delete"
+                  asp-route-id="@Model.Id"
+                  method="post"
+                  id="deleteTrainerForm">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       asp-for="Id" />
+
+                <div class="d-flex justify-content-end
+                            flex-wrap
+                            gap-2">
+
+                    <a asp-controller="AdminTrainers"
+                       asp-action="Index"
+                       class="btn btn-iron-outline">
+                        Cancel
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-danger"
+                            id="deleteTrainerButton">
+
+                        <span id="deleteTrainerText">
+                            Delete trainer
+                        </span>
+
+                        <span id="deleteTrainerLoading"
+                              class="d-none">
+
+                            <span class="spinner-border spinner-border-sm me-2"
+                                  aria-hidden="true"></span>
+
+                            Deleting...
+
+                        </span>
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </div>
+
+    <div class="col-lg-4">
+
+        <section class="content-panel h-100">
+
+            <p class="auth-kicker">
+                TRAINER RECORD
+            </p>
+
+            <h3 class="mb-3">
+                Check related activity first.
+            </h3>
+
+            <p class="text-secondary mb-0">
+                Trainers may be referenced by classes,
+                workout plans, reviews, or other gym records.
+                If the database prevents deletion, the operation
+                should return a safe error instead of exposing
+                database details.
+            </p>
+
+        </section>
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const form =
+                document.getElementById("deleteTrainerForm");
+
+            const button =
+                document.getElementById("deleteTrainerButton");
+
+            const text =
+                document.getElementById("deleteTrainerText");
+
+            const loading =
+                document.getElementById("deleteTrainerLoading");
+
+            if (!form || !button) {
+                return;
+            }
+
+            form.addEventListener("submit", function () {
+
+                button.disabled = true;
+
+                if (text) {
+                    text.classList.add("d-none");
+                }
+
+                if (loading) {
+                    loading.classList.remove("d-none");
+                }
+            });
+        });
+    </script>
+}
