@@ -4,30 +4,103 @@
     ViewData["Title"] = "Delete Trainer";
 }
 
-<div class="container py-4">
+<section class="admin-trainer-delete-page">
 
-    <h1>Delete Trainer</h1>
+    <div class="admin-form-header">
 
-    <p>
-        Are you sure you want to delete
-        <strong>@Model.FullName</strong>?
-    </p>
+        <div>
+            <p class="admin-kicker">COACHING TEAM</p>
 
-    <form asp-action="Delete" method="post">
+            <h1>REMOVE TRAINER</h1>
 
-        <input type="hidden"
-               asp-for="Id" />
+            <p>
+                Review the profile before permanently removing it.
+            </p>
+        </div>
 
-        <button type="submit"
-                class="btn btn-danger">
-            Delete
-        </button>
-
-        <a asp-action="Index"
-           class="btn btn-secondary">
-            Cancel
+        <a asp-controller="AdminTrainers"
+           asp-action="Index"
+           class="iron-admin-secondary">
+            BACK TO TRAINERS
         </a>
 
-    </form>
+    </div>
 
-</div>
+    <div class="delete-card">
+
+        <div class="delete-mark">
+            !
+        </div>
+
+        <p class="admin-kicker">CONFIRM ACTION</p>
+
+        <h2>REMOVE @Model.FullName?</h2>
+
+        <p class="delete-message">
+            This action will remove this trainer from the
+            administrative directory.
+        </p>
+
+        <div class="delete-profile">
+
+            <div class="trainer-avatar large">
+                @Model.FullName.Substring(
+                    0,
+                    Math.Min(1, Model.FullName.Length)
+                ).ToUpper()
+            </div>
+
+            <div>
+                <strong>@Model.FullName</strong>
+
+                <span>
+                    @Model.Specialty
+                </span>
+
+                @if (!string.IsNullOrWhiteSpace(Model.Certificates))
+                {
+                    <small>
+                        @Model.Certificates
+                    </small>
+                }
+                else
+                {
+                    <small>
+                        No certifications listed
+                    </small>
+                }
+            </div>
+
+        </div>
+
+        <form asp-controller="AdminTrainers"
+              asp-action="Delete"
+              method="post">
+
+            <input type="hidden"
+                   asp-for="Id" />
+
+            <div asp-validation-summary="ModelOnly"
+                 class="iron-validation-summary">
+            </div>
+
+            <div class="delete-actions">
+
+                <a asp-controller="AdminTrainers"
+                   asp-action="Index"
+                   class="iron-admin-secondary">
+                    CANCEL
+                </a>
+
+                <button type="submit"
+                        class="iron-delete-button">
+                    DELETE TRAINER
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</section>

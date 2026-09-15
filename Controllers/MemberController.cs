@@ -575,6 +575,16 @@ public class MemberController : Controller
     }
 
     // =========================
+    // AI Coach
+    // =========================
+
+    [HttpGet]
+    public IActionResult Assistant()
+    {
+        return View();
+    }
+
+    // =========================
     // Helpers
     // =========================
 

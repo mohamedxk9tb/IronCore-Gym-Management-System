@@ -1,0 +1,144 @@
+@model GymMvc.ViewModels.SubscriptionCreateViewModel
+
+@{
+    ViewData["Title"] = "Confirm Subscription";
+    ViewData["Dashboard"] = true;
+}
+
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = "Confirm subscription",
+    ["Description"] = "Review your selected membership plan before activating it.",
+    ["Eyebrow"] = "Membership"
+})
+
+<section class="content-panel subscription-create-page">
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-9">
+
+            <div class="subscription-confirmation-card">
+
+                <div class="subscription-card-header">
+
+                    <div>
+                        <p class="section-kicker mb-2">
+                            Selected plan
+                        </p>
+
+                        <h2 class="panel-title mb-2">
+                            @Model.Plan.Name
+                        </h2>
+                    </div>
+
+                    <div class="subscription-price">
+
+                        <span class="subscription-price-value">
+                            @Model.Plan.Price.ToString("0.00")
+                        </span>
+
+                        <span class="subscription-price-currency">
+                            EGP
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="subscription-details">
+
+                    <div class="subscription-detail">
+
+                        <span class="subscription-detail-label">
+                            Plan
+                        </span>
+
+                        <strong>
+                            @Model.Plan.Name
+                        </strong>
+
+                    </div>
+
+
+                    <div class="subscription-detail">
+
+                        <span class="subscription-detail-label">
+                            Duration
+                        </span>
+
+                        <strong>
+                            @Model.Plan.DurationMonths
+                            @(Model.Plan.DurationMonths == 1
+                                ? "Month"
+                                : "Months")
+                        </strong>
+
+                    </div>
+
+
+                    <div class="subscription-detail">
+
+                        <span class="subscription-detail-label">
+                            Price
+                        </span>
+
+                        <strong>
+                            @Model.Plan.Price.ToString("0.00") EGP
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="alert alert-iron-warning mt-4 mb-4"
+                     role="note">
+
+                    <strong>Before you continue:</strong>
+
+                    Your subscription will start immediately after
+                    confirmation and remain active for the selected
+                    plan duration.
+
+                </div>
+
+
+                <form asp-action="Create"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden"
+                           name="planId"
+                           value="@Model.Plan.Id" />
+
+                    <div class="d-flex flex-column flex-sm-row
+                                justify-content-end
+                                gap-2">
+
+                        <a asp-controller="Plans"
+                           asp-action="Index"
+                           class="btn btn-iron-outline">
+
+                            Back to plans
+
+                        </a>
+
+                        <button type="submit"
+                                class="btn btn-iron">
+
+                            Confirm subscription
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+
+</section>

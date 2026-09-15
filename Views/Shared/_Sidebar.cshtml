@@ -181,6 +181,16 @@
                 Change password
 
             </a>
+
+
+            <a class="@(IsActive("Assistant") ? "active" : "")"
+               asp-controller="Member"
+               asp-action="Assistant">
+
+                <span>06</span>
+                AI Coach
+
+            </a>
         }
 
     </nav>

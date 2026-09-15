@@ -1,23 +1,144 @@
-@model GymMvc.Models.Trainer
+@model GymMvc.ViewModels.TrainerFormViewModel
 
-<h2>Edit Trainer</h2>
+@{
+    ViewData["Title"] = "Edit Trainer";
+}
 
-<form asp-action="Edit" method="post">
+<section class="admin-trainer-form-page">
 
-    <input type="hidden" asp-for="Id" />
+    <div class="admin-form-header">
 
-    <div>
-        <label asp-for="FullName"></label>
-        <input asp-for="FullName" />
-        <span asp-validation-for="FullName"></span>
+        <div>
+            <p class="admin-kicker">COACHING TEAM</p>
+
+            <h1>EDIT TRAINER</h1>
+
+            <p>
+                Update the professional information for this coach.
+            </p>
+        </div>
+
+        <a asp-controller="AdminTrainers"
+           asp-action="Index"
+           class="iron-admin-secondary">
+            BACK TO TRAINERS
+        </a>
+
     </div>
 
-    <div>
-        <label asp-for="Specialty"></label>
-        <input asp-for="Specialty" />
-        <span asp-validation-for="Specialty"></span>
+    <div class="admin-form-card">
+
+        <div class="admin-form-intro">
+
+            <div>
+                <p class="admin-kicker">PROFILE #@Model.Id</p>
+
+                <h2>@Model.FullName</h2>
+
+                <p>
+                    Keep the trainer profile accurate and up to date.
+                </p>
+            </div>
+
+            <div class="form-number">
+                02
+            </div>
+
+        </div>
+
+        <form asp-controller="AdminTrainers"
+              asp-action="Edit"
+              method="post">
+
+            <input type="hidden"
+                   asp-for="Id" />
+
+            <div asp-validation-summary="ModelOnly"
+                 class="iron-validation-summary">
+            </div>
+
+            <div class="admin-form-fields">
+
+                <div class="iron-field">
+
+                    <label asp-for="FullName">
+                        FULL NAME
+                    </label>
+
+                    <input asp-for="FullName"
+                           class="iron-form-input"
+                           placeholder="Enter trainer's full name"
+                           autocomplete="off" />
+
+                    <span asp-validation-for="FullName"
+                          class="iron-field-error">
+                    </span>
+
+                </div>
+
+                <div class="iron-field">
+
+                    <label asp-for="Specialty">
+                        SPECIALTY
+                    </label>
+
+                    <input asp-for="Specialty"
+                           class="iron-form-input"
+                           placeholder="e.g. Strength & Conditioning"
+                           autocomplete="off" />
+
+                    <span asp-validation-for="Specialty"
+                          class="iron-field-error">
+                    </span>
+
+                </div>
+
+                <div class="iron-field full-width">
+
+                    <label asp-for="Certificates">
+                        CERTIFICATIONS
+                    </label>
+
+                    <input asp-for="Certificates"
+                           class="iron-form-input"
+                           placeholder="e.g. NASM, ACE, CrossFit Level 1"
+                           autocomplete="off" />
+
+                    <span class="field-hint">
+                        Optional — separate multiple certifications with commas.
+                    </span>
+
+                    <span asp-validation-for="Certificates"
+                          class="iron-field-error">
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="admin-form-footer">
+
+                <a asp-controller="AdminTrainers"
+                   asp-action="Index"
+                   class="iron-admin-secondary">
+                    CANCEL
+                </a>
+
+                <button type="submit"
+                        class="iron-admin-primary">
+                    SAVE CHANGES
+                </button>
+
+            </div>
+
+        </form>
+
     </div>
 
-    <button type="submit">Save</button>
+</section>
 
-</form>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
