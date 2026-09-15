@@ -66,21 +66,21 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         // Plan - Subscription
         builder.Entity<Subscription>()
             .HasOne(subscription => subscription.Plan)
-            .WithMany()
+            .WithMany(plan => plan.Subscriptions)
             .HasForeignKey(subscription => subscription.PlanId)
             .OnDelete(DeleteBehavior.Restrict);
 
         // Subscription - Payment
         builder.Entity<Payment>()
             .HasOne(payment => payment.Subscription)
-            .WithMany()
+            .WithMany(subscription => subscription.Payments)
             .HasForeignKey(payment => payment.SubscriptionId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // Trainer - GymClass
         builder.Entity<GymClass>()
             .HasOne(gymClass => gymClass.Trainer)
-            .WithMany()
+            .WithMany(trainer => trainer.GymClasses)
             .HasForeignKey(gymClass => gymClass.TrainerId)
             .OnDelete(DeleteBehavior.Restrict);
 
@@ -94,7 +94,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         // GymClass - Booking
         builder.Entity<Booking>()
             .HasOne(booking => booking.GymClass)
-            .WithMany()
+            .WithMany(gymClass => gymClass.Bookings)
             .HasForeignKey(booking => booking.GymClassId)
             .OnDelete(DeleteBehavior.Cascade);
 
@@ -108,7 +108,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         // Trainer - WorkoutPlan
         builder.Entity<WorkoutPlan>()
             .HasOne(workoutPlan => workoutPlan.Trainer)
-            .WithMany()
+            .WithMany(trainer => trainer.WorkoutPlans)
             .HasForeignKey(workoutPlan => workoutPlan.TrainerId)
             .OnDelete(DeleteBehavior.Restrict);
 
@@ -129,7 +129,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         // Trainer - TrainerReview
         builder.Entity<TrainerReview>()
             .HasOne(review => review.Trainer)
-            .WithMany()
+            .WithMany(trainer => trainer.Reviews)
             .HasForeignKey(review => review.TrainerId)
             .OnDelete(DeleteBehavior.Restrict);
 
@@ -161,5 +161,13 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         builder.Entity<WeightLog>()
             .Property(weightLog => weightLog.Weight)
             .HasPrecision(5, 2);
+
+        builder.Entity<Payment>()
+            .Property(payment => payment.Amount)
+            .HasPrecision(18, 2);
+
+        builder.Entity<Plan>()
+            .Property(plan => plan.Price)
+            .HasPrecision(18, 2);
     }
 }

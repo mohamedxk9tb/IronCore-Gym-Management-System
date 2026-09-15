@@ -7,7 +7,7 @@
 
 @await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
 {
-    ["Title"] = Model.Trainer.FullName,
+    ["Title"] = Model.FullName,
     ["Description"] = "Trainer profile, specialty, classes, and member feedback.",
     ["Eyebrow"] = "Our team / Trainer"
 })
@@ -25,14 +25,14 @@
             </p>
 
             <h2 class="panel-title mb-2">
-                @Model.Trainer.FullName
+                @Model.FullName
             </h2>
 
             <p class="text-secondary mb-4">
                 @(
-                    string.IsNullOrWhiteSpace(Model.Trainer.Specialty)
+                    string.IsNullOrWhiteSpace(Model.Specialty)
                         ? "General fitness"
-                        : Model.Trainer.Specialty
+                        : Model.Specialty
                 )
             </p>
 
@@ -45,13 +45,13 @@
 
                 <strong class="d-block mt-2">
 
-                    @if (string.IsNullOrWhiteSpace(Model.Trainer.Certificates))
+                    @if (string.IsNullOrWhiteSpace(Model.Certificates))
                     {
                         <span>Not listed</span>
                     }
                     else
                     {
-                        @Model.Trainer.Certificates
+                        @Model.Certificates
                     }
 
                 </strong>
@@ -68,7 +68,7 @@
                 </span>
 
                 <strong>
-                    @Model.Classes.Count
+                    @Model.ClassNames.Count
                 </strong>
 
             </div>
@@ -101,11 +101,11 @@
             </div>
 
 
-            @if (Model.Classes.Any())
+            @if (Model.ClassNames.Any())
             {
                 <div class="d-flex flex-column gap-3">
 
-                    @foreach (var gymClass in Model.Classes)
+                    @foreach (var className in Model.ClassNames)
                     {
                         <div class="metric-block">
 
@@ -116,18 +116,15 @@
                                 <div>
 
                                     <strong class="d-block">
-                                        @gymClass.Name
+                                        @className
                                     </strong>
 
                                     <span class="text-secondary">
-                                        @gymClass.DayOfWeek
+                                        Trainer class
                                     </span>
 
                                 </div>
 
-                                <span class="status-pill">
-                                    @gymClass.StartTime.ToString(@"hh\:mm")
-                                </span>
 
                             </div>
 

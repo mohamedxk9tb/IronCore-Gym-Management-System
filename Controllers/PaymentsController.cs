@@ -88,7 +88,7 @@ public class PaymentsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(int subscriptionId)
+    public async Task<IActionResult> CreatePayment(int subscriptionId)
     {
         var member = await GetCurrentMemberAsync();
 

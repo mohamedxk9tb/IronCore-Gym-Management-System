@@ -89,7 +89,7 @@
 
                                 <small class="text-secondary">
                                     Booked
-                                    @booking.BookedAt.ToString("dd MMM yyyy")
+                                    @booking.Booking.BookedAt.ToString("dd MMM yyyy")
                                 </small>
 
                             </td>
@@ -107,11 +107,11 @@
                             <td>
 
                                 <div>
-                                    @booking.ClassDateTime.ToString("ddd, dd MMM yyyy")
+                                    @(booking.ClassDateTime?.ToString("ddd, dd MMM yyyy") ?? "Schedule unavailable")
                                 </div>
 
                                 <small class="text-secondary">
-                                    @booking.ClassDateTime.ToString("hh:mm tt")
+                                    @(booking.ClassDateTime?.ToString("hh:mm tt") ?? "")
                                 </small>
 
                             </td>
@@ -119,13 +119,13 @@
 
                             <td>
 
-                                @if (booking.Status == "Cancelled")
+                                @if (booking.Booking.Status == "Cancelled")
                                 {
                                     <span class="status-pill">
                                         Cancelled
                                     </span>
                                 }
-                                else if (booking.Status == "Attended")
+                                else if (booking.Booking.Status == "Attended")
                                 {
                                     <span class="status-pill">
                                         Attended
@@ -147,7 +147,7 @@
                                 {
                                     <form asp-controller="Booking"
                                           asp-action="Cancel"
-                                          asp-route-id="@booking.Id"
+                                          asp-route-id="@booking.Booking.Id"
                                           method="post"
                                           class="d-inline">
 

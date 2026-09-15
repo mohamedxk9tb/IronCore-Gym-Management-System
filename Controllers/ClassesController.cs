@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using GymMvc.Data;
 using GymMvc.ViewModels;
+using GymMvc.Models;
 
 namespace GymMvc.Controllers;
 

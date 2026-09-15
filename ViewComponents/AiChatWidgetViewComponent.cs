@@ -9,7 +9,7 @@ namespace GymMvc.ViewComponents
     {
         public IViewComponentResult Invoke()
         {
-            var history = HttpContext.Session.GetObject<List<AiChatMessageViewModel>>(SessionExtensions.AiChatHistoryKey)
+            var history = HttpContext.Session.GetObject<List<AiChatMessageViewModel>>(GymMvc.Helpers.SessionExtensions.AiChatHistoryKey)
                           ?? new List<AiChatMessageViewModel>();
 
             return View(new AiChatViewModel { Messages = history });
