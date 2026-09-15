@@ -7,12 +7,12 @@ namespace GymMvc.ViewModels
         public decimal MonthlyIncome { get; set; }
         public int ActiveMembers { get; set; }
 
-        // بيانات الشارت (آخر N شهور)
+        
         public List<string> Months { get; set; } = new();
         public List<decimal> IncomeData { get; set; } = new();
         public List<int> MembersData { get; set; } = new();
 
-        // تقارير إضافية مطلوبة
+       
         public List<ExpiringMembershipViewModel> ExpiringMembershipsThisWeek { get; set; } = new();
         public List<PopularClassViewModel> MostPopularClasses { get; set; } = new();
     }

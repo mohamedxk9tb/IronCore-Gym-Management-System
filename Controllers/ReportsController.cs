@@ -30,9 +30,6 @@ namespace GymMvc.Controllers
                 .Select(i => now.AddMonths(-(MonthsToShow - 1 - i)))
                 .ToList();
 
-            // Only pull what's needed for the chart range - aggregation done in memory
-            // per month bucket (SQL Server has no simple portable "group by month" here
-            // without extra complexity, and the row count in this range is small).
             var paymentsInRange = await _context.Payments
                 .Where(p => p.PaymentDate >= rangeStart)
                 .Select(p => new { p.Amount, p.PaymentDate })
@@ -65,10 +62,10 @@ namespace GymMvc.Controllers
                     .Where(p => p.PaymentDate.Year == now.Year && p.PaymentDate.Month == now.Month)
                     .SumAsync(p => p.Amount),
 
-                // Bug fix: a subscription with Status == "Active" whose EndDate has already
-                // passed must not count as an active member.
+                // "Active member" = Status == "Active" AND StartDate <= now AND EndDate >= now.
+                // Previous version was missing the StartDate check.
                 ActiveMembers = await _context.Subscriptions
-                    .Where(s => s.Status == "Active" && s.EndDate >= now)
+                    .Where(s => s.Status == "Active" && s.StartDate <= now && s.EndDate >= now)
                     .Select(s => s.MemberId)
                     .Distinct()
                     .CountAsync(),
