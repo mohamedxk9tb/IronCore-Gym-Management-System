@@ -1,0 +1,21 @@
+@model GymMvc.Models.Trainer
+
+<h2>Add Trainer</h2>
+
+<form asp-action="Create" method="post">
+
+    <div>
+        <label asp-for="FullName"></label>
+        <input asp-for="FullName" />
+        <span asp-validation-for="FullName"></span>
+    </div>
+
+    <div>
+        <label asp-for="Specialty"></label>
+        <input asp-for="Specialty" />
+        <span asp-validation-for="Specialty"></span>
+    </div>
+
+    <button type="submit">Add Trainer</button>
+
+</form>

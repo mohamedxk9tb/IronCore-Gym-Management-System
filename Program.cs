@@ -6,15 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// MVC
 builder.Services.AddControllersWithViews();
 
-// EF Core
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Identity
 builder.Services
     .AddDefaultIdentity<ApplicationUser>(options =>
     {
@@ -29,11 +26,9 @@ builder.Services
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-// Current User Service
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
-// Session
 builder.Services.AddDistributedMemoryCache();
 
 builder.Services.AddSession(options =>
@@ -43,13 +38,11 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// AI
 builder.Services.AddHttpClient<IAiChatService, AiChatService>(client =>
 {
     client.Timeout = TimeSpan.FromSeconds(30);
 });
 
-// Antiforgery
 builder.Services.AddAntiforgery(options =>
 {
     options.HeaderName = "RequestVerificationToken";
@@ -57,14 +50,12 @@ builder.Services.AddAntiforgery(options =>
 
 var app = builder.Build();
 
-// Seed Identity
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     await IdentitySeeder.SeedAsync(services);
 }
 
-// Error handling
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");

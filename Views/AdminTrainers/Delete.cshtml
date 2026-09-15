@@ -1,0 +1,33 @@
+@model GymMvc.Models.Trainer
+
+@{
+    ViewData["Title"] = "Delete Trainer";
+}
+
+<div class="container py-4">
+
+    <h1>Delete Trainer</h1>
+
+    <p>
+        Are you sure you want to delete
+        <strong>@Model.FullName</strong>?
+    </p>
+
+    <form asp-action="Delete" method="post">
+
+        <input type="hidden"
+               asp-for="Id" />
+
+        <button type="submit"
+                class="btn btn-danger">
+            Delete
+        </button>
+
+        <a asp-action="Index"
+           class="btn btn-secondary">
+            Cancel
+        </a>
+
+    </form>
+
+</div>
