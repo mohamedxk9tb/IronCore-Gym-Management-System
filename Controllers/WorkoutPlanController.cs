@@ -139,7 +139,7 @@ namespace GymMvc.Controllers
                 }).ToList()
             };
 
-            return View(model);
+            return View("Index", model);
         }
 
         private async Task<System.Collections.Generic.List<SelectListItem>> GetMembersSelectListAsync()

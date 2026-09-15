@@ -50,7 +50,7 @@ namespace GymMvc.Controllers
                 return BadRequest(new { error = $"الرسالة طويلة أكتر من {MaxMessageLength} حرف" });
             }
 
-            var history = HttpContext.Session.GetObject<List<AiChatMessageViewModel>>(SessionExtensions.AiChatHistoryKey)
+            var history = HttpContext.Session.GetObject<List<AiChatMessageViewModel>>(GymMvc.Helpers.SessionExtensions.AiChatHistoryKey)
                           ?? new List<AiChatMessageViewModel>();
 
             history.Add(new AiChatMessageViewModel { Role = "user", Text = message });
@@ -64,7 +64,7 @@ namespace GymMvc.Controllers
                 history = history.Skip(history.Count - MaxStoredMessages).ToList();
             }
 
-            HttpContext.Session.SetObject(SessionExtensions.AiChatHistoryKey, history);
+            HttpContext.Session.SetObject(GymMvc.Helpers.SessionExtensions.AiChatHistoryKey, history);
 
             return Json(new { reply });
         }
@@ -77,7 +77,7 @@ namespace GymMvc.Controllers
                 return BadRequest(new { error = "Invalid request token" });
             }
 
-            HttpContext.Session.Remove(SessionExtensions.AiChatHistoryKey);
+            HttpContext.Session.Remove(GymMvc.Helpers.SessionExtensions.AiChatHistoryKey);
             return Json(new { success = true });
         }
 

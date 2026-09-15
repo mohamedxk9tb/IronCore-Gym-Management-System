@@ -1,4 +1,4 @@
-@model GymMvc.ViewModels.WorkoutDietPlanViewModel
+@model GymMvc.ViewModels.WorkoutDietPlanDetailsViewModel
 
 @{
     ViewData["Title"] = "Workout & Diet Plan";
@@ -9,8 +9,13 @@
     <h1>Workout & Diet Plan</h1>
 
     <p>
-        Member:
-        <strong>@Model.MemberName</strong>
+        Trainer:
+        <strong>@Model.TrainerName</strong>
+    </p>
+
+    <p class="text-secondary">
+        Created:
+        @Model.CreatedDate.ToString("yyyy-MM-dd")
     </p>
 
     <hr />
@@ -24,27 +29,24 @@
 
                     <h3>Workout Plan</h3>
 
-                    <form asp-action="AddWorkoutPlan" method="post">
-
-                        <input type="hidden"
-                               name="memberId"
-                               value="@Model.MemberId" />
-
-                        <input type="hidden"
-                               name="memberName"
-                               value="@Model.MemberName" />
-
-                        <textarea name="planDetails"
-                                  class="form-control mb-3"
-                                  rows="6"
-                                  placeholder="Write workout plan..."
-                                  required></textarea>
-
-                        <button class="btn btn-primary">
-                            Save Workout Plan
-                        </button>
-
-                    </form>
+                    @if (Model.Exercises.Count == 0)
+                    {
+                        <p class="text-secondary mb-0">No exercises have been added.</p>
+                    }
+                    else
+                    {
+                        <div class="list-group">
+                            @foreach (var exercise in Model.Exercises)
+                            {
+                                <div class="list-group-item">
+                                    <strong>@exercise.ExerciseName</strong>
+                                    <div class="text-secondary">
+                                        @exercise.Sets sets x @exercise.Reps reps
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
 
                 </div>
             </div>
@@ -59,27 +61,26 @@
 
                     <h3>Diet Plan</h3>
 
-                    <form asp-action="AddDietPlan" method="post">
-
-                        <input type="hidden"
-                               name="memberId"
-                               value="@Model.MemberId" />
-
-                        <input type="hidden"
-                               name="memberName"
-                               value="@Model.MemberName" />
-
-                        <textarea name="planDetails"
-                                  class="form-control mb-3"
-                                  rows="6"
-                                  placeholder="Write diet plan..."
-                                  required></textarea>
-
-                        <button class="btn btn-success">
-                            Save Diet Plan
-                        </button>
-
-                    </form>
+                    @if (Model.DietMeals.Count == 0)
+                    {
+                        <p class="text-secondary mb-0">No diet meals have been added.</p>
+                    }
+                    else
+                    {
+                        <div class="list-group">
+                            @foreach (var meal in Model.DietMeals)
+                            {
+                                <div class="list-group-item">
+                                    <strong>@meal.MealName</strong>
+                                    <div class="text-secondary">@meal.DayOfWeek</div>
+                                    @if (!string.IsNullOrWhiteSpace(meal.Description))
+                                    {
+                                        <p class="mb-0">@meal.Description</p>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
 
                 </div>
             </div>
@@ -89,31 +90,5 @@
     </div>
 
     <hr class="my-4" />
-
-    <h3>Saved Workout Plans</h3>
-
-    @foreach (var plan in Model.WorkoutPlans)
-    {
-        <div class="card mb-2">
-            <div class="card-body">
-                <strong>@plan.MemberName</strong>
-                <p>@plan.PlanDetails</p>
-                <small>@plan.CreatedAt</small>
-            </div>
-        </div>
-    }
-
-    <h3 class="mt-4">Saved Diet Plans</h3>
-
-    @foreach (var plan in Model.DietPlans)
-    {
-        <div class="card mb-2">
-            <div class="card-body">
-                <strong>@plan.MemberName</strong>
-                <p>@plan.PlanDetails</p>
-                <small>@plan.CreatedAt</small>
-            </div>
-        </div>
-    }
 
 </div>

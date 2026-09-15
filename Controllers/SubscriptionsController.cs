@@ -74,9 +74,9 @@ public class SubscriptionsController : Controller
         return View(viewModel);
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(int planId)
+  [HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> CreateSubscription(int planId)
     {
         var member = await GetCurrentMemberAsync();
 
