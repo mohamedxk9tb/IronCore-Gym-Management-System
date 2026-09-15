@@ -91,7 +91,6 @@ public class BookingController : Controller
         }
 
         var gymClass = await _context.GymClasses
-            .Include(c => c.Bookings)
             .FirstOrDefaultAsync(c => c.Id == gymClassId);
 
         if (gymClass == null)
@@ -99,8 +98,8 @@ public class BookingController : Controller
             return NotFound();
         }
 
-        var activeBookingsCount = gymClass.Bookings
-            .Count(b => b.Status == "Booked");
+        var activeBookingsCount = await _context.Bookings
+            .CountAsync(b => b.GymClassId == gymClass.Id && b.Status == "Booked");
 
         if (activeBookingsCount >= gymClass.Capacity)
         {
@@ -108,14 +107,18 @@ public class BookingController : Controller
             return RedirectToAction("Index", "Classes");
         }
 
-        var alreadyBooked = gymClass.Bookings
-            .Any(b => b.MemberId == member.Id && b.Status == "Booked");
+        var alreadyBooked = await _context.Bookings
+            .AnyAsync(b => b.GymClassId == gymClass.Id
+                && b.MemberId == member.Id
+                && b.Status == "Booked");
 
         if (alreadyBooked)
         {
             TempData["Error"] = "You are already booked in this class.";
             return RedirectToAction("Index", "Classes");
         }
+
+        using var transaction = await _context.Database.BeginTransactionAsync();
 
         var booking = new Booking
         {
@@ -127,6 +130,21 @@ public class BookingController : Controller
 
         _context.Bookings.Add(booking);
         await _context.SaveChangesAsync();
+
+        var confirmedBookingsCount = await _context.Bookings
+            .CountAsync(b => b.GymClassId == gymClass.Id && b.Status == "Booked");
+
+        if (confirmedBookingsCount > gymClass.Capacity)
+        {
+            _context.Bookings.Remove(booking);
+            await _context.SaveChangesAsync();
+            await transaction.RollbackAsync();
+
+            TempData["Error"] = "Sorry, this class just reached its maximum capacity.";
+            return RedirectToAction("Index", "Classes");
+        }
+
+        await transaction.CommitAsync();
 
         TempData["Success"] = "Booking confirmed successfully.";
         return RedirectToAction(nameof(Index));
