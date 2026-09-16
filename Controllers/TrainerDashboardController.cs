@@ -65,7 +65,7 @@ namespace GymMvc.Controllers
                 }).ToList()
             };
 
-            return View(model);
+            return View("~/Views/TrainerDashboard/Dashboard.cshtml", model);
         }
 
         [HttpPost]
