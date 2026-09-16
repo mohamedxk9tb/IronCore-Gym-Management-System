@@ -1,6 +1,11 @@
 @{
     ViewData["Title"] = "Admin Dashboard";
     ViewData["Dashboard"] = true;
+
+    var activeMembers = ViewBag.ActiveMembers ?? 0;
+    var monthlyIncome = ViewBag.MonthlyIncome ?? 0m;
+    var expiringSoon = ViewBag.ExpiringSoon ?? 0;
+    var classesCount = ViewBag.ClassesCount ?? 0;
 }
 
 @await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
@@ -17,7 +22,7 @@
             new Dictionary<string, string>
             {
                 ["Title"] = "Active members",
-                ["Value"] = "—",
+                ["Value"] = activeMembers.ToString(),
                 ["Icon"] = "01"
             })
     </div>
@@ -27,7 +32,7 @@
             new Dictionary<string, string>
             {
                 ["Title"] = "Monthly income",
-                ["Value"] = "—",
+                ["Value"] = monthlyIncome.ToString("N0"),
                 ["Icon"] = "02"
             })
     </div>
@@ -37,7 +42,7 @@
             new Dictionary<string, string>
             {
                 ["Title"] = "Expiring this week",
-                ["Value"] = "—",
+                ["Value"] = expiringSoon.ToString(),
                 ["Icon"] = "03"
             })
     </div>
@@ -47,7 +52,7 @@
             new Dictionary<string, string>
             {
                 ["Title"] = "Classes",
-                ["Value"] = "—",
+                ["Value"] = classesCount.ToString(),
                 ["Icon"] = "04"
             })
     </div>

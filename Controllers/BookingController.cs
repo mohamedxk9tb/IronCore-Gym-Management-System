@@ -62,7 +62,7 @@ public class BookingController : Controller
             });
         }
 
-        return View(viewModel);
+        return View("~/Views/Member/Bookings.cshtml", viewModel);
     }
 
     [HttpPost]
@@ -86,8 +86,10 @@ public class BookingController : Controller
 
         if (!hasActiveSubscription)
         {
-            TempData["Error"] = "You need an active subscription to book a class.";
-            return RedirectToAction("Index", "Classes");
+            TempData["Error"] =
+     "You need an active subscription to book a class.";
+
+            return RedirectToAction("Index", "Plans");
         }
 
         var gymClass = await _context.GymClasses

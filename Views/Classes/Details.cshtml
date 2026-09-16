@@ -1,0 +1,194 @@
+@model GymMvc.Models.GymClass
+
+@{
+    ViewData["Title"] = "Class Details";
+    ViewData["Dashboard"] = false;
+
+    var bookedCount = ViewBag.BookedCount ?? 0;
+    var availableSlots = ViewBag.AvailableSlots ?? 0;
+    var isFull = ViewBag.IsFull ?? false;
+    var isBookedByCurrentMember = ViewBag.IsBookedByCurrentMember ?? false;
+}
+
+<div class="container py-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold mb-1">@Model.Name</h1>
+            <p class="class-details-subtitle mb-0">
+                Class details and booking
+            </p>
+        </div>
+
+        <a asp-controller="Classes"
+           asp-action="Index"
+           class="btn btn-iron-outline">
+            ← Back to Classes
+        </a>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Class Information -->
+        <div class="col-lg-8">
+            <div class="class-details-card h-100">
+                <div class="card-body p-4">
+
+                    <h4 class="fw-bold mb-4">Class Information</h4>
+
+                    <div class="row g-4">
+
+                        <div class="col-md-6">
+                            <small class="text-muted d-block">Class</small>
+                            <strong>@Model.Name</strong>
+                        </div>
+
+                        <div class="col-md-6">
+                            <small class="text-muted d-block">Trainer</small>
+                            <strong>@Model.Trainer.FullName</strong>
+                        </div>
+
+                        <div class="col-md-6">
+                            <small class="text-muted d-block">Day</small>
+                            <strong>@Model.DayOfWeek</strong>
+                        </div>
+
+                        <div class="col-md-6">
+                            <small class="text-muted d-block">Start Time</small>
+                            <strong>@Model.StartTime.ToString(@"hh\:mm")</strong>
+                        </div>
+
+                        <div class="col-md-6">
+                            <small class="text-muted d-block">Duration</small>
+                            <strong>@Model.DurationMinutes minutes</strong>
+                        </div>
+
+                        <div class="col-md-6">
+                            <small class="text-muted d-block">Capacity</small>
+                            <strong>@Model.Capacity members</strong>
+                        </div>
+
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <!-- Availability -->
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <small class="text-muted d-block">Availability</small>
+
+                            @if (isFull)
+                            {
+                                <span class="text-danger fw-bold">
+                                    Class is Full
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-success fw-bold">
+                                    @availableSlots spots available
+                                </span>
+                            }
+                        </div>
+
+                        <div class="text-end">
+                            <small class="text-muted d-block">Booked</small>
+                            <strong>@bookedCount / @Model.Capacity</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Booking -->
+        <div class="col-lg-4">
+            <div class="class-booking-card">
+                <div class="card-body p-4">
+
+                    <h4 class="fw-bold mb-4">Booking</h4>
+
+                    @if (isBookedByCurrentMember)
+                    {
+                        <div class="alert alert-success">
+                            <strong>You're already booked.</strong>
+                            <br />
+                            You already have a booking for this class.
+                        </div>
+
+                        <a asp-controller="Booking"
+                           asp-action="Index"
+                           class="btn btn-iron w-100">
+                            My Bookings
+                        </a>
+                    }
+                    else if (isFull)
+                    {
+                        <div class="alert alert-danger">
+                            <strong>Class is full.</strong>
+                            <br />
+                            There are no available spots for this class.
+                        </div>
+                    }
+                    else if (!User.Identity?.IsAuthenticated ?? true)
+                    {
+                        <div class="alert alert-warning">
+                            You need to login before booking a class.
+                        </div>
+
+                        <a asp-controller="Account"
+                           asp-action="Login"
+                           class="btn btn-iron w-100">
+                            Login to Book
+                        </a>
+                    }
+                    else if (!User.IsInRole("Member"))
+                    {
+                        <div class="alert alert-warning">
+                            Only members can book gym classes.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="mb-4">
+                            <p class="text-muted mb-1">
+                                Available spots
+                            </p>
+
+                            <h3 class="fw-bold">
+                                @availableSlots
+                            </h3>
+                        </div>
+
+                        <form asp-controller="Booking"
+                              asp-action="Create"
+                              method="post">
+
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden"
+                                   name="gymClassId"
+                                   value="@Model.Id" />
+
+                            <button type="submit"
+                                    class="btn btn-iron w-100">
+                                Book this class
+                            </button>
+
+                        </form>
+
+                        <small class="text-muted d-block mt-3">
+                            An active subscription is required to book a class.
+                        </small>
+                    }
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
