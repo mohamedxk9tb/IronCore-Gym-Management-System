@@ -1,0 +1,145 @@
+@model GymMvc.ViewModels.SubscriptionListViewModel
+
+@{
+    ViewData["Title"] = "My Subscriptions";
+    ViewData["Dashboard"] = true;
+
+    var subscriptions = Model?.Subscriptions
+        ?? new List<GymMvc.ViewModels.SubscriptionRowViewModel>();
+}
+
+@await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
+{
+    ["Title"] = "My Subscriptions",
+    ["Description"] = "View your membership subscriptions and current status.",
+    ["Eyebrow"] = "Membership"
+})
+
+<section class="content-panel">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <p class="section-kicker mb-1">
+                Membership
+            </p>
+
+            <h2 class="panel-title mb-1">
+                My Subscriptions
+            </h2>
+
+            <p class="text-secondary mb-0">
+                Your membership history and current plans.
+            </p>
+        </div>
+
+        <a asp-controller="Plans"
+           asp-action="Index"
+           class="btn btn-iron">
+            Browse Plans
+        </a>
+
+    </div>
+
+    @if (subscriptions.Any())
+    {
+        <div class="table-responsive">
+
+            <table class="table table-dark table-hover align-middle">
+
+                <thead>
+                    <tr>
+                        <th>Plan</th>
+                        <th>Price</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Status</th>
+                        <th>Remaining</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var row in subscriptions)
+                    {
+                        var subscription = row.Subscription;
+
+                        var isActive =
+                            subscription.Status == "Active" &&
+                            subscription.StartDate <= DateTime.Now &&
+                            subscription.EndDate >= DateTime.Now;
+
+                        <tr>
+
+                            <td>
+                                <strong>
+                                    @row.PlanName
+                                </strong>
+                            </td>
+
+                            <td>
+                                @row.PlanPrice.ToString("0.00") EGP
+                            </td>
+
+                            <td>
+                                @subscription.StartDate.ToString("dd MMM yyyy")
+                            </td>
+
+                            <td>
+                                @subscription.EndDate.ToString("dd MMM yyyy")
+                            </td>
+
+                            <td>
+                                @if (isActive)
+                                {
+                                    <span class="status-pill">
+                                        Active
+                                    </span>
+                                }
+                                else if (subscription.EndDate < DateTime.Now)
+                                {
+                                    <span class="text-secondary">
+                                        Expired
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-warning">
+                                        @subscription.Status
+                                    </span>
+                                }
+                            </td>
+
+                            <td>
+                                @if (isActive)
+                                {
+                                    @row.DaysRemaining
+                                    <span>days</span>
+                                }
+                                else
+                                {
+                                    <span class="text-secondary">—</span>
+                                }
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+    }
+    else
+    {
+        @await Html.PartialAsync(
+            "_EmptyState",
+            new Dictionary<string, string>
+            {
+                ["Title"] = "No subscriptions",
+                ["Message"] = "You don't have any subscriptions yet."
+            })
+    }
+
+</section>

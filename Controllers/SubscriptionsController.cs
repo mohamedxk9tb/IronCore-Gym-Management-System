@@ -118,10 +118,16 @@ public class SubscriptionsController : Controller
         _context.Subscriptions.Add(subscription);
         await _context.SaveChangesAsync();
 
+        TempData["Success"] =
+            $"Subscription created successfully. ID = {subscription.Id}";
+
         return RedirectToAction(
             "Create",
             "Payments",
-            new { subscriptionId = subscription.Id });
+            new
+            {
+                subscriptionId = subscription.Id
+            });
     }
 
     private async Task<Member?> GetCurrentMemberAsync()
