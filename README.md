@@ -16,7 +16,6 @@
 
 <img src="https://img.shields.io/badge/Status-Completed-2ECC71?style=flat-square" alt="status">
 
-**[🔗 Live Demo](#)**
 
 </div>
 
