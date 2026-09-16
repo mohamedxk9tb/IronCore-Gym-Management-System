@@ -26,6 +26,13 @@ builder.Services
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+    builder.Services.ConfigureApplicationCookie(options =>
+    {
+       options.LoginPath = "/Account/Login";
+       options.AccessDeniedPath = "/Account/AccessDenied";
+    });
+
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
@@ -53,8 +60,11 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+
     await IdentitySeeder.SeedAsync(services);
+    await DatabaseSeeder.SeedAsync(services);
 }
+
 
 if (!app.Environment.IsDevelopment())
 {
