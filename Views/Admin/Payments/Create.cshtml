@@ -1,21 +1,21 @@
-@model GymMvc.ViewModels.SubscriptionCreateViewModel
+@model GymMvc.ViewModels.PaymentCreateViewModel
 
 @{
-    ViewData["Title"] = "Confirm Subscription";
+    ViewData["Title"] = "Payment";
     ViewData["Dashboard"] = true;
 }
 
 @await Html.PartialAsync("_PageHeader", new Dictionary<string, string>
 {
-    ["Title"] = "Confirm subscription",
-    ["Description"] = "Review your selected membership plan before activating it.",
-    ["Eyebrow"] = "Membership"
+    ["Title"] = "Complete payment",
+    ["Description"] = "Review your membership payment before completing the subscription.",
+    ["Eyebrow"] = "Membership / Payment"
 })
 
-<section class="content-panel subscription-create-page">
+<section class="content-panel">
 
     <div class="row justify-content-center">
-        <div class="col-12 col-xl-9">
+        <div class="col-12 col-md-8 col-lg-6">
 
             <div class="subscription-confirmation-card">
 
@@ -23,113 +23,78 @@
 
                     <div>
                         <p class="section-kicker mb-2">
-                            Selected plan
+                            Payment
                         </p>
 
                         <h2 class="panel-title mb-2">
-                            @Model.Plan.Name
+                            @Model.PlanName
                         </h2>
                     </div>
 
                     <div class="subscription-price">
-
                         <span class="subscription-price-value">
-                            @Model.Plan.Price.ToString("0.00")
+                            @Model.PlanPrice.ToString("0.00")
                         </span>
 
                         <span class="subscription-price-currency">
                             EGP
                         </span>
-
                     </div>
 
                 </div>
 
-
                 <div class="subscription-details">
 
                     <div class="subscription-detail">
-
                         <span class="subscription-detail-label">
                             Plan
                         </span>
 
                         <strong>
-                            @Model.Plan.Name
+                            @Model.PlanName
                         </strong>
-
                     </div>
 
-
                     <div class="subscription-detail">
-
                         <span class="subscription-detail-label">
-                            Duration
+                            Amount
                         </span>
 
                         <strong>
-                            @Model.Plan.DurationMonths
-                            @(Model.Plan.DurationMonths == 1
-                                ? "Month"
-                                : "Months")
+                            @Model.PlanPrice.ToString("0.00") EGP
                         </strong>
-
-                    </div>
-
-
-                    <div class="subscription-detail">
-
-                        <span class="subscription-detail-label">
-                            Price
-                        </span>
-
-                        <strong>
-                            @Model.Plan.Price.ToString("0.00") EGP
-                        </strong>
-
                     </div>
 
                 </div>
 
-
-                <div class="alert alert-iron-warning mt-4 mb-4"
-                     role="note">
-
-                    <strong>Before you continue:</strong>
-
-                    Your subscription will start immediately after
-                    confirmation and remain active for the selected
-                    plan duration.
-
+                <div class="alert alert-iron-warning mt-4 mb-4">
+                    <strong>Payment confirmation:</strong>
+                    Confirming this payment will activate your subscription.
                 </div>
 
-
-                <form asp-action="CreateSubscription"
+                <form asp-controller="Payments"
+                      asp-action="CreatePayment"
                       method="post">
 
                     @Html.AntiForgeryToken()
 
                     <input type="hidden"
-                           name="planId"
-                           value="@Model.Plan.Id" />
+                           name="subscriptionId"
+                           value="@Model.Subscription.Id" />
 
                     <div class="d-flex flex-column flex-sm-row
                                 justify-content-end
                                 gap-2">
 
-                        <a asp-controller="Plans"
+                        <a asp-controller="Subscriptions"
                            asp-action="Index"
                            class="btn btn-iron-outline">
-
-                            Back to plans
-
+                            Back
                         </a>
 
                         <button type="submit"
                                 class="btn btn-iron">
-
-                            Confirm subscription
-
+                            Confirm payment
                         </button>
 
                     </div>

@@ -103,4 +103,55 @@ public class ClassesController : Controller
 
         return View(viewModel);
     }
+
+
+    [HttpGet]
+    public async Task<IActionResult> Details(int id)
+    {
+        var gymClass = await _context.GymClasses
+            .AsNoTracking()
+            .Include(c => c.Trainer)
+            .Include(c => c.Bookings)
+            .FirstOrDefaultAsync(c => c.Id == id);
+
+        if (gymClass is null)
+        {
+            return NotFound();
+        }
+
+        int? memberId = null;
+
+        var currentUserId = _userManager.GetUserId(User);
+
+        if (currentUserId != null)
+        {
+            var member = await _context.Members
+                .FirstOrDefaultAsync(m => m.ApplicationUserId == currentUserId);
+
+            if (member != null)
+            {
+                memberId = member.Id;
+            }
+        }
+
+        var bookedCount = gymClass.Bookings
+            .Count(b => b.Status == "Booked");
+
+        var availableSlots = gymClass.Capacity - bookedCount;
+
+        var isBookedByCurrentMember =
+            memberId != null &&
+            gymClass.Bookings.Any(
+                b => b.MemberId == memberId &&
+                     b.Status == "Booked");
+
+        ViewBag.BookedCount = bookedCount;
+        ViewBag.AvailableSlots = availableSlots > 0
+            ? availableSlots
+            : 0;
+        ViewBag.IsFull = availableSlots <= 0;
+        ViewBag.IsBookedByCurrentMember = isBookedByCurrentMember;
+
+        return View(gymClass);
+    }
 }

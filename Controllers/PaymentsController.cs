@@ -118,13 +118,16 @@ public class PaymentsController : Controller
             PaymentDate = DateTime.Now
         };
 
+        subscription.Status = "Active";
+
         _context.Payments.Add(payment);
+
         await _context.SaveChangesAsync();
 
-        TempData["Success"] = "Payment recorded successfully.";
-        return RedirectToAction(nameof(Index));
-    }
+        TempData["Success"] = "Payment completed successfully.";
 
+        return RedirectToAction("Dashboard", "Member");
+    }
     private async Task<Member?> GetCurrentMemberAsync()
     {
         var currentUserId = _userManager.GetUserId(User);

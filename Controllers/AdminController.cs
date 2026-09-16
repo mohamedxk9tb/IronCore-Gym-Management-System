@@ -396,8 +396,7 @@ public class AdminController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> ClassesCreate(
-        GymClass model)
+    public async Task<IActionResult> ClassesCreate(GymClass model)
     {
         var trainerExists = await _context.Trainers
             .AnyAsync(t => t.Id == model.TrainerId);
@@ -408,6 +407,8 @@ public class AdminController : Controller
                 nameof(model.TrainerId),
                 "Selected trainer does not exist.");
         }
+
+        ModelState.Remove(nameof(GymClass.Trainer));
 
         if (!ModelState.IsValid)
         {
@@ -548,13 +549,15 @@ public class AdminController : Controller
             return NotFound();
         }
 
-        var hasBookings = await _context.Bookings
-            .AnyAsync(b => b.GymClassId == id);
+        var hasActiveBookings = await _context.Bookings
+     .AnyAsync(b =>
+         b.GymClassId == id &&
+         b.Status == "Booked");
 
-        if (hasBookings)
+        if (hasActiveBookings)
         {
             TempData["ErrorMessage"] =
-                "This class cannot be deleted because it has booking records.";
+                "This class cannot be deleted while it has active bookings.";
 
             return RedirectToAction(
                 nameof(ClassesDelete),

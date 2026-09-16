@@ -74,9 +74,9 @@ public class SubscriptionsController : Controller
         return View(viewModel);
     }
 
-  [HttpPost]
-[ValidateAntiForgeryToken]
-public async Task<IActionResult> CreateSubscription(int planId)
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateSubscription(int planId)
     {
         var member = await GetCurrentMemberAsync();
 
@@ -112,14 +112,16 @@ public async Task<IActionResult> CreateSubscription(int planId)
             PlanId = plan.Id,
             StartDate = now,
             EndDate = now.AddMonths(plan.DurationMonths),
-            Status = "Active"
+            Status = "Pending"
         };
 
         _context.Subscriptions.Add(subscription);
         await _context.SaveChangesAsync();
 
-        TempData["Success"] = "Subscription created successfully.";
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction(
+            "Create",
+            "Payments",
+            new { subscriptionId = subscription.Id });
     }
 
     private async Task<Member?> GetCurrentMemberAsync()

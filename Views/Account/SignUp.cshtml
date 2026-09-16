@@ -250,3 +250,40 @@
     </section>
 
 </main>
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const toggles = document.querySelectorAll("[data-password-toggle]");
+
+            toggles.forEach(function (toggle) {
+
+                const inputId = toggle.getAttribute("data-password-toggle");
+                const input = document.getElementById(inputId);
+
+                if (!input) {
+                    return;
+                }
+
+                toggle.addEventListener("click", function () {
+
+                    const isHidden = input.type === "password";
+
+                    input.type = isHidden ? "text" : "password";
+
+                    toggle.textContent = isHidden ? "Hide" : "Show";
+
+                    toggle.setAttribute(
+                        "aria-label",
+                        isHidden
+                            ? "Hide password"
+                            : "Show password"
+                    );
+
+                });
+
+            });
+
+        });
+    </script>
+}
